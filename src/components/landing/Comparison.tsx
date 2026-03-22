@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const FEATURES = [
   "Wallet creation per user",
@@ -86,24 +82,29 @@ export default function Comparison() {
   const headRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headRef.current,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 85%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
         }
       );
-      gsap.fromTo(
-        tableRef.current,
-        { opacity: 0, y: 32 },
-        {
-          opacity: 1, y: 0, duration: 0.8, ease: "power2.out",
-          scrollTrigger: { trigger: tableRef.current, start: "top 80%" },
-        }
-      );
+
+      const rows = tableRef.current?.querySelectorAll("tbody tr");
+      if (rows) {
+        gsap.fromTo(
+          rows,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.05,
+            scrollTrigger: { trigger: tableRef.current, start: "top 80%", once: true },
+          }
+        );
+      }
     }, sectionRef);
 
     return () => ctx.revert();

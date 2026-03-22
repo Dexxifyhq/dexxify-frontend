@@ -1,25 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 export default function CTA() {
   const sectionRef = useRef<HTMLElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
       gsap.fromTo(
         innerRef.current,
-        { opacity: 0, y: 32 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.8, ease: "power2.out",
-          scrollTrigger: { trigger: innerRef.current, start: "top 82%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: innerRef.current, start: "top 80%", once: true },
         }
       );
     }, sectionRef);

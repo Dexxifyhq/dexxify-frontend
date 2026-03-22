@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 type Token = { type: string; text: string };
 type CodeTab = { id: string; label: string; lines: Token[][] };
@@ -133,22 +129,23 @@ export default function CodeShowcase() {
   const showcaseRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("wallet");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headRef.current,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 85%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
         }
       );
       gsap.fromTo(
         showcaseRef.current,
-        { opacity: 0, y: 32 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: showcaseRef.current, start: "top 80%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: showcaseRef.current, start: "top 80%", once: true },
         }
       );
     }, sectionRef);

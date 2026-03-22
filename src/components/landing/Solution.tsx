@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const FLOW_NODES = [
   {
@@ -62,23 +58,24 @@ export default function Solution() {
   const flowRef = useRef<HTMLDivElement>(null);
   const colsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headRef.current,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 85%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
         }
       );
 
       gsap.fromTo(
         flowRef.current,
-        { opacity: 0, y: 24 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: flowRef.current, start: "top 80%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: flowRef.current, start: "top 80%", once: true },
         }
       );
 
@@ -86,10 +83,10 @@ export default function Solution() {
       if (cols) {
         gsap.fromTo(
           cols,
-          { opacity: 0, y: 32 },
+          { opacity: 0, y: 50 },
           {
             opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.12,
-            scrollTrigger: { trigger: colsRef.current, start: "top 80%" },
+            scrollTrigger: { trigger: colsRef.current, start: "top 80%", once: true },
           }
         );
       }

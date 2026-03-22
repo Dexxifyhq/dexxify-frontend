@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const MODULES = [
   {
@@ -104,14 +100,15 @@ export default function ProductModules() {
   const headRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headRef.current,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 50 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 85%" },
+          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
         }
       );
 
@@ -119,10 +116,10 @@ export default function ProductModules() {
       if (cards) {
         gsap.fromTo(
           cards,
-          { opacity: 0, y: 36 },
+          { opacity: 0, y: 50 },
           {
             opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.08,
-            scrollTrigger: { trigger: gridRef.current, start: "top 80%" },
+            scrollTrigger: { trigger: gridRef.current, start: "top 80%", once: true },
           }
         );
       }
