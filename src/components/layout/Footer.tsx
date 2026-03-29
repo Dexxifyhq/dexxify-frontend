@@ -1,36 +1,10 @@
 "use client";
 
 const LINKS = {
-  Product: [
-    "WaaS API",
-    "Swap API",
-    "On/Off Ramp",
-    "KYC API",
-    "Payout API",
-    "Webhooks",
-    "Virtual Accounts",
-  ],
-  Developers: [
-    "Documentation",
-    "API Reference",
-    "SDKs & Libraries",
-    "Sandbox",
-    "Status Page",
-    "Changelog",
-  ],
-  Company: [
-    "About",
-    "Blog",
-    "Careers",
-    "Press Kit",
-    "Contact",
-  ],
-  Legal: [
-    "Privacy Policy",
-    "Terms of Service",
-    "AML Policy",
-    "Cookie Policy",
-  ],
+  Products: ["Payment Gateway", "Offramp API", "Webhooks", "Sandbox"],
+  Developers: ["Documentation", "API Reference", "SDKs", "Status Page", "Changelog"],
+  Company: ["About", "Blog", "Careers", "Contact"],
+  Legal: ["Privacy Policy", "Terms of Service", "AML Policy"],
 };
 
 const GithubIcon = () => (
@@ -45,68 +19,35 @@ const TwitterIcon = () => (
   </svg>
 );
 
-const LinkedinIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-  </svg>
-);
-
 export default function Footer() {
   return (
     <footer className="border-t border-[#1C1C1F] bg-[#09090B]">
       <div className="max-w-5xl mx-auto px-6 pt-16 pb-10">
-        {/* Top: logo + links */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-10 mb-14">
-          {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <p className="text-[#FAFAFA] font-bold text-lg mb-2">Dexxify</p>
-            <p className="text-[#52525B] text-xs leading-relaxed max-w-[180px]">
-              Crypto infrastructure for African developers.
+            <div className="font-bold text-[#FAFAFA] text-lg mb-3">Dexxify</div>
+            <p className="text-[#52525B] text-sm leading-relaxed">
+              Crypto payments and payouts for Nigerian businesses.
             </p>
           </div>
-
-          {/* Link columns */}
-          {(Object.entries(LINKS) as [string, string[]][]).map(([col, links]) => (
-            <div key={col}>
-              <p className="text-[#FAFAFA] text-xs font-semibold mb-4">{col}</p>
-              <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-xs text-[#52525B] hover:text-[#71717A] transition-colors duration-200"
-                    >
-                      {link}
-                    </a>
+          {Object.entries(LINKS).map(([category, items]) => (
+            <div key={category}>
+              <h4 className="text-xs font-semibold text-[#FAFAFA] mb-4 uppercase tracking-wider">{category}</h4>
+              <ul className="space-y-3">
+                {items.map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-sm text-[#52525B] hover:text-[#FAFAFA] transition-colors duration-200">{item}</a>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-
-        {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-[#1C1C1F]">
-          <p className="text-xs text-[#3F3F46] font-mono">
-            © 2025 Dexxify · Built in Nigeria 🇳🇬
-          </p>
-
-          {/* Social icons */}
+        <div className="pt-8 border-t border-[#1C1C1F] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-[#52525B]">© 2025 Dexxify · Built in Nigeria 🇳🇬</p>
           <div className="flex items-center gap-4">
-            {[
-              { icon: <TwitterIcon />, label: "Twitter" },
-              { icon: <GithubIcon />, label: "GitHub" },
-              { icon: <LinkedinIcon />, label: "LinkedIn" },
-            ].map((s) => (
-              <a
-                key={s.label}
-                href="#"
-                aria-label={s.label}
-                className="text-[#3F3F46] hover:text-[#71717A] transition-colors duration-200"
-              >
-                {s.icon}
-              </a>
-            ))}
+            <a href="#" className="text-[#52525B] hover:text-[#FAFAFA] transition-colors duration-200"><GithubIcon /></a>
+            <a href="#" className="text-[#52525B] hover:text-[#FAFAFA] transition-colors duration-200"><TwitterIcon /></a>
           </div>
         </div>
       </div>

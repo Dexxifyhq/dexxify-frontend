@@ -94,7 +94,7 @@ export default function Navbar() {
             href="#"
             className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-md bg-[#2563EB] text-white hover:bg-[#1d4ed8] transition-colors duration-200"
           >
-            Get API Access
+            Get Started
           </a>
         </div>
       </div>

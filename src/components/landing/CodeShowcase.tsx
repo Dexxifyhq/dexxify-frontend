@@ -4,248 +4,178 @@ import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-type Token = { type: string; text: string };
-type CodeTab = { id: string; label: string; lines: Token[][] };
+gsap.registerPlugin(ScrollTrigger);
 
-const TABS: CodeTab[] = [
-  {
-    id: "wallet",
-    label: "Create Wallet",
-    lines: [
-      [{ type: "keyword", text: "import" }, { type: "property", text: " Dexxify " }, { type: "keyword", text: "from" }, { type: "string", text: ' "@dexxify/node"' }, { type: "punctuation", text: ";" }],
-      [],
-      [{ type: "keyword", text: "const" }, { type: "property", text: " dexxify" }, { type: "operator", text: " = " }, { type: "keyword", text: "new" }, { type: "function", text: " Dexxify" }, { type: "punctuation", text: "(" }, { type: "punctuation", text: "{" }],
-      [{ type: "property", text: "  apiKey" }, { type: "punctuation", text: ":" }, { type: "string", text: ' process.env.DEXXIFY_KEY' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  env" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "sandbox"' }, { type: "punctuation", text: "," }],
-      [{ type: "punctuation", text: "});" }],
-      [],
-      [{ type: "comment", text: "// Create a BTC wallet for a user" }],
-      [{ type: "keyword", text: "const" }, { type: "property", text: " wallet" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "wallets" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }],
-      [{ type: "property", text: "  userId" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "usr_01HXYZ123"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  currency" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "BTC"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  label" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "Main wallet"' }, { type: "punctuation", text: "," }],
-      [{ type: "punctuation", text: "});" }],
-      [],
-      [{ type: "comment", text: '// wallet.id      → "wal_01HXYZ456abc"' }],
-      [{ type: "comment", text: '// wallet.address → "bc1qxy2kgdygjrsqtzq2n0yrf24..."' }],
-      [{ type: "comment", text: '// wallet.network → "mainnet"' }],
-    ],
-  },
-  {
-    id: "offramp",
-    label: "Offramp USDT → NGN",
-    lines: [
-      [{ type: "comment", text: "// Get live rate before initiating" }],
-      [{ type: "keyword", text: "const" }, { type: "property", text: " rate" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "rates" }, { type: "punctuation", text: "." }, { type: "function", text: "get" }, { type: "punctuation", text: "({" }],
-      [{ type: "property", text: "  from" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "USDT"' }, { type: "punctuation", text: "," }, { type: "property", text: " to" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "NGN"' }, { type: "punctuation", text: "," }],
-      [{ type: "punctuation", text: "});" }],
-      [{ type: "comment", text: '// rate.buy  → 1620.50 NGN/USDT' }],
-      [],
-      [{ type: "comment", text: "// Initiate the offramp" }],
-      [{ type: "keyword", text: "const" }, { type: "property", text: " tx" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "offramp" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }],
-      [{ type: "property", text: "  walletId" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "wal_01HXYZ456abc"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  amount" }, { type: "punctuation", text: ":" }, { type: "number", text: " 500" }, { type: "punctuation", text: "," }, { type: "comment", text: "  // USDT" }],
-      [{ type: "property", text: "  bankCode" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "058"' }, { type: "punctuation", text: "," }, { type: "comment", text: "    // GTBank" }],
-      [{ type: "property", text: "  accountNumber" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "0123456789"' }, { type: "punctuation", text: "," }],
-      [{ type: "punctuation", text: "});" }],
-      [],
-      [{ type: "comment", text: '// tx.id          → "ofr_01HABC789xyz"' }],
-      [{ type: "comment", text: '// tx.ngnAmount   → 810,250.00 NGN' }],
-      [{ type: "comment", text: '// tx.status      → "processing"' }],
-    ],
-  },
-  {
-    id: "kyc",
-    label: "Verify BVN",
-    lines: [
-      [{ type: "comment", text: "// Verify a user's BVN in one call" }],
-      [{ type: "keyword", text: "const" }, { type: "property", text: " kyc" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "kyc" }, { type: "punctuation", text: "." }, { type: "function", text: "verifyBVN" }, { type: "punctuation", text: "({" }],
-      [{ type: "property", text: "  bvn" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "22345678901"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  firstName" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "Emeka"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  lastName" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "Okonkwo"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  dob" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "1995-03-14"' }, { type: "punctuation", text: "," }],
-      [{ type: "punctuation", text: "});" }],
-      [],
-      [{ type: "comment", text: "// Response" }],
-      [{ type: "punctuation", text: "{" }],
-      [{ type: "property", text: "  verified" }, { type: "punctuation", text: ":" }, { type: "keyword", text: " true" }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  matchScore" }, { type: "punctuation", text: ":" }, { type: "number", text: " 97" }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  kycLevel" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "tier_2"' }, { type: "punctuation", text: "," }],
-      [{ type: "property", text: "  userId" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "usr_01HXYZ123"' }, { type: "punctuation", text: "," }],
-      [{ type: "punctuation", text: "}" }],
-    ],
-  },
+type Token = { type: string; text: string };
+
+const PAYMENT_CODE: Token[][] = [
+  [{ type: "keyword", text: "const" }, { type: "property", text: " payment" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "payments" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }],
+  [{ type: "property", text: "  amount" }, { type: "punctuation", text: ":" }, { type: "number", text: " 50000" }, { type: "punctuation", text: "," }, { type: "comment", text: "       // NGN" }],
+  [{ type: "property", text: "  currency" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "NGN"' }, { type: "punctuation", text: "," }],
+  [{ type: "property", text: "  asset" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "USDT"' }, { type: "punctuation", text: "," }],
+  [{ type: "property", text: "  network" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "TRC20"' }, { type: "punctuation", text: "," }],
+  [{ type: "property", text: "  reference" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "order_123"' }, { type: "punctuation", text: "," }],
+  [{ type: "punctuation", text: "});" }],
+  [],
+  [{ type: "comment", text: "// payment.address     → send USDT here" }],
+  [{ type: "comment", text: "// payment.amount_usdt → 30.77" }],
+  [{ type: "comment", text: "// payment.expires_at  → 30 min window" }],
+];
+
+const OFFRAMP_CODE: Token[][] = [
+  [{ type: "keyword", text: "const" }, { type: "property", text: " offramp" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "offramp" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }],
+  [{ type: "property", text: "  amount" }, { type: "punctuation", text: ":" }, { type: "number", text: " 500" }, { type: "punctuation", text: "," }, { type: "comment", text: "          // USDT" }],
+  [{ type: "property", text: "  asset" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "USDT"' }, { type: "punctuation", text: "," }],
+  [{ type: "property", text: "  network" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "TRC20"' }, { type: "punctuation", text: "," }],
+  [{ type: "property", text: "  account_number" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "0123456789"' }, { type: "punctuation", text: "," }],
+  [{ type: "property", text: "  bank_code" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "044"' }, { type: "punctuation", text: "," }, { type: "comment", text: "  // Access Bank" }],
+  [{ type: "punctuation", text: "});" }],
+  [],
+  [{ type: "comment", text: "// offramp.deposit_address → send USDT here" }],
+  [{ type: "comment", text: "// offramp.ngn_amount      → ₦812,500" }],
+  [{ type: "comment", text: "// offramp.rate            → 1,625" }],
 ];
 
 const WEBHOOK_EVENTS = [
-  {
-    event: "wallet.created",
-    time: "09:41:03",
-    status: 200,
-    data: '{ "id": "wal_01HXYZ456abc", "currency": "BTC" }',
-  },
-  {
-    event: "deposit.confirmed",
-    time: "09:41:47",
-    status: 200,
-    data: '{ "amount": 0.00125, "confirmations": 3 }',
-  },
-  {
-    event: "offramp.completed",
-    time: "09:42:12",
-    status: 200,
-    data: '{ "ngnAmount": 810250, "bank": "GTBank" }',
-  },
+  { event: "payment.created", status: 200, time: "09:41:00.012" },
+  { event: "deposit.detected", status: 200, time: "09:41:47.304" },
+  { event: "deposit.confirmed", status: 200, time: "09:42:11.817" },
+  { event: "conversion.completed", status: 200, time: "09:42:12.042" },
+  { event: "settlement.success", status: 200, time: "09:43:03.556" },
 ];
 
-const SDKS = ["Node.js", "Python", "PHP"];
+const SDKS = ["Node.js", "Python", "PHP", "Go", "Ruby"];
+
+const COLOR_MAP: Record<string, string> = {
+  keyword: "#93C5FD",
+  string: "#86EFAC",
+  comment: "#52525B",
+  number: "#FCD34D",
+  function: "#C4B5FD",
+  property: "#FAFAFA",
+  punctuation: "#71717A",
+  operator: "#93C5FD",
+};
 
 function CodeLine({ tokens }: { tokens: Token[] }) {
-  const colorMap: Record<string, string> = {
-    keyword: "#93C5FD",
-    string: "#86EFAC",
-    comment: "#52525B",
-    number: "#FCD34D",
-    function: "#C4B5FD",
-    property: "#FAFAFA",
-    punctuation: "#71717A",
-    operator: "#93C5FD",
-  };
-  if (tokens.length === 0) return <div className="h-5" />;
+  if (tokens.length === 0) return <div className="h-4" />;
   return (
-    <div className="leading-6">
+    <div className="leading-7">
       {tokens.map((t, i) => (
-        <span key={i} style={{ color: colorMap[t.type] ?? "#FAFAFA" }}>
-          {t.text}
-        </span>
+        <span key={i} style={{ color: COLOR_MAP[t.type] ?? "#FAFAFA" }}>{t.text}</span>
       ))}
     </div>
   );
 }
 
 export default function CodeShowcase() {
+  const [activeTab, setActiveTab] = useState<"gateway" | "offramp">("gateway");
   const sectionRef = useRef<HTMLElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
-  const showcaseRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState("wallet");
+  const blockRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
-        }
-      );
-      gsap.fromTo(
-        showcaseRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: showcaseRef.current, start: "top 80%", once: true },
-        }
-      );
+      if (prefersReducedMotion) {
+        gsap.set([headRef.current, blockRef.current], { opacity: 1, y: 0 });
+        return;
+      }
+      gsap.fromTo(headRef.current, { opacity: 0, y: 50 }, {
+        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+        scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
+      });
+      gsap.fromTo(blockRef.current, { opacity: 0, y: 50 }, {
+        opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+        scrollTrigger: { trigger: blockRef.current, start: "top 80%", once: true },
+      });
     }, sectionRef);
-
     return () => ctx.revert();
   }, []);
 
-  const activeCode = TABS.find((t) => t.id === activeTab) ?? TABS[0];
+  const code = activeTab === "gateway" ? PAYMENT_CODE : OFFRAMP_CODE;
+  const filename = activeTab === "gateway" ? "create-payment.js" : "create-offramp.js";
 
   return (
     <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
       <div className="max-w-5xl mx-auto">
-        {/* Heading */}
-        <div ref={headRef} className="text-center max-w-xl mx-auto mb-14">
-          <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">
-            Developer Experience
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] leading-tight mb-4">
-            In production in hours,{" "}
-            <span className="text-[#71717A]">not weeks.</span>
-          </h2>
-          <p className="text-[#71717A] text-sm leading-relaxed">
-            Clean, predictable APIs. Full TypeScript support. SDKs in multiple languages. Ship crypto features before your next standup.
-          </p>
-        </div>
-
-        <div ref={showcaseRef}>
-          {/* SDK pills */}
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-xs text-[#52525B] mr-2">SDK:</span>
-            {SDKS.map((sdk) => (
-              <span
-                key={sdk}
-                className="px-3 py-1 text-xs rounded border border-[#1C1C1F] bg-[#111113] text-[#71717A] font-mono cursor-default hover:border-[#2563EB]/40 hover:text-[#FAFAFA] transition-all duration-200"
-              >
-                {sdk}
-              </span>
-            ))}
-          </div>
-
-          {/* Tabs + Code */}
-          <div className="rounded-xl border border-[#1C1C1F] overflow-hidden bg-[#111113]">
-            {/* Tab bar */}
-            <div className="flex border-b border-[#1C1C1F] bg-[#0C0C0E]">
-              {TABS.map((tab) => (
+        <div ref={headRef} className="mb-12">
+          <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">Code</p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] leading-tight">
+              Integrate in under 30 minutes
+            </h2>
+            <div className="flex items-center gap-1 p-1 rounded-lg border border-[#1C1C1F] bg-[#111113] w-fit shrink-0">
+              {(["gateway", "offramp"] as const).map((t) => (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-5 py-3 text-xs font-mono transition-all duration-200 border-b-2 ${
-                    activeTab === tab.id
-                      ? "text-[#FAFAFA] border-[#2563EB]"
-                      : "text-[#52525B] border-transparent hover:text-[#71717A]"
-                  }`}
+                  key={t}
+                  onClick={() => setActiveTab(t)}
+                  className="px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap"
+                  style={{
+                    background: activeTab === t ? "#1C1C1F" : "transparent",
+                    color: activeTab === t ? "#FAFAFA" : "#71717A",
+                  }}
                 >
-                  {tab.label}
+                  {t === "gateway" ? "Payment Gateway" : "Offramp API"}
                 </button>
               ))}
             </div>
+          </div>
+        </div>
 
-            {/* Code area */}
-            <div className="flex overflow-x-auto">
-              {/* Line numbers */}
-              <div className="py-5 pl-4 pr-3 flex flex-col text-[#3F3F46] select-none text-right min-w-[2.5rem] shrink-0 border-r border-[#1C1C1F]">
-                {activeCode.lines.map((_, i) => (
-                  <span key={i} className="text-xs leading-6">{i + 1}</span>
-                ))}
+        <div ref={blockRef} className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Code block */}
+          <div className="lg:col-span-3 rounded-xl border border-[#1C1C1F] overflow-hidden" style={{ background: "#111113" }}>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1C1C1F]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] opacity-70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FCD34D] opacity-70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] opacity-70" />
+              <span className="ml-3 text-xs text-[#52525B] font-mono">{filename}</span>
+              <span className="ml-auto text-[10px] text-[#2563EB] font-mono border border-[#2563EB]/20 bg-[#2563EB]/5 px-2 py-0.5 rounded">Node.js</span>
+            </div>
+            <div className="px-5 py-5 font-mono text-sm overflow-x-auto">
+              <div className="flex gap-4">
+                <div className="flex flex-col text-[#3F3F46] select-none text-right min-w-[1.5rem]">
+                  {code.map((_, i) => <span key={i} className="leading-7 text-xs">{i + 1}</span>)}
+                </div>
+                <div className="flex-1">
+                  {code.map((line, i) => <CodeLine key={i} tokens={line} />)}
+                </div>
               </div>
-              {/* Code */}
-              <div className="py-5 px-5 font-mono text-sm flex-1 min-w-0">
-                {activeCode.lines.map((line, i) => (
-                  <CodeLine key={`${activeTab}-${i}`} tokens={line} />
-                ))}
-              </div>
+            </div>
+            <div className="px-5 py-3 border-t border-[#1C1C1F] flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-mono text-[#52525B]">SDKs available:</span>
+              {SDKS.map((sdk) => (
+                <span key={sdk} className="text-[10px] font-mono text-[#71717A] border border-[#1C1C1F] px-2 py-0.5 rounded hover:text-[#FAFAFA] hover:border-[#2563EB] transition-colors duration-200 cursor-pointer">{sdk}</span>
+              ))}
             </div>
           </div>
 
-          {/* Webhook event log */}
-          <div className="mt-4 rounded-xl border border-[#1C1C1F] bg-[#111113] overflow-hidden">
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-[#1C1C1F]">
-              <span className="w-2 h-2 rounded-full bg-[#22C55E] pulse-dot" />
-              <span className="text-xs font-mono text-[#71717A]">Webhook event log</span>
-              <span className="ml-auto text-[10px] font-mono text-[#52525B]">live</span>
+          {/* Webhook log */}
+          <div className="lg:col-span-2 rounded-xl border border-[#1C1C1F] overflow-hidden flex flex-col" style={{ background: "#111113" }}>
+            <div className="px-4 py-3 border-b border-[#1C1C1F] flex items-center justify-between">
+              <span className="text-xs text-[#52525B] font-mono">webhook events</span>
+              <span className="flex items-center gap-1.5 text-[10px] text-[#22C55E] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
+                live
+              </span>
             </div>
-            <div className="divide-y divide-[#1C1C1F]">
-              {WEBHOOK_EVENTS.map((ev) => (
-                <div
-                  key={ev.event}
-                  className="flex items-center gap-4 px-5 py-3 hover:bg-[#09090B]/50 transition-colors"
-                >
-                  <span className="text-xs font-mono text-[#52525B] w-16 shrink-0">{ev.time}</span>
-                  <span
-                    className="text-xs font-mono px-1.5 py-0.5 rounded shrink-0"
-                    style={{ background: "#22C55E18", color: "#22C55E", border: "1px solid #22C55E30" }}
-                  >
-                    {ev.status}
-                  </span>
-                  <span className="text-xs font-mono text-[#2563EB] shrink-0">{ev.event}</span>
-                  <span className="text-xs font-mono text-[#52525B] truncate hidden sm:block">{ev.data}</span>
+            <div className="px-4 py-4 flex flex-col gap-3.5 flex-1">
+              {WEBHOOK_EVENTS.map((ev, i) => (
+                <div key={i} className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
+                    <span className="font-mono text-xs text-[#FAFAFA] truncate">{ev.event}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="font-mono text-[10px] text-[#22C55E] font-semibold">{ev.status}</span>
+                    <span className="font-mono text-[10px] text-[#3F3F46]">{ev.time}</span>
+                  </div>
                 </div>
               ))}
+            </div>
+            <div className="px-4 py-3 border-t border-[#1C1C1F]">
+              <p className="text-[10px] font-mono text-[#52525B]">All events delivered via HTTPS POST to your endpoint</p>
             </div>
           </div>
         </div>

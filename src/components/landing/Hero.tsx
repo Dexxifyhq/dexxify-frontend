@@ -7,28 +7,26 @@ import { SplitText } from "gsap/SplitText";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
+const STATS = [
+  { label: "USDT & BTC" },
+  { label: "NGN settlement" },
+  { label: "Under 2 minutes" },
+  { label: "1% flat fee" },
+  { label: "50+ cryptocurrencies" },
+];
+
 const CODE_LINES = [
-  { tokens: [{ type: "keyword", text: "const" }, { type: "property", text: " wallet" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "function", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "wallets" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }] },
-  { tokens: [{ type: "property", text: "  userId" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "usr_01HXYZ123"' }, { type: "punctuation", text: "," }] },
-  { tokens: [{ type: "property", text: "  currency" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "BTC"' }, { type: "punctuation", text: "," }] },
+  { tokens: [{ type: "keyword", text: "const" }, { type: "property", text: " payment" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "function", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "payments" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }] },
+  { tokens: [{ type: "property", text: "  amount" }, { type: "punctuation", text: ":" }, { type: "number", text: " 50000" }, { type: "punctuation", text: "," }, { type: "comment", text: "    // NGN" }] },
+  { tokens: [{ type: "property", text: "  currency" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "NGN"' }, { type: "punctuation", text: "," }] },
+  { tokens: [{ type: "property", text: "  asset" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "USDT"' }, { type: "punctuation", text: "," }] },
+  { tokens: [{ type: "property", text: "  network" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "TRC20"' }, { type: "punctuation", text: "," }] },
+  { tokens: [{ type: "property", text: "  reference" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "order_123"' }, { type: "punctuation", text: "," }] },
   { tokens: [{ type: "punctuation", text: "});" }] },
   { tokens: [] },
-  { tokens: [{ type: "comment", text: "// wallet.address: bc1qxy2kgdygjrsqtzq2n0yrf24..." }] },
-  { tokens: [{ type: "comment", text: "// wallet.id:      wal_01HXYZ456abc" }] },
-];
-
-const STATS = [
-  { label: "BTC + USDT supported" },
-  { label: "NGN settlement" },
-  { label: "KYC built in" },
-  { label: "Sandbox ready" },
-];
-
-const METRICS = [
-  { end: 3, suffix: "+", label: "Chains" },
-  { end: 60, suffix: "s", label: "Settlement" },
-  { end: 100, suffix: "%", label: "Sandbox parity" },
-  { end: 1, suffix: " API", label: "Integration" },
+  { tokens: [{ type: "comment", text: "// payment.address     → send USDT here" }] },
+  { tokens: [{ type: "comment", text: "// payment.amount_usdt → 30.77" }] },
+  { tokens: [{ type: "comment", text: "// payment.expires_at  → 30 min window" }] },
 ];
 
 const COLOR_MAP: Record<string, string> = {
@@ -61,7 +59,6 @@ export default function Hero() {
   const subRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const metricsRef = useRef<HTMLDivElement>(null);
   const codeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -83,12 +80,11 @@ export default function Hero() {
       });
     };
     const onMouseLeave = () => gsap.to(glowRef.current, { opacity: 0, duration: 0.4 });
-
     section.addEventListener("mousemove", onMouseMove);
     section.addEventListener("mouseleave", onMouseLeave);
 
     if (prefersReducedMotion) {
-      gsap.set([badgeRef.current, headlineRef.current, subRef.current, metricsRef.current, codeRef.current], { opacity: 1, y: 0, scale: 1 });
+      gsap.set([badgeRef.current, headlineRef.current, subRef.current, codeRef.current], { opacity: 1, y: 0, scale: 1 });
       const pills = statsRef.current?.querySelectorAll(".stat-pill");
       if (pills) gsap.set(pills, { opacity: 1, y: 0 });
       const ctaBtns = ctaRef.current?.querySelectorAll("a");
@@ -109,7 +105,7 @@ export default function Hero() {
       tl.fromTo(
         split.words,
         { opacity: 0, y: 60 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.08 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.07 },
         0.4
       );
 
@@ -122,35 +118,13 @@ export default function Hero() {
 
       const pills = statsRef.current?.querySelectorAll(".stat-pill");
       if (pills) {
-        tl.fromTo(pills, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 }, 1.05);
+        tl.fromTo(pills, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.07 }, 1.05);
       }
 
-      tl.fromTo(metricsRef.current, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5 }, 1.15);
-
-      const metricEls = metricsRef.current?.querySelectorAll(".metric-value");
-      if (metricEls) {
-        metricEls.forEach((el, i) => {
-          const target = METRICS[i];
-          const obj = { val: 0 };
-          tl.to(obj, {
-            val: target.end,
-            duration: 1.2,
-            ease: "power2.out",
-            onUpdate: () => { el.textContent = Math.round(obj.val) + target.suffix; },
-          }, 1.2);
-        });
-      }
-
-      tl.fromTo(codeRef.current, { opacity: 0, y: 40, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 1.1);
+      tl.fromTo(codeRef.current, { opacity: 0, y: 40, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 1.15);
 
       tl.call(() => {
-        gsap.to(codeRef.current, {
-          y: -8,
-          duration: 3,
-          ease: "sine.inOut",
-          repeat: -1,
-          yoyo: true,
-        });
+        gsap.to(codeRef.current, { y: -8, duration: 3, ease: "sine.inOut", repeat: -1, yoyo: true });
       });
     }, sectionRef);
 
@@ -164,11 +138,11 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 text-center overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-24 text-center overflow-hidden"
     >
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ backgroundImage: "radial-gradient(circle at 50% 0%, rgba(37,99,235,0.06) 0%, transparent 60%)" }}
+        style={{ backgroundImage: "radial-gradient(circle at 50% 0%, rgba(37,99,235,0.07) 0%, transparent 55%)" }}
       />
 
       <div
@@ -178,7 +152,7 @@ export default function Hero() {
           width: "300px",
           height: "300px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%)",
           top: 0,
           left: 0,
           willChange: "transform",
@@ -194,18 +168,17 @@ export default function Hero() {
 
       <h1
         ref={headlineRef}
-        className="opacity-0 max-w-3xl mx-auto mb-6 text-[2.5rem] sm:text-[3.25rem] lg:text-[3.75rem] font-bold leading-[1.1] tracking-tight text-[#FAFAFA]"
+        className="opacity-0 max-w-3xl mx-auto mb-5 text-[2.75rem] sm:text-[3.5rem] lg:text-[4rem] font-bold leading-[1.08] tracking-tight text-[#FAFAFA]"
       >
-        The crypto infrastructure{" "}
-        <em style={{ fontStyle: "italic" }}>API for Africa.</em>
+        Crypto payments and payouts —{" "}
+        <em style={{ fontStyle: "italic", color: "#71717A" }}>settled in Naira.</em>
       </h1>
 
       <p
         ref={subRef}
-        className="opacity-0 max-w-xl mx-auto text-[#71717A] text-base sm:text-lg leading-relaxed mb-8"
+        className="opacity-0 max-w-lg mx-auto text-[#71717A] text-base sm:text-lg leading-relaxed mb-9"
       >
-        One API to add crypto wallets, Naira settlement, swaps and KYC to your product.{" "}
-        <span className="text-[#FAFAFA]">Stop integrating 5 vendors. Start building.</span>
+        Accept crypto from your customers or pay your users in crypto. Either way, Naira lands in the right bank account in under 2 minutes.
       </p>
 
       <div ref={ctaRef} className="flex flex-col sm:flex-row items-center gap-3 mb-10">
@@ -214,18 +187,21 @@ export default function Hero() {
           style={{ opacity: 0 }}
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#2563EB] text-white text-sm font-semibold hover:bg-[#1d4ed8] transition-colors duration-200"
         >
-          Get API Access
+          Get Started
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2.5 7h9M7 3l4 4-4 4" />
+          </svg>
         </a>
         <a
           href="#"
           style={{ opacity: 0 }}
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md border border-[#1C1C1F] text-[#71717A] text-sm font-medium hover:text-[#FAFAFA] hover:border-[#2563EB] transition-all duration-200"
         >
-          Read the Docs
+          View Docs
         </a>
       </div>
 
-      <div ref={statsRef} className="flex flex-wrap justify-center gap-2 mb-8">
+      <div ref={statsRef} className="flex flex-wrap justify-center gap-2 mb-16">
         {STATS.map((s) => (
           <span
             key={s.label}
@@ -237,27 +213,14 @@ export default function Hero() {
         ))}
       </div>
 
-      <div
-        ref={metricsRef}
-        className="opacity-0 flex items-center justify-center gap-8 sm:gap-12 mb-16 border-t border-b border-[#1C1C1F] py-5 w-full max-w-lg"
-      >
-        {METRICS.map((m) => (
-          <div key={m.label} className="text-center">
-            <div className="metric-value font-bold text-xl text-[#FAFAFA] font-mono tabular-nums">
-              0{m.suffix}
-            </div>
-            <div className="text-[10px] text-[#52525B] mt-0.5 uppercase tracking-wider">{m.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div ref={codeRef} className="opacity-0 w-full max-w-lg mx-auto">
+      <div ref={codeRef} className="opacity-0 w-full max-w-xl mx-auto">
         <div className="rounded-xl border border-[#1C1C1F] overflow-hidden text-left" style={{ background: "#111113" }}>
           <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1C1C1F]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] opacity-70" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#FCD34D] opacity-70" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] opacity-70" />
-            <span className="ml-3 text-xs text-[#52525B] font-mono">create-wallet.js</span>
+            <span className="ml-3 text-xs text-[#52525B] font-mono">create-payment.js</span>
+            <span className="ml-auto text-[10px] text-[#2563EB] font-mono border border-[#2563EB]/20 bg-[#2563EB]/5 px-2 py-0.5 rounded">Node.js</span>
           </div>
           <div className="px-5 py-5 font-mono text-sm overflow-x-auto">
             <div className="flex gap-4">

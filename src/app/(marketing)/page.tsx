@@ -1,11 +1,10 @@
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/landing/Hero";
-import Problem from "@/components/landing/Problem";
-import Solution from "@/components/landing/Solution";
-import ProductModules from "@/components/landing/ProductModules";
+import TwoProducts from "@/components/landing/TwoProducts";
+import HowItWorks from "@/components/landing/HowItWorks";
 import CodeShowcase from "@/components/landing/CodeShowcase";
-import Comparison from "@/components/landing/Comparison";
-import Testimonials from "@/components/landing/Testimonials";
+import WhoItsFor from "@/components/landing/WhoItsFor";
+import Pricing from "@/components/landing/Pricing";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/layout/Footer";
 
@@ -14,12 +13,11 @@ export default function Home() {
     <main className="bg-[#09090B] text-[#FAFAFA] min-h-screen">
       <Navbar />
       <Hero />
-      <Problem />
-      <Solution />
-      <ProductModules />
+      <TwoProducts />
+      <HowItWorks />
       <CodeShowcase />
-      <Comparison />
-      <Testimonials />
+      <WhoItsFor />
+      <Pricing />
       <CTA />
       <Footer />
     </main>
