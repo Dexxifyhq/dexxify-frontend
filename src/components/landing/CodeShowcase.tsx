@@ -1,69 +1,135 @@
 "use client";
-
 import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
 gsap.registerPlugin(ScrollTrigger);
 
-type Token = { type: string; text: string };
+const GATEWAY_CODE = `import Dexxify from "@dexxify/node";
 
-const PAYMENT_CODE: Token[][] = [
-  [{ type: "keyword", text: "const" }, { type: "property", text: " payment" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "payments" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }],
-  [{ type: "property", text: "  amount" }, { type: "punctuation", text: ":" }, { type: "number", text: " 50000" }, { type: "punctuation", text: "," }, { type: "comment", text: "       // NGN" }],
-  [{ type: "property", text: "  currency" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "NGN"' }, { type: "punctuation", text: "," }],
-  [{ type: "property", text: "  asset" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "USDT"' }, { type: "punctuation", text: "," }],
-  [{ type: "property", text: "  network" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "TRC20"' }, { type: "punctuation", text: "," }],
-  [{ type: "property", text: "  reference" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "order_123"' }, { type: "punctuation", text: "," }],
-  [{ type: "punctuation", text: "});" }],
-  [],
-  [{ type: "comment", text: "// payment.address     → send USDT here" }],
-  [{ type: "comment", text: "// payment.amount_usdt → 30.77" }],
-  [{ type: "comment", text: "// payment.expires_at  → 30 min window" }],
-];
+const dexxify = new Dexxify({
+  apiKey: process.env.DEXXIFY_KEY
+});
 
-const OFFRAMP_CODE: Token[][] = [
-  [{ type: "keyword", text: "const" }, { type: "property", text: " offramp" }, { type: "operator", text: " = " }, { type: "keyword", text: "await" }, { type: "property", text: " dexxify" }, { type: "punctuation", text: "." }, { type: "function", text: "offramp" }, { type: "punctuation", text: "." }, { type: "function", text: "create" }, { type: "punctuation", text: "({" }],
-  [{ type: "property", text: "  amount" }, { type: "punctuation", text: ":" }, { type: "number", text: " 500" }, { type: "punctuation", text: "," }, { type: "comment", text: "          // USDT" }],
-  [{ type: "property", text: "  asset" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "USDT"' }, { type: "punctuation", text: "," }],
-  [{ type: "property", text: "  network" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "TRC20"' }, { type: "punctuation", text: "," }],
-  [{ type: "property", text: "  account_number" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "0123456789"' }, { type: "punctuation", text: "," }],
-  [{ type: "property", text: "  bank_code" }, { type: "punctuation", text: ":" }, { type: "string", text: ' "044"' }, { type: "punctuation", text: "," }, { type: "comment", text: "  // Access Bank" }],
-  [{ type: "punctuation", text: "});" }],
-  [],
-  [{ type: "comment", text: "// offramp.deposit_address → send USDT here" }],
-  [{ type: "comment", text: "// offramp.ngn_amount      → ₦812,500" }],
-  [{ type: "comment", text: "// offramp.rate            → 1,625" }],
-];
+const payment = await dexxify.payments.create({
+  amount: 50000,
+  currency: "NGN",
+  asset: "USDT",
+  network: "TRC20",
+  reference: "order_123"
+});
+
+// payment.address     → send USDT here
+// payment.amount_usdt → 30.77 USDT
+// payment.expires_at  → 30 minute window`;
+
+const OFFRAMP_CODE = `import Dexxify from "@dexxify/node";
+
+const dexxify = new Dexxify({
+  apiKey: process.env.DEXXIFY_KEY
+});
+
+const payout = await dexxify.offramp.create({
+  amount: 500,
+  asset: "USDT",
+  network: "TRC20",
+  account_number: "0123456789",
+  bank_code: "044"
+});
+
+// payout.address    → send USDT here
+// payout.ngn_amount → ₦812,500
+// payout.rate       → 1,625 NGN/USDT`;
 
 const WEBHOOK_EVENTS = [
-  { event: "payment.created", status: 200, time: "09:41:00.012" },
-  { event: "deposit.detected", status: 200, time: "09:41:47.304" },
-  { event: "deposit.confirmed", status: 200, time: "09:42:11.817" },
-  { event: "conversion.completed", status: 200, time: "09:42:12.042" },
-  { event: "settlement.success", status: 200, time: "09:43:03.556" },
+  { event: "payment.created", status: "200", color: "#22C55E" },
+  { event: "deposit.detected", status: "200", color: "#22C55E" },
+  { event: "deposit.confirmed", status: "200", color: "#22C55E" },
+  { event: "conversion.completed", status: "200", color: "#22C55E" },
+  { event: "settlement.success", status: "200", color: "#22C55E" },
 ];
 
-const SDKS = ["Node.js", "Python", "PHP", "Go", "Ruby"];
+const SDK_LANGS = ["Node.js", "Python", "Go", "PHP", "Ruby", "Java", ".NET", "Rust"];
 
-const COLOR_MAP: Record<string, string> = {
-  keyword: "#93C5FD",
-  string: "#86EFAC",
-  comment: "#52525B",
-  number: "#FCD34D",
-  function: "#C4B5FD",
-  property: "#FAFAFA",
-  punctuation: "#71717A",
-  operator: "#93C5FD",
-};
+// Syntax highlight function
+function highlight(code: string): React.ReactNode {
+  // Split into lines and highlight keywords
+  return code.split("\n").map((line, i) => {
+    const parts: React.ReactNode[] = [];
+    // Simple tokenizer
+    const tokens = line.split(/(import|from|const|await|process|new|\/\/.+$|"[^"]*"|`[^`]*`|\b\d+\b)/g);
+    tokens.forEach((token, j) => {
+      if (!token) return;
+      if (/^(import|from|const|await|new)$/.test(token)) {
+        parts.push(<span key={j} className="text-[#93C5FD]">{token}</span>);
+      } else if (/^\/\//.test(token)) {
+        parts.push(<span key={j} className="text-[#52525B] italic">{token}</span>);
+      } else if (/^"/.test(token) || /^`/.test(token)) {
+        parts.push(<span key={j} className="text-[#86EFAC]">{token}</span>);
+      } else if (/^\d+$/.test(token)) {
+        parts.push(<span key={j} className="text-[#FCD34D]">{token}</span>);
+      } else if (/^process$/.test(token)) {
+        parts.push(<span key={j} className="text-[#C4B5FD]">{token}</span>);
+      } else {
+        parts.push(<span key={j}>{token}</span>);
+      }
+    });
+    return <div key={i} className="leading-6">{parts}</div>;
+  });
+}
 
-function CodeLine({ tokens }: { tokens: Token[] }) {
-  if (tokens.length === 0) return <div className="h-4" />;
+function WebhookLog() {
+  const logRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const rows = logRef.current?.querySelectorAll(".webhook-row");
+      if (!rows) return;
+
+      gsap.set(Array.from(rows), { opacity: 0, x: -10 });
+
+      const tl = gsap.timeline({ repeat: -1, repeatDelay: 2 });
+      Array.from(rows).forEach((row, i) => {
+        tl.to(row, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, `+=${i === 0 ? 0 : 0.5}`);
+      });
+      tl.to({}, { duration: 1.5 });
+      tl.to(Array.from(rows), { opacity: 0, x: -10, stagger: 0.05, duration: 0.2 });
+      tl.set(Array.from(rows), { x: -10, opacity: 0 });
+    });
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="leading-7">
-      {tokens.map((t, i) => (
-        <span key={i} style={{ color: COLOR_MAP[t.type] ?? "#FAFAFA" }}>{t.text}</span>
-      ))}
+    <div className="bg-[#0D0D0F] border border-[#1C1C1F] rounded-xl overflow-hidden h-full flex flex-col">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1C1C1F]">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#1C1C1F]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#1C1C1F]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#1C1C1F]" />
+        </div>
+        <span className="text-xs text-[#71717A] ml-2">Webhook Events</span>
+        <div className="ml-auto flex items-center gap-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] pulse-dot" />
+          <span className="text-[10px] text-[#71717A]">live</span>
+        </div>
+      </div>
+
+      <div ref={logRef} className="flex-1 p-4 font-mono text-xs space-y-2.5 overflow-hidden">
+        {WEBHOOK_EVENTS.map((e) => (
+          <div key={e.event} className="webhook-row flex items-center gap-3">
+            <div className="w-5 h-5 rounded bg-[#22C55E]/10 border border-[#22C55E]/20 flex items-center justify-center shrink-0">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                <path d="M1.5 4L3 5.5L6.5 2" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="text-[#FAFAFA] flex-1">{e.event}</span>
+            <span className="text-[#22C55E] font-medium">{e.status}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="px-4 py-3 border-t border-[#1C1C1F]">
+        <div className="text-[10px] text-[#71717A]">POST https://your-domain.com/webhooks/dexxify</div>
+      </div>
     </div>
   );
 }
@@ -72,111 +138,97 @@ export default function CodeShowcase() {
   const [activeTab, setActiveTab] = useState<"gateway" | "offramp">("gateway");
   const sectionRef = useRef<HTMLElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
-  const blockRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const ctx = gsap.context(() => {
-      if (prefersReducedMotion) {
-        gsap.set([headRef.current, blockRef.current], { opacity: 1, y: 0 });
-        return;
-      }
-      gsap.fromTo(headRef.current, { opacity: 0, y: 50 }, {
-        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
-      });
-      gsap.fromTo(blockRef.current, { opacity: 0, y: 50 }, {
-        opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-        scrollTrigger: { trigger: blockRef.current, start: "top 80%", once: true },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const ctx = gsap.context(() => {
+        gsap.from(headRef.current, {
+          opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
+          scrollTrigger: { trigger: headRef.current, start: "top 85%" }
+        });
+        gsap.from(contentRef.current, {
+          opacity: 0, y: 30, duration: 0.7, ease: "power2.out", delay: 0.15,
+          scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
+        });
+      }, sectionRef);
+      return () => ctx.revert();
+    });
+    return () => mm.revert();
   }, []);
 
-  const code = activeTab === "gateway" ? PAYMENT_CODE : OFFRAMP_CODE;
-  const filename = activeTab === "gateway" ? "create-payment.js" : "create-offramp.js";
+  const code = activeTab === "gateway" ? GATEWAY_CODE : OFFRAMP_CODE;
 
   return (
-    <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
-      <div className="max-w-5xl mx-auto">
+    <section ref={sectionRef} className="py-24 px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div ref={headRef} className="mb-12">
-          <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">Code</p>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] leading-tight">
-              Integrate in under 30 minutes
-            </h2>
-            <div className="flex items-center gap-1 p-1 rounded-lg border border-[#1C1C1F] bg-[#111113] w-fit shrink-0">
-              {(["gateway", "offramp"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setActiveTab(t)}
-                  className="px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap"
-                  style={{
-                    background: activeTab === t ? "#1C1C1F" : "transparent",
-                    color: activeTab === t ? "#FAFAFA" : "#71717A",
-                  }}
-                >
-                  {t === "gateway" ? "Payment Gateway" : "Offramp API"}
-                </button>
-              ))}
-            </div>
+          <div className="inline-flex items-center gap-2 border border-[#1C1C1F] bg-[#111113] text-xs text-[#71717A] px-3 py-1.5 rounded-full mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+            Developer API
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#FAFAFA] mt-4 mb-3">
+            Built for developers
+          </h2>
+          <p className="text-[#71717A] text-lg max-w-xl">
+            SDKs in 8+ languages. Webhooks, sandbox, and API reference included.
+          </p>
+
+          {/* Tabs */}
+          <div className="flex gap-1 mt-8 bg-[#111113] border border-[#1C1C1F] rounded-lg p-1 w-fit">
+            {(["gateway", "offramp"] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 text-sm rounded-md transition-all duration-200 ${
+                  activeTab === tab
+                    ? "bg-[#2563EB] text-white font-medium"
+                    : "text-[#71717A] hover:text-[#FAFAFA]"
+                }`}
+              >
+                {tab === "gateway" ? "Payment Gateway" : "Offramp API"}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div ref={blockRef} className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Code block */}
-          <div className="lg:col-span-3 rounded-xl border border-[#1C1C1F] overflow-hidden" style={{ background: "#111113" }}>
+        {/* Content */}
+        <div ref={contentRef} className="grid lg:grid-cols-5 gap-4">
+
+          {/* Code block — 3 cols */}
+          <div className="lg:col-span-3 bg-[#0D0D0F] border border-[#1C1C1F] rounded-xl overflow-hidden flex flex-col">
+            {/* Window chrome */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1C1C1F]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] opacity-70" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FCD34D] opacity-70" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] opacity-70" />
-              <span className="ml-3 text-xs text-[#52525B] font-mono">{filename}</span>
-              <span className="ml-auto text-[10px] text-[#2563EB] font-mono border border-[#2563EB]/20 bg-[#2563EB]/5 px-2 py-0.5 rounded">Node.js</span>
-            </div>
-            <div className="px-5 py-5 font-mono text-sm overflow-x-auto">
-              <div className="flex gap-4">
-                <div className="flex flex-col text-[#3F3F46] select-none text-right min-w-[1.5rem]">
-                  {code.map((_, i) => <span key={i} className="leading-7 text-xs">{i + 1}</span>)}
-                </div>
-                <div className="flex-1">
-                  {code.map((line, i) => <CodeLine key={i} tokens={line} />)}
-                </div>
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/40" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/40" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E]/40" />
               </div>
+              <span className="text-xs text-[#71717A] ml-2 font-mono">
+                {activeTab === "gateway" ? "payment.ts" : "payout.ts"}
+              </span>
             </div>
-            <div className="px-5 py-3 border-t border-[#1C1C1F] flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-mono text-[#52525B]">SDKs available:</span>
-              {SDKS.map((sdk) => (
-                <span key={sdk} className="text-[10px] font-mono text-[#71717A] border border-[#1C1C1F] px-2 py-0.5 rounded hover:text-[#FAFAFA] hover:border-[#2563EB] transition-colors duration-200 cursor-pointer">{sdk}</span>
+
+            {/* Code */}
+            <div className="flex-1 p-5 font-mono text-sm text-[#FAFAFA] overflow-auto">
+              {highlight(code)}
+            </div>
+
+            {/* SDK pills footer */}
+            <div className="px-4 py-3 border-t border-[#1C1C1F] flex gap-2 flex-wrap">
+              {SDK_LANGS.map(lang => (
+                <span key={lang} className="text-[10px] text-[#71717A] border border-[#1C1C1F] bg-[#111113] px-2 py-0.5 rounded">
+                  {lang}
+                </span>
               ))}
             </div>
           </div>
 
-          {/* Webhook log */}
-          <div className="lg:col-span-2 rounded-xl border border-[#1C1C1F] overflow-hidden flex flex-col" style={{ background: "#111113" }}>
-            <div className="px-4 py-3 border-b border-[#1C1C1F] flex items-center justify-between">
-              <span className="text-xs text-[#52525B] font-mono">webhook events</span>
-              <span className="flex items-center gap-1.5 text-[10px] text-[#22C55E] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
-                live
-              </span>
-            </div>
-            <div className="px-4 py-4 flex flex-col gap-3.5 flex-1">
-              {WEBHOOK_EVENTS.map((ev, i) => (
-                <div key={i} className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
-                    <span className="font-mono text-xs text-[#FAFAFA] truncate">{ev.event}</span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="font-mono text-[10px] text-[#22C55E] font-semibold">{ev.status}</span>
-                    <span className="font-mono text-[10px] text-[#3F3F46]">{ev.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="px-4 py-3 border-t border-[#1C1C1F]">
-              <p className="text-[10px] font-mono text-[#52525B]">All events delivered via HTTPS POST to your endpoint</p>
-            </div>
+          {/* Webhook log — 2 cols */}
+          <div className="lg:col-span-2">
+            <WebhookLog />
           </div>
         </div>
       </div>
