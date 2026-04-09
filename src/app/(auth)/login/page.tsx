@@ -1,26 +1,18 @@
 "use client";
-import { useState, useLayoutEffect, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import gsap from "gsap";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { authApi, saveTokens } from "@/lib/auth-api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useLayoutEffect(() => {
-    gsap.from(cardRef.current, {
-      opacity: 0, y: 20, duration: 0.5, ease: "power2.out", delay: 0.1
-    });
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div ref={cardRef} className="w-full max-w-sm">
+    <div className="w-full max-w-sm">
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">

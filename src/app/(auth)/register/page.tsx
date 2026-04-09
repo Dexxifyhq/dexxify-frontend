@@ -1,8 +1,7 @@
 "use client";
-import { useState, useLayoutEffect, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import gsap from "gsap";
 import { Eye, EyeOff, ArrowRight, Loader2, Check } from "lucide-react";
 import { authApi } from "@/lib/auth-api";
 
@@ -45,7 +44,6 @@ function PasswordStrength({ password }: { password: string }) {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({
     first_name: "",
@@ -59,12 +57,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useLayoutEffect(() => {
-    gsap.from(cardRef.current, {
-      opacity: 0, y: 20, duration: 0.5, ease: "power2.out", delay: 0.1,
-    });
-  }, []);
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -101,7 +93,7 @@ export default function RegisterPage() {
     "w-full h-10 px-3 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:outline-none focus:border-[#2563EB] transition-colors";
 
   return (
-    <div ref={cardRef} className="w-full max-w-md">
+    <div className="w-full max-w-md">
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">

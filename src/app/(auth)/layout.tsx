@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: {
@@ -11,19 +10,6 @@ export const metadata: Metadata = {
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#09090B] flex flex-col">
-      {/* Top bar */}
-      <header className="flex items-center justify-between px-6 h-16 border-b border-[#1C1C1F]">
-        <Link href="/" className="text-[#FAFAFA] font-bold text-xl tracking-tight">
-          Dexxify
-        </Link>
-        <div className="text-xs text-[#71717A]">
-          Need help?{" "}
-          <a href="#" className="text-[#2563EB] hover:underline">
-            Contact support
-          </a>
-        </div>
-      </header>
-
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         {children}

@@ -1,8 +1,7 @@
 "use client";
-import { useState, useLayoutEffect, useRef, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import gsap from "gsap";
 import { ArrowLeft, Loader2, RotateCcw } from "lucide-react";
 import { authApi } from "@/lib/auth-api";
 
@@ -10,7 +9,6 @@ function VerifyEmailForm() {
   const router = useRouter();
   const params = useSearchParams();
   const email = params.get("email") ?? "";
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,12 +16,6 @@ function VerifyEmailForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(0);
-
-  useLayoutEffect(() => {
-    gsap.from(cardRef.current, {
-      opacity: 0, y: 20, duration: 0.5, ease: "power2.out", delay: 0.1
-    });
-  }, []);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -78,7 +70,7 @@ function VerifyEmailForm() {
   }
 
   return (
-    <div ref={cardRef} className="w-full max-w-sm">
+    <div className="w-full max-w-sm">
       {/* Back */}
       <Link
         href="/register"
