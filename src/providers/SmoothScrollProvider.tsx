@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -13,36 +12,13 @@ export default function SmoothScrollProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (prefersReducedMotion) return;
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    });
-
-    // Drive both Lenis and ScrollTrigger from the same rAF tick
-    // so ScrollTrigger updates exactly once per frame — no double updates
-    const rafCallback = (time: number) => {
-      lenis.raf(time * 1000);
-      ScrollTrigger.update();
-    };
-
-    gsap.ticker.add(rafCallback);
-    gsap.ticker.lagSmoothing(0);
-
-    // Recalculate ScrollTrigger positions once all assets are loaded
+    // Refresh ScrollTrigger after all content is painted
     const onLoad = () => ScrollTrigger.refresh();
     window.addEventListener("load", onLoad);
 
     return () => {
       window.removeEventListener("load", onLoad);
-      lenis.destroy();
-      gsap.ticker.remove(rafCallback);
+      ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
 
