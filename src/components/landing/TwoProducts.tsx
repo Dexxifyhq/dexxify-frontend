@@ -29,13 +29,13 @@ export default function TwoProducts() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
         gsap.from(headRef.current, {
-          opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
+          opacity: 0, y: 30, duration: 1.1, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
         const cards = cardsRef.current?.querySelectorAll(".product-card");
         if (cards) {
           gsap.from(Array.from(cards), {
-            opacity: 0, y: 40, stagger: 0.15, duration: 0.7, ease: "power2.out",
+            opacity: 0, y: 40, stagger: 0.15, duration: 1.1, ease: "power2.out",
             immediateRender: false, scrollTrigger: { trigger: cardsRef.current, start: "top 80%" }
           });
         }

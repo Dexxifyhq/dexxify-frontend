@@ -145,11 +145,11 @@ export default function CodeShowcase() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
         gsap.from(headRef.current, {
-          opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
+          opacity: 0, y: 30, duration: 1.1, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
         gsap.from(contentRef.current, {
-          opacity: 0, y: 30, duration: 0.7, ease: "power2.out", delay: 0.15,
+          opacity: 0, y: 30, duration: 1.1, ease: "power2.out", delay: 0.15,
           immediateRender: false, scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
         });
       }, sectionRef);

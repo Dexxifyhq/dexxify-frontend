@@ -31,13 +31,13 @@ export default function FeaturesGrid() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
         gsap.from(headRef.current, {
-          opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
+          opacity: 0, y: 30, duration: 1.1, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
         const cards = gridRef.current?.querySelectorAll(".feature-card");
         if (cards) {
           gsap.from(Array.from(cards), {
-            opacity: 0, y: 30, stagger: 0.08, duration: 0.6, ease: "power2.out",
+            opacity: 0, y: 30, stagger: 0.15, duration: 1.0, ease: "power2.out",
             immediateRender: false, scrollTrigger: { trigger: gridRef.current, start: "top 80%" }
           });
         }

@@ -14,7 +14,7 @@ export default function CTA() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
         gsap.from(contentRef.current, {
-          opacity: 0, y: 40, duration: 0.8, ease: "power2.out",
+          opacity: 0, y: 40, duration: 1.2, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
         });
       }, sectionRef);

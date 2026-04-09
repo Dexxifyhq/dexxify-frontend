@@ -101,11 +101,11 @@ export default function FAQ() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
         gsap.from(headRef.current, {
-          opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
+          opacity: 0, y: 30, duration: 1.1, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
         gsap.from(listRef.current, {
-          opacity: 0, y: 20, duration: 0.6, ease: "power2.out", delay: 0.1,
+          opacity: 0, y: 20, duration: 1.0, ease: "power2.out", delay: 0.1,
           immediateRender: false, scrollTrigger: { trigger: listRef.current, start: "top 80%" }
         });
       }, sectionRef);
