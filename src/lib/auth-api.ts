@@ -47,25 +47,25 @@ export const authApi = {
   register: (payload: RegisterPayload) =>
     apiRequest<{ message: string }>("/auth/register", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     }),
 
   login: (payload: LoginPayload) =>
     apiRequest<AuthTokens>("/auth/login", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     }),
 
   verifyOtp: (payload: VerifyOtpPayload) =>
     apiRequest<{ message: string }>("/auth/verify-otp", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     }),
 
   resendOtp: (payload: ResendOtpPayload) =>
     apiRequest<{ message: string }>("/auth/resend-otp", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     }),
 
   logout: () =>

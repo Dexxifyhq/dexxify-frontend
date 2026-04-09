@@ -1,5 +1,23 @@
+import axios, { AxiosError } from "axios";
+
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://docs.dexxify.com/api/v1";
+
+export const apiClient = axios.create({
+  baseURL: API_BASE,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Attach Bearer token from localStorage on every request
+apiClient.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("dexxify_token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// ── Typed wrapper ──────────────────────────────────────────────────────────
 
 interface ApiResponse<T> {
   data: T | null;
@@ -9,38 +27,19 @@ interface ApiResponse<T> {
 
 export async function apiRequest<T>(
   path: string,
-  options?: RequestInit
+  options?: { method?: string; body?: unknown }
 ): Promise<ApiResponse<T>> {
   try {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("dexxify_token") : null;
-
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
+    const res = await apiClient.request<T>({
+      url: path,
+      method: options?.method ?? "GET",
+      data: options?.body,
     });
-
-    let json: unknown;
-    try {
-      json = await res.json();
-    } catch {
-      json = null;
-    }
-
-    if (!res.ok) {
-      const err = json as { message?: string | string[] };
-      const message = Array.isArray(err?.message)
-        ? err.message[0]
-        : err?.message ?? "Something went wrong";
-      return { data: null, error: message, status: res.status };
-    }
-
-    return { data: json as T, error: null, status: res.status };
-  } catch {
-    return { data: null, error: "Network error. Please try again.", status: null };
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const e = err as AxiosError<{ message?: string | string[] }>;
+    const msg = e.response?.data?.message;
+    const message = Array.isArray(msg) ? msg[0] : msg ?? "Something went wrong";
+    return { data: null, error: message, status: e.response?.status ?? null };
   }
 }
