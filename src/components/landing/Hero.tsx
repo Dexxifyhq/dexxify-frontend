@@ -169,7 +169,7 @@ export default function Hero() {
         const split = new SplitText(headlineRef.current, { type: "words" });
         gsap.from(split.words, {
           opacity: 0,
-          y: 20,
+          y: 12,
           stagger: 0.06,
           duration: 0.7,
           ease: "power3.out",
@@ -177,17 +177,16 @@ export default function Hero() {
         });
 
         // Sub + CTA + pills sequence
-        gsap.from(subRef.current, { opacity: 0, y: 15, duration: 0.6, ease: "power2.out", delay: 0.9 });
-        gsap.from(ctaRef.current, { opacity: 0, y: 10, duration: 0.5, ease: "power2.out", delay: 1.1 });
+        gsap.from(subRef.current, { opacity: 0, y: 8, duration: 0.6, ease: "power2.out", delay: 0.9 });
+        gsap.from(ctaRef.current, { opacity: 0, y: 6, duration: 0.5, ease: "power2.out", delay: 1.1 });
 
         // Pills stagger
         gsap.from(pillsRef.current?.children ? Array.from(pillsRef.current.children) : [], {
-          opacity: 0, y: 8, stagger: 0.08, duration: 0.4, ease: "power2.out", delay: 1.3
+          opacity: 0, y: 4, stagger: 0.08, duration: 0.4, ease: "power2.out", delay: 1.3
         });
 
-        // Panels float
-        gsap.from(panelsRef.current, { opacity: 0, y: 30, duration: 0.8, ease: "power2.out", delay: 1.5 });
-        gsap.to(panelsRef.current, { y: -8, duration: 4, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 2.3 });
+        // Panels fade in
+        gsap.from(panelsRef.current, { opacity: 0, y: 20, duration: 0.8, ease: "power2.out", delay: 1.5 });
 
       }, sectionRef);
       return () => ctx.revert();

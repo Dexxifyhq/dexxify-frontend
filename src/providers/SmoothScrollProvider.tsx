@@ -25,10 +25,11 @@ export default function SmoothScrollProvider({
       smoothWheel: true,
     });
 
-    lenis.on("scroll", ScrollTrigger.update);
-
+    // Drive both Lenis and ScrollTrigger from the same rAF tick
+    // so ScrollTrigger updates exactly once per frame — no double updates
     const rafCallback = (time: number) => {
       lenis.raf(time * 1000);
+      ScrollTrigger.update();
     };
 
     gsap.ticker.add(rafCallback);

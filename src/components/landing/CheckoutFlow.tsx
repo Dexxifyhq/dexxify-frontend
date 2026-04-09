@@ -32,7 +32,7 @@ export default function CheckoutFlow() {
       const ctx = gsap.context(() => {
         // Section header fade in
         gsap.from(headRef.current, {
-          opacity: 0, y: 30, duration: 1.1, ease: "power2.out",
+          opacity: 0, y: 14, duration: 1.1, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
 
@@ -40,14 +40,14 @@ export default function CheckoutFlow() {
         const stepCards = stepsRef.current?.querySelectorAll(".step-card");
         if (stepCards) {
           gsap.from(Array.from(stepCards), {
-            opacity: 0, y: 30, stagger: 0.18, duration: 1.0, ease: "power2.out",
+            opacity: 0, y: 14, stagger: 0.18, duration: 1.0, ease: "power2.out",
             immediateRender: false, scrollTrigger: { trigger: stepsRef.current, start: "top 80%" }
           });
         }
 
         // Note fade
         gsap.from(noteRef.current, {
-          opacity: 0, y: 10, duration: 0.9, ease: "power2.out",
+          opacity: 0, y: 8, duration: 0.9, ease: "power2.out",
           immediateRender: false, scrollTrigger: { trigger: noteRef.current, start: "top 90%" }
         });
       }, sectionRef);
