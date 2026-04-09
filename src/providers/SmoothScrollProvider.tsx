@@ -34,7 +34,11 @@ export default function SmoothScrollProvider({
     gsap.ticker.add(rafCallback);
     gsap.ticker.lagSmoothing(0);
 
+    // Recalculate all ScrollTrigger positions after full page render
+    const refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 300);
+
     return () => {
+      clearTimeout(refreshTimer);
       lenis.destroy();
       gsap.ticker.remove(rafCallback);
     };

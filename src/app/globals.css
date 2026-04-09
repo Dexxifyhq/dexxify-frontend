@@ -4,12 +4,18 @@
   --background: #09090B;
   --foreground: #FAFAFA;
   --card: #111113;
+  --deeper: #0D0D0F;
   --border: #1C1C1F;
   --primary: #2563EB;
   --muted: #71717A;
   --nav-bg: #0C0C0E;
   --success: #22C55E;
   --error: #EF4444;
+  --code-blue: #93C5FD;
+  --code-green: #86EFAC;
+  --code-comment: #52525B;
+  --code-yellow: #FCD34D;
+  --code-purple: #C4B5FD;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -18,6 +24,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-deeper: var(--deeper);
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-muted: var(--muted);
@@ -49,25 +56,33 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090B;
+  background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1C1C1F;
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2563EB;
+  background: var(--primary);
+}
+
+/* Nav scrolled state — applied via JS class toggle */
+.nav-scrolled {
+  background-color: color-mix(in srgb, var(--background) 92%, transparent);
+  border-bottom-color: var(--border) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Code block syntax highlighting */
-.token-keyword { color: #93C5FD; }
-.token-string { color: #86EFAC; }
-.token-comment { color: #52525B; font-style: italic; }
-.token-number { color: #FCD34D; }
-.token-function { color: #C4B5FD; }
-.token-property { color: #FAFAFA; }
-.token-punctuation { color: #71717A; }
-.token-operator { color: #93C5FD; }
+.token-keyword  { color: var(--code-blue); }
+.token-string   { color: var(--code-green); }
+.token-comment  { color: var(--code-comment); font-style: italic; }
+.token-number   { color: var(--code-yellow); }
+.token-function { color: var(--code-purple); }
+.token-property { color: var(--foreground); }
+.token-punctuation { color: var(--muted); }
+.token-operator { color: var(--code-blue); }
 
 /* Floating animation for code block */
 @keyframes float {
@@ -87,10 +102,4 @@ body {
 
 .pulse-dot {
   animation: pulse-dot 1.5s ease-in-out infinite;
-}
-
-/* Shimmer for beta badge */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
 }

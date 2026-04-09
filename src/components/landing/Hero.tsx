@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 // QR pattern component
 function QRPattern() {
   return (
-    <div className="w-20 h-20 bg-[#0D0D0F] border border-[#1C1C1F] rounded-sm grid grid-cols-5 gap-0.5 p-1.5">
+    <div className="w-20 h-20 bg-deeper border border-border rounded-sm grid grid-cols-5 gap-0.5 p-1.5">
       {Array.from({ length: 25 }).map((_, i) => (
         <div
           key={i}
@@ -56,16 +56,16 @@ function PaymentPanel() {
   return (
     <div className="flex-1 p-6 flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
-        <span className="text-xs text-[#71717A] font-medium">Payment Gateway</span>
+        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+        <span className="text-xs text-muted font-medium">Payment Gateway</span>
       </div>
 
       <div>
-        <div className="text-xs text-[#71717A] mb-1">Pay with</div>
-        <div className="flex items-center justify-between bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg px-3 py-2">
+        <div className="text-xs text-muted mb-1">Pay with</div>
+        <div className="flex items-center justify-between bg-deeper border border-border rounded-lg px-3 py-2">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-[#26A17B] text-white text-[8px] flex items-center justify-center font-bold">₮</div>
-            <span className="text-sm text-[#FAFAFA]">USDT · TRC20</span>
+            <span className="text-sm text-foreground">USDT · TRC20</span>
           </div>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="#71717A" strokeWidth="1.5" strokeLinecap="round"/></svg>
         </div>
@@ -73,18 +73,18 @@ function PaymentPanel() {
 
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-xs text-[#71717A] mb-0.5">Amount</div>
-          <div className="text-2xl font-bold text-[#FAFAFA]">30.77 USDT</div>
-          <div className="text-sm text-[#71717A]">≈ ₦50,000</div>
+          <div className="text-xs text-muted mb-0.5">Amount</div>
+          <div className="text-2xl font-bold text-foreground">30.77 USDT</div>
+          <div className="text-sm text-muted">≈ ₦50,000</div>
         </div>
         <QRPattern />
       </div>
 
-      <div className="flex items-center gap-2 mt-auto pt-2 border-t border-[#1C1C1F]">
-        <div ref={checkRef} style={{ scale: 0, opacity: 0 }} className="w-5 h-5 rounded-full bg-[#22C55E]/10 border border-[#22C55E] flex items-center justify-center">
+      <div className="flex items-center gap-2 mt-auto pt-2 border-t border-border">
+        <div ref={checkRef} style={{ scale: 0, opacity: 0 }} className="w-5 h-5 rounded-full bg-success/10 border border-success flex items-center justify-center">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </div>
-        <span ref={statusRef} className="text-xs text-[#71717A]">Waiting for payment...</span>
+        <span ref={statusRef} className="text-xs text-muted">Waiting for payment...</span>
       </div>
     </div>
   );
@@ -107,43 +107,43 @@ function OfframpPanel() {
   }, []);
 
   return (
-    <div className="flex-1 p-6 flex flex-col gap-4 border-l border-[#1C1C1F] relative overflow-hidden">
+    <div className="flex-1 p-6 flex flex-col gap-4 border-l border-border relative overflow-hidden">
       <div className="flex items-center gap-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
-        <span className="text-xs text-[#71717A] font-medium">Offramp API</span>
+        <div className="w-1.5 h-1.5 rounded-full bg-success" />
+        <span className="text-xs text-muted font-medium">Offramp API</span>
       </div>
 
       <div className="space-y-2">
         <div>
-          <div className="text-xs text-[#71717A] mb-1">USDT Amount</div>
-          <div className="flex items-center bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg px-3 py-2 gap-2">
+          <div className="text-xs text-muted mb-1">USDT Amount</div>
+          <div className="flex items-center bg-deeper border border-border rounded-lg px-3 py-2 gap-2">
             <div className="w-4 h-4 rounded-full bg-[#26A17B] text-white text-[8px] flex items-center justify-center font-bold">₮</div>
-            <span className="text-sm text-[#FAFAFA]">500 USDT</span>
+            <span className="text-sm text-foreground">500 USDT</span>
           </div>
         </div>
         <div>
-          <div className="text-xs text-[#71717A] mb-1">Bank Account</div>
-          <div className="flex items-center bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg px-3 py-2 gap-2">
+          <div className="text-xs text-muted mb-1">Bank Account</div>
+          <div className="flex items-center bg-deeper border border-border rounded-lg px-3 py-2 gap-2">
             <div className="w-4 h-4 rounded-sm bg-[#F97316] flex items-center justify-center">
               <span className="text-[6px] font-bold text-white">GT</span>
             </div>
-            <span className="text-sm text-[#FAFAFA]">GTBank · 0123456789</span>
+            <span className="text-sm text-foreground">GTBank · 0123456789</span>
           </div>
         </div>
       </div>
 
-      <div className="mt-auto pt-3 border-t border-[#1C1C1F]">
-        <div className="text-xs text-[#71717A] mb-1">1 USDT = ₦1,625</div>
-        <div className="text-2xl font-bold text-[#FAFAFA]">₦812,500</div>
-        <div className="text-xs text-[#71717A]">delivered to bank</div>
+      <div className="mt-auto pt-3 border-t border-border">
+        <div className="text-xs text-muted mb-1">1 USDT = ₦1,625</div>
+        <div className="text-2xl font-bold text-foreground">₦812,500</div>
+        <div className="text-xs text-muted">delivered to bank</div>
       </div>
 
       {/* Toast notification */}
-      <div ref={toastRef} className="absolute bottom-4 left-4 right-4 bg-[#0D2B1B] border border-[#22C55E]/20 rounded-lg px-3 py-2 flex items-center gap-2">
-        <div className="w-4 h-4 rounded-full bg-[#22C55E]/20 border border-[#22C55E] flex items-center justify-center shrink-0">
+      <div ref={toastRef} className="absolute bottom-4 left-4 right-4 bg-success/5 border border-success/20 rounded-lg px-3 py-2 flex items-center gap-2">
+        <div className="w-4 h-4 rounded-full bg-success/20 border border-success flex items-center justify-center shrink-0">
           <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </div>
-        <span className="text-xs text-[#22C55E]">Naira delivered to GTBank</span>
+        <span className="text-xs text-success">Naira delivered to GTBank</span>
       </div>
     </div>
   );
@@ -195,50 +195,51 @@ export default function Hero() {
     return () => mm.revert();
   }, []);
 
-  const stats = ["50+ cryptocurrencies", "NGN settlement", "Under 2 minutes", "1% flat fee"];
+  const stats = ["USDT & BTC", "NGN settlement", "Under 2 minutes", "1% flat fee", "50+ cryptocurrencies"];
 
   return (
     <section ref={sectionRef} className="relative pt-32 pb-24 px-6 overflow-hidden">
       {/* Gradient glow background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#2563EB]/5 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto relative">
         {/* Badge */}
         <div className="flex justify-center mb-8">
-          <div ref={badgeRef} className="inline-flex items-center gap-2 border border-[#1C1C1F] bg-[#111113] text-xs text-[#71717A] px-3 py-1.5 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+          <div ref={badgeRef} className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-success" />
             Now in private beta
           </div>
         </div>
 
         {/* Headline */}
-        <h1 ref={headlineRef} className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-center">
-          Crypto payments and payouts{" "}
-          <span className="italic text-[#2563EB]">settled in Naira.</span>
+        <h1 ref={headlineRef} className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-center max-w-3xl mx-auto">
+          Crypto payments and payouts —{" "}
+          <span className="italic text-muted">settled in Naira.</span>
         </h1>
 
         {/* Sub */}
-        <p ref={subRef} className="mt-6 text-[#71717A] text-lg md:text-xl max-w-2xl mx-auto text-center leading-relaxed">
-          Accept crypto from your customers. Pay your users in crypto. Either way — Naira lands in the right bank account in under 2 minutes.
+        <p ref={subRef} className="mt-6 text-muted text-lg md:text-xl max-w-2xl mx-auto text-center leading-relaxed">
+          Accept crypto from your customers or pay your users in crypto. Either way, Naira lands in the right bank account in under 2 minutes.
         </p>
 
         {/* CTAs */}
         <div ref={ctaRef} className="flex items-center justify-center gap-3 mt-8 flex-wrap">
-          <a href="#" className="inline-flex h-11 px-6 items-center text-sm font-medium text-white bg-[#2563EB] rounded-lg hover:brightness-110 transition-all duration-200 gap-2">
+          <a href="#" className="inline-flex h-11 px-6 items-center text-sm font-medium text-white bg-primary rounded-lg hover:brightness-110 transition-all duration-200 gap-2">
             Get Started
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </a>
-          <a href="#" className="inline-flex h-11 px-6 items-center text-sm font-medium text-[#71717A] border border-[#1C1C1F] rounded-lg hover:text-[#FAFAFA] hover:border-[#2563EB] transition-all duration-200">
-            Read the Docs
+          <a href="#" className="inline-flex h-11 px-6 items-center text-sm font-medium text-muted border border-border rounded-lg hover:text-foreground hover:border-primary transition-all duration-200">
+            View Docs
           </a>
         </div>
 
         {/* Stats */}
         <div ref={pillsRef} className="flex items-center justify-center gap-2 mt-6 flex-wrap">
           {stats.map(s => (
-            <div key={s} className="text-xs text-[#71717A] border border-[#1C1C1F] bg-[#111113] px-3 py-1.5 rounded-full">
+            <div key={s} className="inline-flex items-center gap-1.5 text-xs text-muted border border-border bg-card px-3 py-1.5 rounded-full">
+              <div className="w-1.5 h-1.5 rounded-full bg-success shrink-0" />
               {s}
             </div>
           ))}
@@ -246,7 +247,7 @@ export default function Hero() {
 
         {/* Animated panels */}
         <div className="flex justify-center mt-16">
-          <div ref={panelsRef} className="w-full max-w-3xl rounded-2xl border border-[#1C1C1F] overflow-hidden bg-[#111113] flex">
+          <div ref={panelsRef} className="w-full max-w-3xl rounded-2xl border border-border overflow-hidden bg-card flex">
             <PaymentPanel />
             <OfframpPanel />
           </div>

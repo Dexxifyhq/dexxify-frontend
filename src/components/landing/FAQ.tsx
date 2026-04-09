@@ -72,19 +72,19 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
   }, [open]);
 
   return (
-    <div className="border-b border-[#1C1C1F] last:border-0">
+    <div className="border-b border-border last:border-0">
       <button
         onClick={toggle}
         className="w-full flex items-center justify-between py-5 text-left gap-4 group"
       >
-        <span className="text-[#FAFAFA] text-base font-medium group-hover:text-white transition-colors">{q}</span>
-        <div ref={iconRef} className="w-6 h-6 rounded-full border border-[#1C1C1F] flex items-center justify-center shrink-0 group-hover:border-[#2563EB]/40 transition-colors duration-200">
-          {open ? <Minus size={12} className="text-[#71717A]" /> : <Plus size={12} className="text-[#71717A]" />}
+        <span className="text-foreground text-base font-medium group-hover:text-white transition-colors">{q}</span>
+        <div ref={iconRef} className="w-6 h-6 rounded-full border border-border flex items-center justify-center shrink-0 group-hover:border-primary/40 transition-colors duration-200">
+          {open ? <Minus size={12} className="text-muted" /> : <Plus size={12} className="text-muted" />}
         </div>
       </button>
       <div ref={bodyRef} style={{ height: 0, overflow: "hidden" }}>
         <div ref={innerRef} className="pb-5">
-          <p className="text-[#71717A] leading-relaxed">{a}</p>
+          <p className="text-muted leading-relaxed">{a}</p>
         </div>
       </div>
     </div>
@@ -102,11 +102,11 @@ export default function FAQ() {
       const ctx = gsap.context(() => {
         gsap.from(headRef.current, {
           opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 85%" }
+          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
         gsap.from(listRef.current, {
           opacity: 0, y: 20, duration: 0.6, ease: "power2.out", delay: 0.1,
-          scrollTrigger: { trigger: listRef.current, start: "top 80%" }
+          immediateRender: false, scrollTrigger: { trigger: listRef.current, start: "top 80%" }
         });
       }, sectionRef);
       return () => ctx.revert();
@@ -119,17 +119,17 @@ export default function FAQ() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div ref={headRef} className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 border border-[#1C1C1F] bg-[#111113] text-xs text-[#71717A] px-3 py-1.5 rounded-full mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+          <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             FAQ
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#FAFAFA] mt-4">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mt-4">
             Common questions
           </h2>
         </div>
 
         {/* FAQ list */}
-        <div ref={listRef} className="bg-[#111113] border border-[#1C1C1F] rounded-2xl px-6">
+        <div ref={listRef} className="bg-card border border-border rounded-2xl px-6">
           {FAQ_ITEMS.map((item, i) => (
             <FAQItem key={i} q={item.q} a={item.a} index={i} />
           ))}

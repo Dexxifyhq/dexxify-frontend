@@ -29,14 +29,14 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[#1C1C1F] py-16 px-6">
+    <footer className="border-t border-border py-16 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Top row */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2">
-            <div className="text-[#FAFAFA] font-bold text-xl tracking-tight mb-3">Dexxify</div>
-            <p className="text-[#71717A] text-sm leading-relaxed max-w-xs">
+            <div className="text-foreground font-bold text-xl tracking-tight mb-3">Dexxify</div>
+            <p className="text-muted text-sm leading-relaxed max-w-xs">
               Crypto payments and payouts for Nigerian businesses.
             </p>
             <div className="flex gap-2 mt-4">
@@ -44,7 +44,7 @@ export default function Footer() {
                 <a
                   key={link}
                   href="#"
-                  className="text-xs text-[#71717A] border border-[#1C1C1F] px-2.5 py-1 rounded hover:border-[#2563EB]/40 hover:text-[#FAFAFA] transition-all duration-200"
+                  className="text-xs text-muted border border-border px-2.5 py-1 rounded hover:border-primary/40 hover:text-foreground transition-all duration-200"
                 >
                   {link}
                 </a>
@@ -55,13 +55,13 @@ export default function Footer() {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([category, links]) => (
             <div key={category}>
-              <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-4">{category}</div>
+              <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-4">{category}</div>
               <ul className="space-y-3">
                 {links.map(link => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-sm text-[#71717A] hover:text-[#FAFAFA] transition-colors duration-200"
+                      className="text-sm text-muted hover:text-foreground transition-colors duration-200"
                     >
                       {link.label}
                     </a>
@@ -73,15 +73,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-[#1C1C1F] gap-4">
-          <p className="text-xs text-[#71717A]">
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-border gap-4">
+          <p className="text-xs text-muted">
             © 2025 Dexxify · Built in Nigeria 🇳🇬
           </p>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-xs text-[#71717A] hover:text-[#FAFAFA] transition-colors flex items-center gap-1">
+            <a href="#" className="text-xs text-muted hover:text-foreground transition-colors flex items-center gap-1">
               FAQs <ArrowUpRight size={10} />
             </a>
-            <a href="#" className="text-xs text-[#71717A] hover:text-[#FAFAFA] transition-colors flex items-center gap-1">
+            <a href="#" className="text-xs text-muted hover:text-foreground transition-colors flex items-center gap-1">
               Get Started <ArrowUpRight size={10} />
             </a>
           </div>

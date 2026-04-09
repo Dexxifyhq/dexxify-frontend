@@ -99,36 +99,36 @@ function WebhookLog() {
   }, []);
 
   return (
-    <div className="bg-[#0D0D0F] border border-[#1C1C1F] rounded-xl overflow-hidden h-full flex flex-col">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1C1C1F]">
+    <div className="bg-deeper border border-border rounded-xl overflow-hidden h-full flex flex-col">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
         <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#1C1C1F]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#1C1C1F]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#1C1C1F]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-border" />
+          <div className="w-2.5 h-2.5 rounded-full bg-border" />
+          <div className="w-2.5 h-2.5 rounded-full bg-border" />
         </div>
-        <span className="text-xs text-[#71717A] ml-2">Webhook Events</span>
+        <span className="text-xs text-muted ml-2">Webhook Events</span>
         <div className="ml-auto flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] pulse-dot" />
-          <span className="text-[10px] text-[#71717A]">live</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-success pulse-dot" />
+          <span className="text-[10px] text-muted">live</span>
         </div>
       </div>
 
       <div ref={logRef} className="flex-1 p-4 font-mono text-xs space-y-2.5 overflow-hidden">
         {WEBHOOK_EVENTS.map((e) => (
           <div key={e.event} className="webhook-row flex items-center gap-3">
-            <div className="w-5 h-5 rounded bg-[#22C55E]/10 border border-[#22C55E]/20 flex items-center justify-center shrink-0">
+            <div className="w-5 h-5 rounded bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                 <path d="M1.5 4L3 5.5L6.5 2" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <span className="text-[#FAFAFA] flex-1">{e.event}</span>
-            <span className="text-[#22C55E] font-medium">{e.status}</span>
+            <span className="text-foreground flex-1">{e.event}</span>
+            <span className="text-success font-medium">{e.status}</span>
           </div>
         ))}
       </div>
 
-      <div className="px-4 py-3 border-t border-[#1C1C1F]">
-        <div className="text-[10px] text-[#71717A]">POST https://your-domain.com/webhooks/dexxify</div>
+      <div className="px-4 py-3 border-t border-border">
+        <div className="text-[10px] text-muted">POST https://your-domain.com/webhooks/dexxify</div>
       </div>
     </div>
   );
@@ -146,11 +146,11 @@ export default function CodeShowcase() {
       const ctx = gsap.context(() => {
         gsap.from(headRef.current, {
           opacity: 0, y: 30, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 85%" }
+          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
         });
         gsap.from(contentRef.current, {
           opacity: 0, y: 30, duration: 0.7, ease: "power2.out", delay: 0.15,
-          scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
+          immediateRender: false, scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
         });
       }, sectionRef);
       return () => ctx.revert();
@@ -165,27 +165,27 @@ export default function CodeShowcase() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div ref={headRef} className="mb-12">
-          <div className="inline-flex items-center gap-2 border border-[#1C1C1F] bg-[#111113] text-xs text-[#71717A] px-3 py-1.5 rounded-full mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+          <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             Developer API
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#FAFAFA] mt-4 mb-3">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mt-4 mb-3">
             Built for developers
           </h2>
-          <p className="text-[#71717A] text-lg max-w-xl">
+          <p className="text-muted text-lg max-w-xl">
             SDKs in 8+ languages. Webhooks, sandbox, and API reference included.
           </p>
 
           {/* Tabs */}
-          <div className="flex gap-1 mt-8 bg-[#111113] border border-[#1C1C1F] rounded-lg p-1 w-fit">
+          <div className="flex gap-1 mt-8 bg-card border border-border rounded-lg p-1 w-fit">
             {(["gateway", "offramp"] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 text-sm rounded-md transition-all duration-200 ${
                   activeTab === tab
-                    ? "bg-[#2563EB] text-white font-medium"
-                    : "text-[#71717A] hover:text-[#FAFAFA]"
+                    ? "bg-primary text-white font-medium"
+                    : "text-muted hover:text-foreground"
                 }`}
               >
                 {tab === "gateway" ? "Payment Gateway" : "Offramp API"}
@@ -198,28 +198,28 @@ export default function CodeShowcase() {
         <div ref={contentRef} className="grid lg:grid-cols-5 gap-4">
 
           {/* Code block — 3 cols */}
-          <div className="lg:col-span-3 bg-[#0D0D0F] border border-[#1C1C1F] rounded-xl overflow-hidden flex flex-col">
+          <div className="lg:col-span-3 bg-deeper border border-border rounded-xl overflow-hidden flex flex-col">
             {/* Window chrome */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1C1C1F]">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
               <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/40" />
+                <div className="w-2.5 h-2.5 rounded-full bg-error/40" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/40" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E]/40" />
+                <div className="w-2.5 h-2.5 rounded-full bg-success/40" />
               </div>
-              <span className="text-xs text-[#71717A] ml-2 font-mono">
+              <span className="text-xs text-muted ml-2 font-mono">
                 {activeTab === "gateway" ? "payment.ts" : "payout.ts"}
               </span>
             </div>
 
             {/* Code */}
-            <div className="flex-1 p-5 font-mono text-sm text-[#FAFAFA] overflow-auto">
+            <div className="flex-1 p-5 font-mono text-sm text-foreground overflow-auto">
               {highlight(code)}
             </div>
 
             {/* SDK pills footer */}
-            <div className="px-4 py-3 border-t border-[#1C1C1F] flex gap-2 flex-wrap">
+            <div className="px-4 py-3 border-t border-border flex gap-2 flex-wrap">
               {SDK_LANGS.map(lang => (
-                <span key={lang} className="text-[10px] text-[#71717A] border border-[#1C1C1F] bg-[#111113] px-2 py-0.5 rounded">
+                <span key={lang} className="text-[10px] text-muted border border-border bg-card px-2 py-0.5 rounded">
                   {lang}
                 </span>
               ))}
