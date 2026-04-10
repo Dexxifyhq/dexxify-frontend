@@ -81,7 +81,7 @@ export default function Footer() {
             <a href="#" className="text-xs text-muted hover:text-foreground transition-colors flex items-center gap-1">
               FAQs <ArrowUpRight size={10} />
             </a>
-            <a href="#" className="text-xs text-muted hover:text-foreground transition-colors flex items-center gap-1">
+            <a href="/register" className="text-xs text-muted hover:text-foreground transition-colors flex items-center gap-1">
               Get Started <ArrowUpRight size={10} />
             </a>
           </div>

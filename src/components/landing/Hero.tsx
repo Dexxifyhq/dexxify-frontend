@@ -225,7 +225,7 @@ export default function Hero() {
 
         {/* CTAs */}
         <div ref={ctaRef} className="flex items-center justify-center gap-3 mt-8 flex-wrap">
-          <a href="#" className="inline-flex h-11 px-6 items-center text-sm font-medium text-white bg-primary rounded-lg hover:brightness-110 transition-all duration-200 gap-2">
+          <a href="/register" className="inline-flex h-11 px-6 items-center text-sm font-medium text-white bg-primary rounded-lg hover:brightness-110 transition-all duration-200 gap-2">
             Get Started
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </a>

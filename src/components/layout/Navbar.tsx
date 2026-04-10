@@ -56,13 +56,13 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-3">
           <a
-            href="#"
+            href="/login"
             className="hidden md:inline-flex h-9 px-4 items-center text-sm text-muted border border-border rounded-md hover:border-primary hover:text-foreground transition-all duration-200"
           >
             Sign in
           </a>
           <a
-            href="#"
+            href="/register"
             className="inline-flex h-9 px-4 items-center text-sm font-medium text-white bg-primary rounded-md hover:brightness-110 transition-all duration-200"
           >
             Get Started

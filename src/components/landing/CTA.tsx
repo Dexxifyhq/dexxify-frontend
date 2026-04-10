@@ -45,7 +45,7 @@ export default function CTA() {
 
             <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
               <a
-                href="#"
+                href="/register"
                 className="inline-flex h-12 px-8 items-center text-sm font-medium text-white bg-primary rounded-lg hover:brightness-110 transition-all duration-200 gap-2"
               >
                 Create free account
