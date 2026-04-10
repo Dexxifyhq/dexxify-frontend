@@ -26,6 +26,16 @@ export interface ResendOtpPayload {
   email: string;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  email: string;
+  code: string;
+  new_password: string;
+}
+
 export interface AuthTokens {
   access_token: string;
   refresh_token?: string;
@@ -64,6 +74,18 @@ export const authApi = {
 
   resendOtp: (payload: ResendOtpPayload) =>
     apiRequest<{ message: string }>("/auth/resend-otp", {
+      method: "POST",
+      body: payload,
+    }),
+
+  forgotPassword: (payload: ForgotPasswordPayload) =>
+    apiRequest<{ message: string }>("/auth/forgot-password", {
+      method: "POST",
+      body: payload,
+    }),
+
+  resetPassword: (payload: ResetPasswordPayload) =>
+    apiRequest<{ message: string }>("/auth/reset-password", {
       method: "POST",
       body: payload,
     }),
