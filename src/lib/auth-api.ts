@@ -1,4 +1,4 @@
-import { apiRequest } from "./api-client";
+import { get, post } from "./api-client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -51,49 +51,32 @@ export interface UserProfile {
   phone?: string;
 }
 
-// ── API calls ──────────────────────────────────────────────────────────────
+// ── API calls (throw ApiError on failure) ──────────────────────────────────
 
 export const authApi = {
   register: (payload: RegisterPayload) =>
-    apiRequest<{ message: string }>("/auth/register", {
-      method: "POST",
-      body: payload,
-    }),
+    post<{ message: string }>("/auth/register", payload),
 
   login: (payload: LoginPayload) =>
-    apiRequest<AuthTokens>("/auth/login", {
-      method: "POST",
-      body: payload,
-    }),
+    post<AuthTokens>("/auth/login", payload),
 
   verifyOtp: (payload: VerifyOtpPayload) =>
-    apiRequest<{ message: string }>("/auth/verify-otp", {
-      method: "POST",
-      body: payload,
-    }),
+    post<{ message: string }>("/auth/verify-otp", payload),
 
   resendOtp: (payload: ResendOtpPayload) =>
-    apiRequest<{ message: string }>("/auth/resend-otp", {
-      method: "POST",
-      body: payload,
-    }),
+    post<{ message: string }>("/auth/resend-otp", payload),
 
   forgotPassword: (payload: ForgotPasswordPayload) =>
-    apiRequest<{ message: string }>("/auth/forgot-password", {
-      method: "POST",
-      body: payload,
-    }),
+    post<{ message: string }>("/auth/forgot-password", payload),
 
   resetPassword: (payload: ResetPasswordPayload) =>
-    apiRequest<{ message: string }>("/auth/reset-password", {
-      method: "POST",
-      body: payload,
-    }),
+    post<{ message: string }>("/auth/reset-password", payload),
 
   logout: () =>
-    apiRequest<{ message: string }>("/auth/logout", { method: "POST" }),
+    post<{ message: string }>("/auth/logout"),
 
-  getProfile: () => apiRequest<UserProfile>("/auth/profile"),
+  getProfile: () =>
+    get<UserProfile>("/auth/profile"),
 };
 
 // ── Token helpers ──────────────────────────────────────────────────────────

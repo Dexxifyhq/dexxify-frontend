@@ -1,10 +1,15 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { authApi } from "@/lib/auth-api";
-import { AuthAlert, AuthCard, AuthField, AuthInput, PasswordInput, PasswordStrength, AuthButton } from "@/components/ui/auth";
+import { ApiError } from "@/lib/api-client";
+import {
+  AuthAlert, AuthCard, AuthField, AuthInput,
+  PasswordInput, PasswordStrength, AuthButton,
+} from "@/components/ui/auth";
 
 const BUSINESS_TYPES = ["E-commerce", "Freelance / Agency", "SaaS", "Fintech", "Gaming", "Travel", "Other"];
 
@@ -14,29 +19,34 @@ export default function RegisterPage() {
     first_name: "", last_name: "", email: "", business_name: "",
     business_type: "", phone: "", password: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const { mutate, isPending, error, reset } = useMutation({
+    mutationFn: authApi.register,
+    onSuccess: () => {
+      router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
+    },
+  });
+
+  const errorMessage = error ? (error as ApiError).message : null;
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setForm(f => ({ ...f, [field]: e.target.value }));
-      setError(null);
+      setForm((f) => ({ ...f, [field]: e.target.value }));
+      reset();
     };
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const { error } = await authApi.register({
-      email: form.email, password: form.password,
-      first_name: form.first_name, last_name: form.last_name,
+    mutate({
+      email: form.email,
+      password: form.password,
+      first_name: form.first_name,
+      last_name: form.last_name,
       business_name: form.business_name,
       ...(form.business_type ? { business_type: form.business_type } : {}),
       ...(form.phone ? { phone: form.phone } : {}),
     });
-    if (error) { setError(error); setLoading(false); return; }
-    router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
   }
 
   return (
@@ -48,7 +58,7 @@ export default function RegisterPage() {
 
       <AuthCard>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <AuthAlert message={error} variant="error" />}
+          {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
 
           <div className="grid grid-cols-2 gap-3">
             <AuthField label="First name">
@@ -73,10 +83,13 @@ export default function RegisterPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <AuthField label="Business type" optional>
-              <select value={form.business_type} onChange={set("business_type")}
-                className="w-full h-10 px-3 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-sm text-[#FAFAFA] focus:outline-none focus:border-[#2563EB] transition-colors appearance-none">
+              <select
+                value={form.business_type}
+                onChange={set("business_type")}
+                className="w-full h-10 px-3 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-sm text-[#FAFAFA] focus:outline-none focus:border-[#2563EB] transition-colors appearance-none"
+              >
                 <option value="">Select type</option>
-                {BUSINESS_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                {BUSINESS_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </AuthField>
             <AuthField label="Phone" optional>
@@ -86,8 +99,11 @@ export default function RegisterPage() {
           </div>
 
           <AuthField label="Password">
-            <PasswordInput value={form.password} onChange={set("password") as React.ChangeEventHandler<HTMLInputElement>}
-              required minLength={8} autoComplete="new-password" placeholder="Min. 8 characters" />
+            <PasswordInput
+              value={form.password}
+              onChange={set("password") as React.ChangeEventHandler<HTMLInputElement>}
+              required minLength={8} autoComplete="new-password" placeholder="Min. 8 characters"
+            />
             <PasswordStrength password={form.password} />
           </AuthField>
 
@@ -97,7 +113,7 @@ export default function RegisterPage() {
             <a href="#" className="text-[#2563EB] hover:underline">Privacy Policy</a>.
           </p>
 
-          <AuthButton loading={loading}>
+          <AuthButton loading={isPending}>
             Create account <ArrowRight size={14} />
           </AuthButton>
         </form>
