@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { apiClient, get, post, ApiError } from "./api-client";
-import { setMemoryToken, clearMemoryToken, getMemoryToken } from "./api-client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -38,10 +37,6 @@ export interface ResetPasswordPayload {
   new_password: string;
 }
 
-export interface AuthTokens {
-  access_token: string;
-}
-
 export interface UserProfile {
   id: string;
   email: string;
@@ -56,15 +51,11 @@ export interface UserProfile {
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export const authApi = {
-  /**
-   * Login is routed through the Next.js session handler (/api/auth/session)
-   * instead of calling the backend directly. The handler sets the httpOnly
-   * refresh token cookie and returns only the short-lived access token.
-   */
-  login: async (payload: LoginPayload): Promise<AuthTokens> => {
+  login: async (payload: LoginPayload) => {
     try {
-      const { data } = await axios.post<AuthTokens>("/api/auth/session", payload);
-      return data;
+      return post<{ message: string }>("/auth/login", payload);
+      // const { data } = await axios.post('/auth/login', payload);
+      // return data;
     } catch (err) {
       // Extract the backend's error message from the response body and
       // re-throw as ApiError so the login form can display it correctly.
@@ -94,48 +85,11 @@ export const authApi = {
 
   /**
    * Full logout:
-   * 1. Tell the backend to invalidate the access/refresh token server-side
-   *    (POST /api/v1/auth/logout — Authorization header is added automatically
-   *    by the Axios interceptor via the in-memory access token)
-   * 2. Clear the httpOnly session + refresh-token cookies via the Next.js route
-   * 3. Clear the in-memory access token
    */
   logout: async () => {
     await post<{ message: string }>("/auth/logout").catch(() => null);
-    await axios.post("/api/auth/logout").catch(() => null);
-    clearMemoryToken();
   },
 
-  // _noAutoLogout: true — a 401 here shows "Unknown User", it does NOT log
-  // the user out. Session validity is enforced by proxy.ts, not this call.
-  getProfile: () =>
-    apiClient
-      .get<UserProfile>("/auth/profile", { _noAutoLogout: true })
-      .then((r) => r.data),
+  getProfile: () => get<any>("/auth/profile"),
+  // apiClient.get<UserProfile>('/auth/profile').then((r) => r.data),
 };
-
-// ── Token helpers ──────────────────────────────────────────────────────────
-
-/**
- * Called after a successful login. Stores the access token in memory only —
- * never in localStorage or a readable cookie.
- */
-export function saveTokens(tokens: AuthTokens) {
-  setMemoryToken(tokens.access_token);
-}
-
-/**
- * Clears the in-memory access token and invalidates the server-side session.
- */
-export function clearTokens() {
-  clearMemoryToken();
-}
-
-/**
- * Returns the current in-memory access token, or null if not set.
- * Returns null on the server (SSR) since memory is per-request there.
- */
-export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return getMemoryToken();
-}

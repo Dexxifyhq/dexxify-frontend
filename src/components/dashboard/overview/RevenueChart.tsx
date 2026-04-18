@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import EmptyState from "@/components/dashboard/shared/EmptyState";
-import { BarChart2 } from "lucide-react";
-import type { RevenueChartData } from "@/lib/types/dashboard";
+import EmptyState from '@/components/dashboard/shared/EmptyState';
+import { BarChart2 } from 'lucide-react';
+import type { RevenueChartData } from '@/lib/types/dashboard';
 
 interface RevenueChartProps {
   data?: RevenueChartData;
@@ -45,13 +45,19 @@ export default function RevenueChart({ data, loading }: RevenueChartProps) {
             const max = Math.max(...data.data.map((d) => d.revenue));
             const height = max > 0 ? (point.revenue / max) * 100 : 0;
             return (
-              <div key={i} className="group relative flex-1 flex flex-col items-center gap-1">
+              <div
+                key={i}
+                className="group relative flex-1 flex flex-col items-center gap-1"
+              >
                 <div
                   className="w-full rounded-sm bg-[#2563EB] transition-all group-hover:bg-[#3B82F6]"
                   style={{ height: `${Math.max(height, 2)}%` }}
                 />
                 <span className="text-[9px] text-[#3F3F46]">
-                  {new Date(point.date).toLocaleDateString("en", { month: "short", day: "numeric" })}
+                  {new Date(point.date).toLocaleDateString('en', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </span>
               </div>
             );

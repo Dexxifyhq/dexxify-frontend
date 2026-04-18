@@ -1,27 +1,40 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { DollarSign, FileText, ArrowLeftRight, Users, SlidersHorizontal, Plus, ChevronDown } from "lucide-react";
-import PageHeader from "@/components/dashboard/shared/PageHeader";
-import StatCard from "@/components/dashboard/shared/StatCard";
-import RevenueChart from "@/components/dashboard/overview/RevenueChart";
-import AssetDistribution from "@/components/dashboard/overview/AssetDistribution";
-import RecentActivity from "@/components/dashboard/overview/RecentActivity";
-import { useDashboardStats, useRevenueChart, useAssetDistribution, useRecentActivity } from "@/lib/hooks/dashboard/useDashboardStats";
-import type { DateRange, FiatCurrency } from "@/lib/types/common";
-import type { StatChange } from "@/lib/types/dashboard";
+import { useState } from 'react';
+import {
+  DollarSign,
+  FileText,
+  ArrowLeftRight,
+  Users,
+  SlidersHorizontal,
+  Plus,
+  ChevronDown,
+} from 'lucide-react';
+import PageHeader from '@/components/dashboard/shared/PageHeader';
+import StatCard from '@/components/dashboard/shared/StatCard';
+import RevenueChart from '@/components/dashboard/overview/RevenueChart';
+import AssetDistribution from '@/components/dashboard/overview/AssetDistribution';
+import RecentActivity from '@/components/dashboard/overview/RecentActivity';
+import {
+  useDashboardStats,
+  useRevenueChart,
+  useAssetDistribution,
+  useRecentActivity,
+} from '@/lib/hooks/dashboard/useDashboardStats';
+import type { DateRange, FiatCurrency } from '@/lib/types/common';
+import type { StatChange } from '@/lib/types/dashboard';
 
 // ── Controls ───────────────────────────────────────────────────────────────
 
 const DATE_RANGES: { label: string; value: DateRange }[] = [
-  { label: "7 Days", value: "7d" },
-  { label: "30 Days", value: "30d" },
-  { label: "90 Days", value: "90d" },
-  { label: "1 Year", value: "1y" },
-  { label: "All Time", value: "all" },
+  { label: '7 Days', value: '7d' },
+  { label: '30 Days', value: '30d' },
+  { label: '90 Days', value: '90d' },
+  { label: '1 Year', value: '1y' },
+  { label: 'All Time', value: 'all' },
 ];
 
-const CURRENCIES: FiatCurrency[] = ["USD", "NGN", "GBP", "EUR"];
+const CURRENCIES: FiatCurrency[] = ['USD', 'NGN', 'GBP', 'EUR'];
 
 function SelectButton({
   value,
@@ -40,10 +53,15 @@ function SelectButton({
         className="h-9 appearance-none rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] pl-3 pr-8 text-sm font-medium text-[#A1A1AA] hover:border-[#2563EB] focus:border-[#2563EB] focus:outline-none transition-colors cursor-pointer"
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
-      <ChevronDown size={13} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#52525B]" />
+      <ChevronDown
+        size={13}
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#52525B]"
+      />
     </div>
   );
 }
@@ -51,17 +69,18 @@ function SelectButton({
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [range, setRange] = useState<DateRange>("30d");
-  const [currency, setCurrency] = useState<FiatCurrency>("USD");
+  const [range, setRange] = useState<DateRange>('30d');
+  const [currency, setCurrency] = useState<FiatCurrency>('USD');
 
   const params = { range, currency };
 
   const { data: stats, isLoading: statsLoading } = useDashboardStats(params);
-  const { data: revenueChart, isLoading: chartLoading } = useRevenueChart(params);
+  const { data: revenueChart, isLoading: chartLoading } =
+    useRevenueChart(params);
   const { data: assetDist, isLoading: assetLoading } = useAssetDistribution();
   const { data: activity, isLoading: activityLoading } = useRecentActivity(10);
 
-  const flat: StatChange = { value: 0, percent: 0, direction: "flat" };
+  const flat: StatChange = { value: 0, percent: 0, direction: 'flat' };
 
   return (
     <div className="flex flex-col gap-6">
@@ -96,28 +115,30 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Total Revenue"
-          value={stats ? `$${stats.total_revenue.value.toLocaleString()}` : "$0"}
+          value={
+            stats ? `$${stats.total_revenue.value.toLocaleString()}` : '$0'
+          }
           change={stats?.total_revenue.change ?? flat}
           icon={<DollarSign size={15} />}
           loading={statsLoading}
         />
         <StatCard
           label="Total Sessions"
-          value={stats ? stats.total_sessions.value.toLocaleString() : "0"}
+          value={stats ? stats.total_sessions.value.toLocaleString() : '0'}
           change={stats?.total_sessions.change ?? flat}
           icon={<FileText size={15} />}
           loading={statsLoading}
         />
         <StatCard
           label="Transactions"
-          value={stats ? stats.transactions.value.toLocaleString() : "0"}
+          value={stats ? stats.transactions.value.toLocaleString() : '0'}
           change={stats?.transactions.change ?? flat}
           icon={<ArrowLeftRight size={15} />}
           loading={statsLoading}
         />
         <StatCard
           label="Customers"
-          value={stats ? stats.customers.value.toLocaleString() : "0"}
+          value={stats ? stats.customers.value.toLocaleString() : '0'}
           change={stats?.customers.change ?? flat}
           icon={<Users size={15} />}
           loading={statsLoading}
@@ -126,12 +147,15 @@ export default function DashboardPage() {
 
       {/* Revenue chart + Asset distribution */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
-        <RevenueChart data={revenueChart} loading={chartLoading} />
-        <AssetDistribution data={assetDist} loading={assetLoading} />
+        <RevenueChart data={revenueChart || undefined} loading={chartLoading} />
+        <AssetDistribution
+          data={assetDist || undefined}
+          loading={assetLoading}
+        />
       </div>
 
       {/* Recent activity */}
-      <RecentActivity items={activity} loading={activityLoading} />
+      <RecentActivity items={activity || undefined} loading={activityLoading} />
     </div>
   );
 }

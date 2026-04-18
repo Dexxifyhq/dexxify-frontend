@@ -1,46 +1,56 @@
-"use client";
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { authApi } from "@/lib/auth-api";
-import { ApiError } from "@/lib/api-client";
-import { useCountdown } from "@/lib/hooks/useCountdown";
+'use client';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowRight, Loader2, RotateCcw } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { authApi } from '@/lib/auth-api';
+import { ApiError } from '@/lib/api-client';
+import { useCountdown } from '@/lib/hooks/useCountdown';
 import {
-  AuthAlert, AuthCard, AuthField, AuthButton,
-  AuthBackLink, PasswordInput, PasswordStrength,
-} from "@/components/ui/auth";
+  AuthAlert,
+  AuthCard,
+  AuthField,
+  AuthButton,
+  AuthBackLink,
+  PasswordInput,
+  PasswordStrength,
+} from '@/components/ui/auth';
 
 function ResetPasswordForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const email = params.get("email") ?? "";
+  const email = params.get('email') ?? '';
 
-  const [code, setCode] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const { count, start } = useCountdown();
 
   const resetMutation = useMutation({
     mutationFn: authApi.resetPassword,
     onSuccess: () => {
-      toast.success("Password reset successfully! Redirecting to login…");
-      setTimeout(() => router.push("/login"), 1500);
+      toast.success('Password reset successfully! Redirecting to login…');
+      setTimeout(() => router.push('/login'), 1500);
     },
     onError: (err) => {
-      toast.error((err as ApiError).message ?? "Reset failed. Please check your code and try again.");
+      toast.error(
+        (err as ApiError).message ??
+          'Reset failed. Please check your code and try again.',
+      );
     },
   });
 
   const resendMutation = useMutation({
     mutationFn: authApi.forgotPassword,
     onSuccess: () => {
-      toast.success("A new code was sent to your email.");
+      toast.success('A new code was sent to your email.');
       start(60);
-      setCode("");
+      setCode('');
     },
     onError: (err) => {
-      toast.error((err as ApiError).message ?? "Could not resend code. Please try again.");
+      toast.error(
+        (err as ApiError).message ?? 'Could not resend code. Please try again.',
+      );
     },
   });
 
@@ -50,13 +60,13 @@ function ResetPasswordForm() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSuccessMsg(null);
+    // setSuccessMsg(null);
     resetMutation.mutate({ email, code, new_password: newPassword });
   }
 
   function handleResend() {
     if (count > 0) return;
-    setSuccessMsg(null);
+    // setSuccessMsg(null);
     resetMutation.reset();
     resendMutation.mutate({ email });
   }
@@ -68,14 +78,33 @@ function ResetPasswordForm() {
       <div className="mb-8">
         <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center mb-4">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="3" y="8" width="12" height="9" rx="1.5" stroke="#2563EB" strokeWidth="1.5" />
-            <path d="M6 8V5.5a3 3 0 016 0V8" stroke="#2563EB" strokeWidth="1.5" strokeLinecap="round" />
+            <rect
+              x="3"
+              y="8"
+              width="12"
+              height="9"
+              rx="1.5"
+              stroke="#2563EB"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M6 8V5.5a3 3 0 016 0V8"
+              stroke="#2563EB"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">Reset your password</h1>
+        <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">
+          Reset your password
+        </h1>
         <p className="text-sm text-[#71717A]">
-          Enter the 6-digit code sent to{" "}
-          {email ? <span className="text-[#FAFAFA] font-medium">{email}</span> : "your email"}{" "}
+          Enter the 6-digit code sent to{' '}
+          {email ? (
+            <span className="text-[#FAFAFA] font-medium">{email}</span>
+          ) : (
+            'your email'
+          )}{' '}
           and choose a new password.
         </p>
       </div>
@@ -95,7 +124,7 @@ function ResetPasswordForm() {
               placeholder="000000"
               value={code}
               onChange={(e) => {
-                setCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+                setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
                 resetMutation.reset();
               }}
               className="w-full h-12 px-4 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-lg font-mono text-center text-[#FAFAFA] placeholder:text-[#3F3F46] tracking-[0.4em] focus:outline-none focus:border-[#2563EB] transition-colors"
@@ -105,7 +134,10 @@ function ResetPasswordForm() {
           <AuthField label="New password">
             <PasswordInput
               value={newPassword}
-              onChange={(e) => { setNewPassword(e.target.value); resetMutation.reset(); }}
+              onChange={(e) => {
+                setNewPassword(e.target.value);
+                resetMutation.reset();
+              }}
               required
               minLength={8}
               autoComplete="new-password"
@@ -114,20 +146,29 @@ function ResetPasswordForm() {
             <PasswordStrength password={newPassword} />
           </AuthField>
 
-          <AuthButton loading={resetMutation.isPending} disabled={code.length < 6}>
+          <AuthButton
+            loading={resetMutation.isPending}
+            disabled={code.length < 6}
+          >
             Reset password <ArrowRight size={14} />
           </AuthButton>
 
           <div className="pt-1 border-t border-[#1C1C1F] text-center">
-            <p className="text-xs text-[#71717A] mb-2">Didn&apos;t receive a code?</p>
+            <p className="text-xs text-[#71717A] mb-2">
+              Didn&apos;t receive a code?
+            </p>
             <button
               type="button"
               disabled={resendMutation.isPending || count > 0}
               onClick={handleResend}
               className="inline-flex items-center gap-1.5 text-sm text-[#2563EB] hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
             >
-              {resendMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
-              {count > 0 ? `Resend in ${count}s` : "Resend code"}
+              {resendMutation.isPending ? (
+                <Loader2 size={13} className="animate-spin" />
+              ) : (
+                <RotateCcw size={13} />
+              )}
+              {count > 0 ? `Resend in ${count}s` : 'Resend code'}
             </button>
           </div>
         </form>
@@ -137,5 +178,9 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
-  return <Suspense><ResetPasswordForm /></Suspense>;
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
+  );
 }
