@@ -1,9 +1,4 @@
-"use client";
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Check, CreditCard, ArrowUpRight } from "lucide-react";
-gsap.registerPlugin(ScrollTrigger);
 
 const GATEWAY_FEATURES = [
   "Hosted checkout page",
@@ -20,36 +15,11 @@ const OFFRAMP_FEATURES = [
 ];
 
 export default function TwoProducts() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const ctx = gsap.context(() => {
-        gsap.from(headRef.current, {
-          opacity: 0, y: 14, duration: 1.1, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
-        });
-        const cards = cardsRef.current?.querySelectorAll(".product-card");
-        if (cards) {
-          gsap.from(Array.from(cards), {
-            opacity: 0, y: 16, stagger: 0.15, duration: 1.1, ease: "power2.out",
-            immediateRender: false, scrollTrigger: { trigger: cardsRef.current, start: "top 80%" }
-          });
-        }
-      }, sectionRef);
-      return () => ctx.revert();
-    });
-    return () => mm.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div ref={headRef} className="text-center mb-16">
+        <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
             Two products. One integration.
           </h2>
@@ -59,11 +29,10 @@ export default function TwoProducts() {
         </div>
 
         {/* Cards */}
-        <div ref={cardsRef} className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
 
           {/* Card 1 — Payment Gateway */}
           <div className="product-card group bg-card border border-border rounded-2xl p-8 flex flex-col gap-6 hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
-            {/* Subtle top glow on hover */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="flex items-start justify-between">

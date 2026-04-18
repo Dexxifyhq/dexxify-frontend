@@ -1,9 +1,7 @@
 "use client";
-import { useLayoutEffect, useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Plus, Minus } from "lucide-react";
-gsap.registerPlugin(ScrollTrigger);
 
 const FAQ_ITEMS = [
   {
@@ -36,7 +34,7 @@ const FAQ_ITEMS = [
   }
 ];
 
-function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
+function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +44,6 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (open) {
-      // Close
       if (prefersReducedMotion) {
         if (bodyRef.current) bodyRef.current.style.height = "0px";
         if (bodyRef.current) bodyRef.current.style.overflow = "hidden";
@@ -57,7 +54,6 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
         gsap.to(iconRef.current, { rotation: 0, duration: 0.3, ease: "power2.out" });
       }
     } else {
-      // Open
       if (bodyRef.current) bodyRef.current.style.overflow = "visible";
       const targetHeight = innerRef.current?.offsetHeight ?? 0;
       if (prefersReducedMotion) {
@@ -92,33 +88,11 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
 }
 
 export default function FAQ() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const ctx = gsap.context(() => {
-        gsap.from(headRef.current, {
-          opacity: 0, y: 14, duration: 1.1, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
-        });
-        gsap.from(listRef.current, {
-          opacity: 0, y: 8, duration: 1.0, ease: "power2.out", delay: 0.1,
-          immediateRender: false, scrollTrigger: { trigger: listRef.current, start: "top 80%" }
-        });
-      }, sectionRef);
-      return () => ctx.revert();
-    });
-    return () => mm.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div ref={headRef} className="text-center mb-16">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             FAQ
@@ -129,9 +103,9 @@ export default function FAQ() {
         </div>
 
         {/* FAQ list */}
-        <div ref={listRef} className="bg-card border border-border rounded-2xl px-6">
+        <div className="bg-card border border-border rounded-2xl px-6">
           {FAQ_ITEMS.map((item, i) => (
-            <FAQItem key={i} q={item.q} a={item.a} index={i} />
+            <FAQItem key={i} q={item.q} a={item.a} />
           ))}
         </div>
       </div>

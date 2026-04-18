@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, AlertTriangle, X, Sparkles, User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Bell, AlertTriangle, X, Sparkles, User, Settings, LogOut, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/utils/utils";
-import { clearTokens } from "@/lib/auth-api";
+import { authApi } from "@/lib/auth-api";
 import type { Environment } from "@/lib/types/common";
 
 // ── Pending actions panel ──────────────────────────────────────────────────
@@ -32,14 +33,18 @@ function UserDropdown({ user, onClose }: {
   onClose: () => void;
 }) {
   const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  function handleLogout() {
-    clearTokens();
-    router.push("/login");
+  async function handleLogout() {
+    setLoggingOut(true);
+    await authApi.logout(); // calls backend + clears httpOnly cookies + clears memory
+    toast.success("Signed out successfully.");
+    // Full page reload so proxy.ts sees cleared cookies and redirects cleanly
+    window.location.href = "/login";
   }
 
   return (
-    <div className="absolute right-4 top-12 z-50 w-56 rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
+    <div className="absolute right-4 top-12 z-50 w-56 rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl cursor-pointer">
       {/* User info */}
       <div className="flex items-center gap-2.5 px-3 py-3 border-b border-[#1C1C1F]">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-sm font-semibold text-white">
@@ -69,13 +74,17 @@ function UserDropdown({ user, onClose }: {
         </button>
       </div>
 
-      <div className="border-t border-[#1C1C1F] py-1">
+      <div className="border-t border-[#1C1C1F] py-1 cursor-pointer">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#EF4444] hover:bg-[#1C1C1F] transition-colors"
+          disabled={loggingOut}
+          className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#EF4444] hover:bg-[#1C1C1F] transition-colors disabled:opacity-50 cursor-pointer"
         >
-          <LogOut size={14} />
-          Logout
+          {loggingOut
+            ? <Loader2 size={14} className="animate-spin" />
+            : <LogOut size={14} />
+          }
+          {loggingOut ? "Signing out…" : "Logout"}
         </button>
       </div>
     </div>
@@ -162,7 +171,7 @@ export default function Topbar({ user, environment, onEnvToggle, showVerificatio
           {/* User avatar */}
           <button
             onClick={() => { setShowUserMenu((v) => !v); setShowNotifications(false); }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1C1F] text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1C1F] text-[#71717A] hover:text-[#FAFAFA] transition-colors cursor-pointer"
           >
             <User size={15} />
           </button>

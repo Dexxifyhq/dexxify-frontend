@@ -1,8 +1,6 @@
 "use client";
 import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-gsap.registerPlugin(ScrollTrigger);
 
 const GATEWAY_CODE = `import Dexxify from "@dexxify/node";
 
@@ -52,10 +50,8 @@ const SDK_LANGS = ["Node.js", "Python", "Go", "PHP", "Ruby", "Java", ".NET", "Ru
 
 // Syntax highlight function
 function highlight(code: string): React.ReactNode {
-  // Split into lines and highlight keywords
   return code.split("\n").map((line, i) => {
     const parts: React.ReactNode[] = [];
-    // Simple tokenizer
     const tokens = line.split(/(import|from|const|await|process|new|\/\/.+$|"[^"]*"|`[^`]*`|\b\d+\b)/g);
     tokens.forEach((token, j) => {
       if (!token) return;
@@ -136,35 +132,13 @@ function WebhookLog() {
 
 export default function CodeShowcase() {
   const [activeTab, setActiveTab] = useState<"gateway" | "offramp">("gateway");
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const ctx = gsap.context(() => {
-        gsap.from(headRef.current, {
-          opacity: 0, y: 14, duration: 1.1, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
-        });
-        gsap.from(contentRef.current, {
-          opacity: 0, y: 14, duration: 1.1, ease: "power2.out", delay: 0.15,
-          immediateRender: false, scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
-        });
-      }, sectionRef);
-      return () => ctx.revert();
-    });
-    return () => mm.revert();
-  }, []);
-
   const code = activeTab === "gateway" ? GATEWAY_CODE : OFFRAMP_CODE;
 
   return (
-    <section ref={sectionRef} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div ref={headRef} className="mb-12">
+        <div className="mb-12">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             Developer API
@@ -195,11 +169,10 @@ export default function CodeShowcase() {
         </div>
 
         {/* Content */}
-        <div ref={contentRef} className="grid lg:grid-cols-5 gap-4">
+        <div className="grid lg:grid-cols-5 gap-4">
 
           {/* Code block — 3 cols */}
           <div className="lg:col-span-3 bg-deeper border border-border rounded-xl overflow-hidden flex flex-col">
-            {/* Window chrome */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
               <div className="flex gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-error/40" />
@@ -211,12 +184,10 @@ export default function CodeShowcase() {
               </span>
             </div>
 
-            {/* Code */}
             <div className="flex-1 p-5 font-mono text-sm text-foreground overflow-auto">
               {highlight(code)}
             </div>
 
-            {/* SDK pills footer */}
             <div className="px-4 py-3 border-t border-border flex gap-2 flex-wrap">
               {SDK_LANGS.map(lang => (
                 <span key={lang} className="text-[10px] text-muted border border-border bg-card px-2 py-0.5 rounded">

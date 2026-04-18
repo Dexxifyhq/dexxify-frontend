@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import {
@@ -23,7 +24,11 @@ export default function RegisterPage() {
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.register,
     onSuccess: () => {
+      toast.success("Account created! Check your email for a verification code.");
       router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
+    },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Registration failed. Please try again.");
     },
   });
 

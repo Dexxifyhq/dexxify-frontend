@@ -1,35 +1,10 @@
-"use client";
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
-gsap.registerPlugin(ScrollTrigger);
 
 export default function CTA() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const ctx = gsap.context(() => {
-        gsap.from(contentRef.current, {
-          opacity: 0, y: 16, duration: 1.2, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: contentRef.current, start: "top 80%" }
-        });
-      }, sectionRef);
-      return () => ctx.revert();
-    });
-    return () => mm.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-3xl mx-auto">
-        <div
-          ref={contentRef}
-          className="relative bg-card border border-border rounded-2xl p-12 text-center overflow-hidden"
-        >
+        <div className="relative bg-card border border-border rounded-2xl p-12 text-center overflow-hidden">
           {/* Background glow */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/8 rounded-full blur-[80px]" />

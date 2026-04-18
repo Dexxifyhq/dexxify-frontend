@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import { AuthAlert, AuthCard, AuthField, AuthInput, AuthButton, AuthBackLink } from "@/components/ui/auth";
@@ -15,7 +16,11 @@ export default function ForgotPasswordPage() {
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.forgotPassword,
     onSuccess: () => {
+      toast.success("Reset code sent! Check your inbox.");
       router.push(`/reset-password?email=${encodeURIComponent(email)}`);
+    },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Could not send reset code. Please try again.");
     },
   });
 

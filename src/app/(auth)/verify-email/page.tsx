@@ -3,6 +3,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, RotateCcw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import { useCountdown } from "@/lib/hooks/useCountdown";
@@ -14,23 +15,28 @@ function VerifyEmailForm() {
   const email = params.get("email") ?? "";
 
   const [code, setCode] = useState("");
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const { count, start } = useCountdown();
 
   const verifyMutation = useMutation({
     mutationFn: (otp: string) => authApi.verifyOtp({ email, code: otp }),
     onSuccess: () => {
-      setSuccessMsg("Email verified! Redirecting to login...");
+      toast.success("Email verified! Redirecting to login…");
       setTimeout(() => router.push("/login"), 1500);
+    },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Verification failed. Please try again.");
     },
   });
 
   const resendMutation = useMutation({
     mutationFn: () => authApi.resendOtp({ email }),
     onSuccess: () => {
-      setSuccessMsg("A new code was sent to your email.");
+      toast.success("A new code was sent to your email.");
       start(60);
       setCode("");
+    },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Could not resend code. Please try again.");
     },
   });
 
@@ -48,7 +54,6 @@ function VerifyEmailForm() {
 
   function handleResend() {
     if (!email || count > 0) return;
-    setSuccessMsg(null);
     resendMutation.mutate();
   }
 
@@ -74,7 +79,6 @@ function VerifyEmailForm() {
 
       <AuthCard className="space-y-4">
         {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
-        {successMsg && <AuthAlert message={successMsg} variant="success" />}
 
         <AuthField label="Verification code">
           <input

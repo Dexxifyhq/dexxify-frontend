@@ -1,9 +1,8 @@
 "use client";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(SplitText);
 
 // QR pattern component
 function QRPattern() {
@@ -28,21 +27,17 @@ function PaymentPanel() {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ repeat: -1, repeatDelay: 3 });
-      // Step 1: waiting
       tl.set(statusRef.current, { opacity: 1 });
       tl.to({}, { duration: 1.5 });
-      // Step 2: change text to detected
       tl.to(statusRef.current, { opacity: 0, duration: 0.3 })
         .call(() => { if (statusRef.current) statusRef.current.textContent = "Deposit detected..."; })
         .to(statusRef.current, { opacity: 1, duration: 0.3 });
       tl.to({}, { duration: 1.5 });
-      // Step 3: confirmed + show check
       tl.to(statusRef.current, { opacity: 0, duration: 0.3 })
         .call(() => { if (statusRef.current) statusRef.current.textContent = "✓ Confirmed"; if (statusRef.current) statusRef.current.style.color = "#22C55E"; })
         .to(statusRef.current, { opacity: 1, duration: 0.3 })
         .to(checkRef.current, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)" });
       tl.to({}, { duration: 2 });
-      // Reset
       tl.to([statusRef.current, checkRef.current], { opacity: 0, duration: 0.3 })
         .call(() => {
           if (statusRef.current) { statusRef.current.textContent = "Waiting for payment..."; statusRef.current.style.color = "#71717A"; }

@@ -1,8 +1,6 @@
 "use client";
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
@@ -21,17 +19,24 @@ export default function Navbar() {
           ease: "power2.out",
           delay: 0.1,
         });
-
-        // Scroll state: add/remove CSS class (no inline color strings)
-        ScrollTrigger.create({
-          start: "top+=50 top",
-          onEnter: () => navRef.current?.classList.add("nav-scrolled"),
-          onLeaveBack: () => navRef.current?.classList.remove("nav-scrolled"),
-        });
       });
       return () => ctx.revert();
     });
-    return () => mm.revert();
+
+    // Native scroll listener replaces ScrollTrigger for the nav-scrolled class
+    const onScroll = () => {
+      if (window.scrollY > 50) {
+        navRef.current?.classList.add("nav-scrolled");
+      } else {
+        navRef.current?.classList.remove("nav-scrolled");
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      mm.revert();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   return (

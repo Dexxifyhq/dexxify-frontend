@@ -4,24 +4,27 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { authApi, saveTokens } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
-import { AuthAlert, AuthCard, AuthField, AuthInput, PasswordInput, AuthButton } from "@/components/ui/auth";
+import { AuthCard, AuthField, AuthInput, PasswordInput, AuthButton } from "@/components/ui/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate, isPending, error, reset } = useMutation({
+  const { mutate, isPending, reset } = useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
       saveTokens(data);
+      toast.success("Welcome back!");
       router.push("/dashboard");
     },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Sign in failed. Please try again.");
+    },
   });
-
-  const errorMessage = error ? (error as ApiError).message : null;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,7 +40,6 @@ export default function LoginPage() {
 
       <AuthCard>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
 
           <AuthField label="Email address">
             <AuthInput

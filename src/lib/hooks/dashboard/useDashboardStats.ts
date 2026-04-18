@@ -39,6 +39,7 @@ export function useRecentActivity(limit = 10) {
     queryKey: dashboardKeys.recentActivity(limit),
     queryFn: () => dashboardApi.getRecentActivity(limit),
     staleTime: 15_000,
-    refetchInterval: 30_000,
+    // Don't poll for endpoints that aren't live yet — wastes requests
+    refetchInterval: false,
   });
 }

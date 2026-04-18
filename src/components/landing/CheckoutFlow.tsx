@@ -1,10 +1,5 @@
-"use client";
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Coins, QrCode, CheckCircle2, Landmark, ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-gsap.registerPlugin(ScrollTrigger);
 
 interface Step {
   number: string;
@@ -21,46 +16,11 @@ const STEPS: Step[] = [
 ];
 
 export default function CheckoutFlow() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const stepsRef = useRef<HTMLDivElement>(null);
-  const noteRef = useRef<HTMLParagraphElement>(null);
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const ctx = gsap.context(() => {
-        // Section header fade in
-        gsap.from(headRef.current, {
-          opacity: 0, y: 14, duration: 1.1, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
-        });
-
-        // Steps stagger left to right
-        const stepCards = stepsRef.current?.querySelectorAll(".step-card");
-        if (stepCards) {
-          gsap.from(Array.from(stepCards), {
-            opacity: 0, y: 14, stagger: 0.18, duration: 1.0, ease: "power2.out",
-            immediateRender: false, scrollTrigger: { trigger: stepsRef.current, start: "top 80%" }
-          });
-        }
-
-        // Note fade
-        gsap.from(noteRef.current, {
-          opacity: 0, y: 8, duration: 0.9, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: noteRef.current, start: "top 90%" }
-        });
-      }, sectionRef);
-      return () => ctx.revert();
-    });
-    return () => mm.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div ref={headRef} className="text-center mb-16">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             How it works
@@ -74,7 +34,7 @@ export default function CheckoutFlow() {
         </div>
 
         {/* Steps */}
-        <div ref={stepsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
           {STEPS.map((step, i) => (
             <div key={step.number} className="relative flex items-start gap-1">
               <div className="step-card flex-1 bg-card border border-border rounded-xl p-6 hover:border-primary/30 transition-colors duration-300">
@@ -98,7 +58,7 @@ export default function CheckoutFlow() {
         </div>
 
         {/* Note */}
-        <p ref={noteRef} className="text-center text-sm text-muted mt-8 border border-border bg-card rounded-full px-5 py-2 inline-flex items-center gap-2 mx-auto w-full justify-center max-w-fit">
+        <p className="text-center text-sm text-muted mt-8 border border-border bg-card rounded-full px-5 py-2 inline-flex items-center gap-2 mx-auto w-full justify-center max-w-fit">
           <span className="text-success">✓</span>
           Same flow works for Offramp — your users receive Naira instead
         </p>

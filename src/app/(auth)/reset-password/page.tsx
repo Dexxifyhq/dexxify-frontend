@@ -3,6 +3,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import { useCountdown } from "@/lib/hooks/useCountdown";
@@ -18,23 +19,28 @@ function ResetPasswordForm() {
 
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const { count, start } = useCountdown();
 
   const resetMutation = useMutation({
     mutationFn: authApi.resetPassword,
     onSuccess: () => {
-      setSuccessMsg("Password reset! Redirecting to login...");
+      toast.success("Password reset successfully! Redirecting to login…");
       setTimeout(() => router.push("/login"), 1500);
+    },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Reset failed. Please check your code and try again.");
     },
   });
 
   const resendMutation = useMutation({
     mutationFn: authApi.forgotPassword,
     onSuccess: () => {
-      setSuccessMsg("A new code was sent to your email.");
+      toast.success("A new code was sent to your email.");
       start(60);
       setCode("");
+    },
+    onError: (err) => {
+      toast.error((err as ApiError).message ?? "Could not resend code. Please try again.");
     },
   });
 
@@ -77,7 +83,6 @@ function ResetPasswordForm() {
       <AuthCard>
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
-          {successMsg && <AuthAlert message={successMsg} variant="success" />}
 
           <AuthField label="Reset code">
             <input

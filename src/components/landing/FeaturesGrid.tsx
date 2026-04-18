@@ -1,10 +1,5 @@
-"use client";
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Coins, Zap, CircleDollarSign, Code2, Webhook, LayoutDashboard } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-gsap.registerPlugin(ScrollTrigger);
 
 interface Feature {
   icon: LucideIcon;
@@ -22,36 +17,11 @@ const FEATURES: Feature[] = [
 ];
 
 export default function FeaturesGrid() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const ctx = gsap.context(() => {
-        gsap.from(headRef.current, {
-          opacity: 0, y: 14, duration: 1.1, ease: "power2.out",
-          immediateRender: false, scrollTrigger: { trigger: headRef.current, start: "top 85%" }
-        });
-        const cards = gridRef.current?.querySelectorAll(".feature-card");
-        if (cards) {
-          gsap.from(Array.from(cards), {
-            opacity: 0, y: 14, stagger: 0.15, duration: 1.0, ease: "power2.out",
-            immediateRender: false, scrollTrigger: { trigger: gridRef.current, start: "top 80%" }
-          });
-        }
-      }, sectionRef);
-      return () => ctx.revert();
-    });
-    return () => mm.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div ref={headRef} className="text-center mb-16">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             Platform
@@ -63,7 +33,7 @@ export default function FeaturesGrid() {
         </div>
 
         {/* Grid */}
-        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {FEATURES.map((f) => (
             <div
               key={f.title}
