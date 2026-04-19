@@ -103,7 +103,7 @@ apiClient.interceptors.response.use(
           },
         );
 
-        // console.log(response.data.data);
+        console.log(response.data.data);
 
         // Server will set new access_token cookie
         processQueue(null); // Tell waiting requests to retry
