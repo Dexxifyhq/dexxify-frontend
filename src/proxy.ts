@@ -24,7 +24,7 @@ export function proxy(request: NextRequest) {
   // const hasSession = request.cookies.has('__dexxify_session');
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("access_token")?.value;
-  console.log(token);
+  console.log('access_token', token);
   const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p));
   // const isPrivatePath = PRIVATE_PATHS.some(p => pathname.startswith(p))
 

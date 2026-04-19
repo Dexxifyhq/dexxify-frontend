@@ -52,20 +52,20 @@ export interface UserProfile {
 
 export const authApi = {
   login: async (payload: LoginPayload) => {
-    try {
-      return post<{ message: string }>("/auth/login", payload);
-      // const { data } = await axios.post('/auth/login', payload);
-      // return data;
-    } catch (err) {
-      // Extract the backend's error message from the response body and
-      // re-throw as ApiError so the login form can display it correctly.
-      const e = err as AxiosError<{ message?: string | string[] }>;
-      const raw = e.response?.data?.message;
-      const message = Array.isArray(raw)
-        ? raw[0]
-        : (raw ?? "Invalid email or password.");
-      throw new ApiError(message, e.response?.status ?? null);
-    }
+    return post<{ message: string }>("/auth/login", payload);
+    // try {
+    //   // const { data } = await axios.post('/auth/login', payload);
+    //   // return data;
+    // } catch (err) {
+    //   // Extract the backend's error message from the response body and
+    //   // re-throw as ApiError so the login form can display it correctly.
+    //   const e = err as AxiosError<{ message?: string | string[] }>;
+    //   const raw = e.response?.data?.message;
+    //   const message = Array.isArray(raw)
+    //     ? raw[0]
+    //     : (raw ?? "Invalid email or password.");
+    //   throw new ApiError(message, e.response?.status ?? null);
+    // }
   },
 
   register: (payload: RegisterPayload) =>
