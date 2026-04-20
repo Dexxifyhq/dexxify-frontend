@@ -71,12 +71,6 @@ export default function LoginPage() {
               <span className="text-xs font-medium text-[#71717A]">
                 Password
               </span>
-              <Link
-                href="/forgot-password"
-                className="text-xs text-[#2563EB] hover:underline"
-              >
-                Forgot password?
-              </Link>
             </div>
             <PasswordInput
               value={password}
@@ -88,6 +82,12 @@ export default function LoginPage() {
               autoComplete="current-password"
               placeholder="••••••••"
             />
+              <Link
+                href="/forgot-password"
+                className="text-xs text-[#2563EB] hover:underline"
+              >
+                Forgot password?
+              </Link>
           </div>
 
           <AuthButton loading={isPending}>
