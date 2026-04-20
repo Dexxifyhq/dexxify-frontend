@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, AlertTriangle, X, Sparkles, User, Settings, LogOut, Loader2 } from "lucide-react";
+import {
+  Bell,
+  AlertTriangle,
+  X,
+  Sparkles,
+  User,
+  Settings,
+  LogOut,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
@@ -28,8 +37,11 @@ function PendingActionsPanel({ onClose }: { onClose: () => void }) {
 
 // ── User dropdown ──────────────────────────────────────────────────────────
 
-function UserDropdown({ user, onClose }: {
-  user: { name: string; role: string; initials: string };
+function UserDropdown({
+  user,
+  onClose,
+}: {
+  user: { name: string; initials: string };
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -37,8 +49,10 @@ function UserDropdown({ user, onClose }: {
 
   async function handleLogout() {
     setLoggingOut(true);
-    await authApi.logout(); // calls backend + clears httpOnly cookies + clears memory
-    toast.success("Signed out successfully.");
+    const {
+      data: { message },
+    } = await authApi.logout(); // calls backend + clears httpOnly cookies + clears memory
+    toast.success(message || "Signed out successfully.");
     // Full page reload so proxy.ts sees cleared cookies and redirects cleanly
     window.location.href = "/login";
   }
@@ -51,22 +65,29 @@ function UserDropdown({ user, onClose }: {
           {user.initials}
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-[#FAFAFA]">{user.name}</p>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-[#52525B]">{user.role}</p>
+          <p className="truncate text-sm font-medium text-[#FAFAFA]">
+            {user.name}
+          </p>
         </div>
       </div>
 
       {/* Actions */}
       <div className="py-1">
         <button
-          onClick={() => { router.push("/settings"); onClose(); }}
+          onClick={() => {
+            router.push("/settings");
+            onClose();
+          }}
           className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
         >
           <User size={14} />
           Profile
         </button>
         <button
-          onClick={() => { router.push("/settings"); onClose(); }}
+          onClick={() => {
+            router.push("/settings");
+            onClose();
+          }}
           className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
         >
           <Settings size={14} />
@@ -80,10 +101,11 @@ function UserDropdown({ user, onClose }: {
           disabled={loggingOut}
           className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#EF4444] hover:bg-[#1C1C1F] transition-colors disabled:opacity-50 cursor-pointer"
         >
-          {loggingOut
-            ? <Loader2 size={14} className="animate-spin" />
-            : <LogOut size={14} />
-          }
+          {loggingOut ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <LogOut size={14} />
+          )}
           {loggingOut ? "Signing out…" : "Logout"}
         </button>
       </div>
@@ -94,13 +116,18 @@ function UserDropdown({ user, onClose }: {
 // ── Topbar ─────────────────────────────────────────────────────────────────
 
 interface TopbarProps {
-  user: { name: string; role: string; initials: string };
+  user: { name: string; initials: string };
   environment: Environment;
   onEnvToggle: () => void;
   showVerificationBanner?: boolean;
 }
 
-export default function Topbar({ user, environment, onEnvToggle, showVerificationBanner = true }: TopbarProps) {
+export default function Topbar({
+  user,
+  environment,
+  onEnvToggle,
+  showVerificationBanner = true,
+}: TopbarProps) {
   const [bannerVisible, setBannerVisible] = useState(showVerificationBanner);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -125,7 +152,9 @@ export default function Topbar({ user, environment, onEnvToggle, showVerificatio
           {bannerVisible && (
             <div className="flex items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5">
               <AlertTriangle size={13} className="text-[#F59E0B] shrink-0" />
-              <span className="text-xs font-medium text-[#F59E0B]">Complete verification</span>
+              <span className="text-xs font-medium text-[#F59E0B]">
+                Complete verification
+              </span>
               <button
                 onClick={() => setBannerVisible(false)}
                 className="ml-1 text-[#F59E0B]/60 hover:text-[#F59E0B] transition-colors"
@@ -140,7 +169,10 @@ export default function Topbar({ user, environment, onEnvToggle, showVerificatio
         <div className="relative flex items-center gap-1">
           {/* Notification bell */}
           <button
-            onClick={() => { setShowNotifications((v) => !v); setShowUserMenu(false); }}
+            onClick={() => {
+              setShowNotifications((v) => !v);
+              setShowUserMenu(false);
+            }}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
           >
             <Bell size={15} />
@@ -153,13 +185,15 @@ export default function Topbar({ user, environment, onEnvToggle, showVerificatio
               "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors border",
               isLive
                 ? "bg-[#052E16]/60 border-[#14532D]/50 text-[#22C55E]"
-                : "bg-[#451A03]/60 border-[#78350F]/50 text-[#F59E0B]"
+                : "bg-[#451A03]/60 border-[#78350F]/50 text-[#F59E0B]",
             )}
           >
-            <span className={cn(
-              "h-1.5 w-1.5 rounded-full",
-              isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]"
-            )} />
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
+              )}
+            />
             {isLive ? "LIVE" : "SANDBOX"}
           </button>
 
@@ -170,15 +204,22 @@ export default function Topbar({ user, environment, onEnvToggle, showVerificatio
 
           {/* User avatar */}
           <button
-            onClick={() => { setShowUserMenu((v) => !v); setShowNotifications(false); }}
+            onClick={() => {
+              setShowUserMenu((v) => !v);
+              setShowNotifications(false);
+            }}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1C1F] text-[#71717A] hover:text-[#FAFAFA] transition-colors cursor-pointer"
           >
             <User size={15} />
           </button>
 
           {/* Dropdowns */}
-          {showNotifications && <PendingActionsPanel onClose={() => setShowNotifications(false)} />}
-          {showUserMenu && <UserDropdown user={user} onClose={() => setShowUserMenu(false)} />}
+          {showNotifications && (
+            <PendingActionsPanel onClose={() => setShowNotifications(false)} />
+          )}
+          {showUserMenu && (
+            <UserDropdown user={user} onClose={() => setShowUserMenu(false)} />
+          )}
         </div>
       </header>
     </>

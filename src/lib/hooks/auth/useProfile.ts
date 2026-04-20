@@ -35,7 +35,7 @@ export function useProfile() {
  */
 export function useProfileDisplay() {
   const { data, isLoading } = useProfile();
-  console.log(data);
+  // console.log(data);
 
   const name = data?.data
     ? `${data.data.first_name} ${data.data.last_name}`.trim()
@@ -45,14 +45,11 @@ export function useProfileDisplay() {
     ? `${data.data.first_name?.at(0) ?? ""}${data.data.last_name?.at(0) ?? ""}`.toUpperCase()
     : "";
 
-  const role = data?.data?.role ?? "Owner";
-
   return {
     isLoading,
     user: {
       name,
       initials,
-      role,
       email: data?.data?.email ?? "",
       businessName: data?.data?.business_name ?? "",
     },

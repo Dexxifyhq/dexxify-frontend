@@ -3,9 +3,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Wallet, GitBranch, FileText, ShoppingCart,
-  ArrowLeftRight, Layout, RotateCcw, Users, Users2, Landmark,
-  HardDrive, Monitor, Webhook, Settings, ChevronDown,
+  LayoutDashboard,
+  Wallet,
+  GitBranch,
+  FileText,
+  ShoppingCart,
+  ArrowLeftRight,
+  Layout,
+  RotateCcw,
+  Users,
+  Users2,
+  Landmark,
+  HardDrive,
+  Monitor,
+  Webhook,
+  Settings,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/utils/utils";
 
@@ -14,9 +27,7 @@ import { cn } from "@/utils/utils";
 const NAV_SECTIONS = [
   {
     label: "OVERVIEW",
-    links: [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    ],
+    links: [{ label: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
   },
   {
     label: "BALANCE",
@@ -52,15 +63,21 @@ const NAV_SECTIONS = [
   },
   {
     label: "DEVELOPERS",
-    links: [
-      { label: "API & Webhooks", href: "/api-webhooks", icon: Webhook },
-    ],
+    links: [{ label: "API & Webhooks", href: "/api-webhooks", icon: Webhook }],
   },
 ];
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
-function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
+function NavLink({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+}) {
   const pathname = usePathname();
   const active = pathname === href || pathname.startsWith(href + "/");
 
@@ -71,10 +88,13 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
         "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors",
         active
           ? "bg-[#1C1C1F] text-[#FAFAFA] font-medium"
-          : "text-[#71717A] hover:text-[#FAFAFA] hover:bg-[#111113]"
+          : "text-[#71717A] hover:text-[#FAFAFA] hover:bg-[#111113]",
       )}
     >
-      <Icon size={15} className={active ? "text-[#FAFAFA]" : "text-[#52525B]"} />
+      <Icon
+        size={15}
+        className={active ? "text-[#FAFAFA]" : "text-[#52525B]"}
+      />
       {label}
     </Link>
   );
@@ -83,7 +103,7 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
 // ── Sidebar ─────────────────────────────────────────────────────────────────
 
 interface SidebarProps {
-  user: { name: string; role: string; initials: string };
+  user: { name: string; initials: string };
 }
 
 export default function Sidebar({ user }: SidebarProps) {
@@ -95,8 +115,9 @@ export default function Sidebar({ user }: SidebarProps) {
           {user.initials}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-[#FAFAFA]">{user.name}</p>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-[#52525B]">{user.role}</p>
+          <p className="truncate text-sm font-medium text-[#FAFAFA]">
+            {user.name}
+          </p>
         </div>
         <ChevronDown size={14} className="shrink-0 text-[#52525B]" />
       </div>
