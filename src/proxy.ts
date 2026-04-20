@@ -13,7 +13,7 @@ import type { NextRequest } from "next/server";
 //   "/dashboard",
 // ];
 
-const AUTH_PATHS = ["/login", "/register"];
+const AUTH_PATHS = ["/login"];
 
 function clearAuthCookies(response: NextResponse): NextResponse {
   response.cookies.delete("access_token");
