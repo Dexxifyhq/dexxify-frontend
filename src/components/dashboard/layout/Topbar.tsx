@@ -59,7 +59,7 @@ function UserDropdown({ user, onClose }: {
       {/* Actions */}
       <div className="py-1">
         <button
-          onClick={() => { router.push("/settings/profile"); onClose(); }}
+          onClick={() => { router.push("/settings"); onClose(); }}
           className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] hover:text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
         >
           <User size={14} />
@@ -119,7 +119,7 @@ export default function Topbar({ user, environment, onEnvToggle, showVerificatio
         <div className="fixed inset-0 z-40" onClick={closeAll} />
       )}
 
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-6">
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-6">
         {/* Left: verification banner */}
         <div className="flex items-center gap-3">
           {bannerVisible && (
