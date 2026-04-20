@@ -34,19 +34,19 @@ export default function CustomersPage() {
         <StatCard
           label="New Customers"
           value="0"
-          change={{ direction: "up", percent: 0 }}
+          change={{ value: 0, direction: "up", percent: 0 }}
           icon={<UserPlus size={15} />}
         />
         <StatCard
           label="Active Customers"
           value="0"
-          change={{ direction: "up", percent: 0 }}
+          change={{ value: 0, direction: "up", percent: 0 }}
           icon={<UserCog size={15} />}
         />
         <StatCard
           label="Verified Customers"
           value="0"
-          change={{ direction: "up", percent: 0 }}
+          change={{ value: 0, direction: "up", percent: 0 }}
           icon={<UserCheck size={15} />}
         />
       </div>
