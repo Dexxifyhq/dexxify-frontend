@@ -12,7 +12,7 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_ENV === "production"
-    ? "https://docs.dexxify.com/api/v1"
+    ? "https://api.dexxify.com/api/v1"
     : "http://localhost:4000/api/v1";
 
 // ── Error class ────────────────────────────────────────────────────────────
