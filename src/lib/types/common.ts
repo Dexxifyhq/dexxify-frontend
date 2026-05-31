@@ -1,3 +1,11 @@
+// ── API envelope ───────────────────────────────────────────────────────────
+
+export interface ApiResponse<T> {
+  success?: boolean;
+  message?: string;
+  data: T;
+}
+
 // ── Pagination ─────────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {

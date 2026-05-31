@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import {
-  DollarSign,
-  FileText,
-  ArrowLeftRight,
-  Users,
+  Banknote,
+  Wallet,
+  Send,
+  ShieldCheck,
   SlidersHorizontal,
   Plus,
   ChevronDown,
@@ -114,33 +114,35 @@ export default function DashboardPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Total Revenue"
+          label="Total Volume"
           value={
-            stats ? `$${stats.total_revenue.value.toLocaleString()}` : '$0'
+            stats ? `₦${stats.total_volume.value.toLocaleString()}` : '₦0'
           }
-          change={stats?.total_revenue.change ?? flat}
-          icon={<DollarSign size={15} />}
+          change={stats?.total_volume.change ?? flat}
+          icon={<Banknote size={15} />}
           loading={statsLoading}
         />
         <StatCard
-          label="Total Sessions"
-          value={stats ? stats.total_sessions.value.toLocaleString() : '0'}
-          change={stats?.total_sessions.change ?? flat}
-          icon={<FileText size={15} />}
+          label="Wallets"
+          value={stats ? stats.wallets.value.toLocaleString() : '0'}
+          change={stats?.wallets.change ?? flat}
+          icon={<Wallet size={15} />}
           loading={statsLoading}
         />
         <StatCard
-          label="Transactions"
-          value={stats ? stats.transactions.value.toLocaleString() : '0'}
-          change={stats?.transactions.change ?? flat}
-          icon={<ArrowLeftRight size={15} />}
+          label="Payouts"
+          value={stats ? stats.payouts.value.toLocaleString() : '0'}
+          change={stats?.payouts.change ?? flat}
+          icon={<Send size={15} />}
           loading={statsLoading}
         />
         <StatCard
-          label="Customers"
-          value={stats ? stats.customers.value.toLocaleString() : '0'}
-          change={stats?.customers.change ?? flat}
-          icon={<Users size={15} />}
+          label="KYC Verifications"
+          value={
+            stats ? stats.kyc_verifications.value.toLocaleString() : '0'
+          }
+          change={stats?.kyc_verifications.change ?? flat}
+          icon={<ShieldCheck size={15} />}
           loading={statsLoading}
         />
       </div>

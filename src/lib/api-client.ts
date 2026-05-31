@@ -10,10 +10,19 @@ interface RetryConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
+// Resolution order:
+//   1. NEXT_PUBLIC_API_URL    (explicit override — set this for local backend)
+//   2. production fallback    (api.dexxify.com)
+//   3. development fallback   (api.dexxify.com — see note below)
+//
+// We default to api.dexxify.com in dev too because the project does not
+// require a local backend; set NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+// in .env.local to point at a local server when one is running.
 export const API_BASE =
-  process.env.NEXT_PUBLIC_ENV === "production"
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NEXT_PUBLIC_ENV === "production"
     ? "https://api.dexxify.com/api/v1"
-    : "http://localhost:4000/api/v1";
+    : "https://api.dexxify.com/api/v1");
 
 // ── Error class ────────────────────────────────────────────────────────────
 
@@ -144,6 +153,61 @@ function toApiError(err: unknown): ApiError {
   return new ApiError(message, e.response?.status ?? null);
 }
 
+// ── Envelope unwrap ─────────────────────────────────────────────────────────
+
+/**
+ * The backend wraps every response in an envelope:
+ *   success: { success: true,  data: <payload>, message?, timestamp }
+ *   error:   { success: false, status, message, timestamp }
+ *
+ * The typed wrappers below return the inner `data` payload so callers work
+ * with the resource directly (e.g. `get<Wallet>` resolves to a Wallet, not
+ * `{ success, data: Wallet }`). If a response is NOT enveloped (no `success`
+ * + `data` keys), the raw body is returned unchanged so non-standard
+ * endpoints still pass through.
+ */
+function unwrap<T>(body: unknown): T {
+  if (
+    body &&
+    typeof body === "object" &&
+    "success" in body &&
+    "data" in body
+  ) {
+    return (body as { data: T }).data;
+  }
+  return body as T;
+}
+
+// ── Realm routing ───────────────────────────────────────────────────────────
+
+/**
+ * The API has two auth realms:
+ *   • cookie/session — /auth/*, /dashboard/*, /health, /webhooks/incoming/*
+ *     (authorized by the login cookie, called directly via `apiClient`)
+ *   • API-key bearer — everything else (/wallets, /transactions, /balance,
+ *     /payouts, /kyc, /misc, …). The key authorizes money movement and must
+ *     stay server-side, so these go through the Next.js BFF proxy.
+ *
+ * `proxyClient` targets that proxy (same-origin /api/dexxify); the route
+ * handler attaches the key. See src/app/api/dexxify/[...path]/route.ts.
+ */
+export const proxyClient = axios.create({
+  baseURL: "/api/dexxify",
+});
+
+function isCookieRealm(url: string): boolean {
+  return (
+    url.startsWith("/auth/") ||
+    url.startsWith("/dashboard/") ||
+    url.startsWith("/health") ||
+    url.startsWith("/webhooks/incoming")
+  );
+}
+
+function clientFor(url: string): AxiosInstance {
+  return isCookieRealm(url) ? apiClient : proxyClient;
+}
+
 // ── Typed HTTP wrappers (throw ApiError on failure) ────────────────────────
 
 export async function get<T>(
@@ -151,8 +215,8 @@ export async function get<T>(
   params?: Record<string, unknown>,
 ): Promise<T> {
   try {
-    const res = await apiClient.get<T>(url, { params });
-    return res.data;
+    const res = await clientFor(url).get(url, { params });
+    return unwrap<T>(res.data);
   } catch (err) {
     throw toApiError(err);
   }
@@ -160,8 +224,8 @@ export async function get<T>(
 
 export async function post<T>(url: string, body?: unknown): Promise<T> {
   try {
-    const res = await apiClient.post<T>(url, body);
-    return res.data;
+    const res = await clientFor(url).post(url, body);
+    return unwrap<T>(res.data);
   } catch (err) {
     throw toApiError(err);
   }
@@ -169,8 +233,8 @@ export async function post<T>(url: string, body?: unknown): Promise<T> {
 
 export async function patch<T>(url: string, body?: unknown): Promise<T> {
   try {
-    const res = await apiClient.patch<T>(url, body);
-    return res.data;
+    const res = await clientFor(url).patch(url, body);
+    return unwrap<T>(res.data);
   } catch (err) {
     throw toApiError(err);
   }
@@ -178,8 +242,8 @@ export async function patch<T>(url: string, body?: unknown): Promise<T> {
 
 export async function put<T>(url: string, body?: unknown): Promise<T> {
   try {
-    const res = await apiClient.put<T>(url, body);
-    return res.data;
+    const res = await clientFor(url).put(url, body);
+    return unwrap<T>(res.data);
   } catch (err) {
     throw toApiError(err);
   }
@@ -187,8 +251,8 @@ export async function put<T>(url: string, body?: unknown): Promise<T> {
 
 export async function del<T>(url: string): Promise<T> {
   try {
-    const res = await apiClient.delete<T>(url);
-    return res.data;
+    const res = await clientFor(url).delete(url);
+    return unwrap<T>(res.data);
   } catch (err) {
     throw toApiError(err);
   }

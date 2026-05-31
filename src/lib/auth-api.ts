@@ -3,14 +3,6 @@ import { apiClient, get, post, ApiError } from "./api-client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-// Generic API response wrapper from backend
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  timestamp: string;
-}
-
 export interface RegisterPayload {
   email: string;
   password: string;
@@ -60,13 +52,15 @@ export interface UserProfile {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+  // Backend does not currently return a role; useProfileDisplay defaults to "Owner".
+  role?: string;
 }
 
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export const authApi = {
   login: async (payload: LoginPayload) => {
-    return post<ApiResponse<any>>("/auth/login", payload);
+    return post<{ message: string }>("/auth/login", payload);
     // try {
     //   // const { data } = await axios.post('/auth/login', payload);
     //   // return data;
@@ -83,27 +77,26 @@ export const authApi = {
   },
 
   register: (payload: RegisterPayload) =>
-    post<ApiResponse<any>>("/auth/register", payload),
+    post<{ message: string }>("/auth/register", payload),
 
   verifyOtp: (payload: VerifyOtpPayload) =>
-    post<ApiResponse<any>>("/auth/verify-otp", payload),
+    post<{ message: string }>("/auth/verify-otp", payload),
 
   resendOtp: (payload: ResendOtpPayload) =>
-    post<ApiResponse<any>>("/auth/resend-otp", payload),
+    post<{ message: string }>("/auth/resend-otp", payload),
 
   forgotPassword: (payload: ForgotPasswordPayload) =>
-    post<ApiResponse<any>>("/auth/forgot-password", payload),
+    post<{ message: string }>("/auth/forgot-password", payload),
 
   resetPassword: (payload: ResetPasswordPayload) =>
-    post<ApiResponse<any>>("/auth/reset-password", payload),
+    post<{ message: string }>("/auth/reset-password", payload),
 
   /**
    * Full logout:
    */
   logout: async () => {
-    return post<ApiResponse<any>>("/auth/logout");
-    // console.log(data);
+    await post<{ message: string }>("/auth/logout")
   },
 
-  getProfile: () => get<ApiResponse<UserProfile>>("/auth/profile"),
+  getProfile: () => get<UserProfile>("/auth/profile"),
 };

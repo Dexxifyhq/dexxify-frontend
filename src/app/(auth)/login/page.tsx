@@ -22,10 +22,9 @@ export default function LoginPage() {
 
   const { mutate, isPending, reset } = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
-      // console.log(data);
+    onSuccess: () => {
       toast.success('Welcome back!');
-      router.replace('dashboard');
+      router.replace('/dashboard');
     },
     onError: (err) => {
       toast.error(
