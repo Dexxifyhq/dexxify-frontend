@@ -2,24 +2,35 @@ import type { DateRange, FiatCurrency } from "./common";
 
 // ── Stats ──────────────────────────────────────────────────────────────────
 
-export interface StatCard {
-  total_revenue: number;
-  total_sessions: number;
-  transactions: number;
-  customers: number;
-}
-
 export interface StatChange {
   value: number;
   percent: number;
   direction: "up" | "down" | "flat";
 }
 
+/**
+ * Raw shape of GET /dashboard/overview (after envelope unwrap). The backend
+ * returns nested objects with counts + NGN volumes; all kept optional so a
+ * partial/changed payload degrades to zeros instead of throwing.
+ */
+export interface DashboardOverviewResponse {
+  wallets?: { total?: number };
+  payouts?: { total?: number; volume_ngn?: number };
+  offramps?: { total?: number; volume_ngn?: number };
+  kyc_verifications?: { total?: number };
+  total_volume_ngn?: number;
+}
+
+/**
+ * UI-facing stats mapped from DashboardOverviewResponse. The four cards reflect
+ * the real crypto-infra metrics this backend exposes (volume / wallets /
+ * payouts / KYC verifications) — not generic payments-SaaS metrics.
+ */
 export interface DashboardStats {
-  total_revenue: { value: number; change: StatChange; currency: FiatCurrency };
-  total_sessions: { value: number; change: StatChange };
-  transactions: { value: number; change: StatChange };
-  customers: { value: number; change: StatChange };
+  total_volume: { value: number; change: StatChange; currency: string };
+  wallets: { value: number; change: StatChange };
+  payouts: { value: number; change: StatChange };
+  kyc_verifications: { value: number; change: StatChange };
 }
 
 // ── Revenue chart ──────────────────────────────────────────────────────────

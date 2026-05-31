@@ -5,11 +5,21 @@ import type { CryptoCurrency } from "@/lib/types/common";
 
 export const balanceKeys = {
   all: ["balance"] as const,
+  account: () => [...balanceKeys.all, "account"] as const,
   overview: (currency: CryptoCurrency) => [...balanceKeys.all, "overview", currency] as const,
   history: (filters: BalanceHistoryFilters) => [...balanceKeys.all, "history", filters] as const,
   swaps: (page: number) => [...balanceKeys.all, "swaps", page] as const,
   payouts: (page: number) => [...balanceKeys.all, "payouts", page] as const,
 };
+
+export function useAccountBalance() {
+  return useQuery({
+    queryKey: balanceKeys.account(),
+    queryFn: balanceApi.getAccountBalance,
+    staleTime: 20_000,
+    refetchInterval: 60_000,
+  });
+}
 
 export function useBalanceOverview(currency: CryptoCurrency = "USDT") {
   return useQuery({

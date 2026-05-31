@@ -1,65 +1,78 @@
 'use client';
 
-import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/dashboard/layout/Sidebar';
 import Topbar from '@/components/dashboard/layout/Topbar';
-import { useProfileDisplay } from '@/lib/hooks/auth/useProfile';
+import { useProfile, useProfileDisplay } from '@/lib/hooks/auth/useProfile';
+import { cn } from '@/utils/utils';
 import type { Environment } from '@/lib/types/common';
 
-const SKELETON_USER = { name: '', initials: '', role: 'Owner' };
+const SIDEBAR_KEY = 'dexxify:sidebar-collapsed';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [environment, setEnvironment] = useState<Environment>('sandbox');
-  // tokenReady gates all child queries so they never fire without a token
-  // const [tokenReady, setTokenReady] = useState(
-  //   // If memory already has a token (client-side nav from login page), skip
-  //   // the restore round-trip entirely — dashboard is instant.
-  //   () => typeof window !== "undefined" && !!getMemoryToken()
-  // );
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(SIDEBAR_KEY) === '1';
+  });
 
-  // useEffect(() => {
-  //   if (tokenReady) return; // already have a token, nothing to do
+  function setCollapsedPersisted(value: boolean) {
+    setCollapsed(value);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(SIDEBAR_KEY, value ? '1' : '0');
+    }
+  }
 
-  //   // Page was refreshed or opened in a new tab — silently restore the
-  //   // access token using the httpOnly __dexxify_rt cookie.
-  //   axios
-  //     .post<{ access_token: string }>("/api/auth/refresh")
-  //     .then(({ data }) => setMemoryToken(data.access_token))
-  //     .catch(() => {
-  //       // Refresh failed (no cookie or expired).
-  //       // proxy.ts will handle the redirect on the next navigation.
-  //       // We still set tokenReady so the layout doesn't hang indefinitely.
-  //     })
-  //     .finally(() => setTokenReady(true));
-  // }, [tokenReady]);
+  // Auth gate. The API session cookie is httpOnly and lives on the API origin,
+  // so middleware can't see it — we verify client-side instead. A 200 from
+  // /auth/profile means the session is valid; a hard 401 (after the axios
+  // interceptor's silent refresh also fails) means we're logged out.
+  const { isLoading, isError } = useProfile();
+  const { user } = useProfileDisplay();
 
-  const { user, isLoading } = useProfileDisplay();
-  const displayUser = isLoading ? SKELETON_USER : user;
+  useEffect(() => {
+    if (isError) router.replace('/login');
+  }, [isError, router]);
 
-  // if (!tokenReady) {
-  //   return (
-  //     <div className="flex h-screen items-center justify-center bg-[#09090B]">
-  //       <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent" />
-  //     </div>
-  //   );
-  // }
+  // First load (and the refresh-retry window): hold the dashboard behind a
+  // spinner so child queries don't flash against a half-authed shell.
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#09090B]">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Logged out — the effect above is redirecting; render nothing meanwhile.
+  if (isError) return null;
 
   return (
     <div className="flex min-h-screen bg-[#09090B]">
-      <Sidebar user={displayUser} />
+      <Sidebar
+        user={user}
+        collapsed={collapsed}
+        onExpand={() => setCollapsedPersisted(false)}
+      />
 
-      <div className="flex flex-1 flex-col pl-60">
+      <div
+        className={cn(
+          'flex flex-1 flex-col transition-[padding] duration-200',
+          collapsed ? 'pl-16' : 'pl-60',
+        )}
+      >
         <Topbar
-          user={displayUser}
           environment={environment}
           onEnvToggle={() =>
             setEnvironment((e) => (e === 'sandbox' ? 'live' : 'sandbox'))
           }
+          onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
         />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
