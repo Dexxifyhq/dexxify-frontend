@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { authApi } from "@/lib/auth-api";
+import type { Environment } from "@/lib/types/common";
 
 export const profileKeys = {
   all: ["profile"] as const,
@@ -29,6 +30,17 @@ export function useProfile() {
   });
 }
 
+/** Maps the UI Environment type to the API mode value. */
+function toApiMode(env: Environment): "live" | "test" {
+  return env === "live" ? "live" : "test";
+}
+
+export function useSwitchMode() {
+  return useMutation({
+    mutationFn: (env: Environment) => authApi.switchMode(toApiMode(env)),
+  });
+}
+
 /**
  * Derived helper — returns the display shape consumed by Sidebar / Topbar.
  * Falls back gracefully while loading or if the API hasn't responded yet.
@@ -36,9 +48,7 @@ export function useProfile() {
 export function useProfileDisplay() {
   const { data, isLoading } = useProfile();
 
-  const name = data
-    ? `${data.first_name} ${data.last_name}`.trim()
-    : "";
+  const name = data ? `${data.first_name} ${data.last_name}`.trim() : "";
 
   const initials = data
     ? `${data.first_name?.at(0) ?? ""}${data.last_name?.at(0) ?? ""}`.toUpperCase()
@@ -53,8 +63,9 @@ export function useProfileDisplay() {
       initials,
       role,
       email: data?.email ?? "",
+      mode: data?.mode,
       businessName: data?.business_name ?? "",
-      businessId: data?.id ?? "",
+      businessId: data?.id ?? "", // TODO: UPDATE THE BUSINESS TABLE
     },
   };
 }

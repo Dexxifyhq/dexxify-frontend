@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, AlertTriangle, X, Sparkles, PanelLeft } from "lucide-react";
+import {
+  Bell,
+  AlertTriangle,
+  X,
+  Sparkles,
+  PanelLeft,
+  Loader2,
+} from "lucide-react";
 import { cn } from "@/utils/utils";
 import type { Environment } from "@/lib/types/common";
+import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
 
 // ── Pending actions panel ──────────────────────────────────────────────────
 
@@ -32,11 +40,22 @@ interface TopbarProps {
   showVerificationBanner?: boolean;
 }
 
-export default function Topbar({ environment, onEnvToggle, onToggleSidebar, showVerificationBanner = true }: TopbarProps) {
+export default function Topbar({
+  environment,
+  onEnvToggle,
+  onToggleSidebar,
+  showVerificationBanner = true,
+}: TopbarProps) {
   const [bannerVisible, setBannerVisible] = useState(showVerificationBanner);
   const [showNotifications, setShowNotifications] = useState(false);
+  const switchMode = useSwitchMode();
 
   const isLive = environment === "live";
+
+  function handleEnvToggle() {
+    const next: Environment = isLive ? "test" : "live";
+    switchMode.mutate(next, { onSuccess: onEnvToggle });
+  }
 
   function closeAll() {
     setShowNotifications(false);
@@ -62,7 +81,9 @@ export default function Topbar({ environment, onEnvToggle, onToggleSidebar, show
           {bannerVisible && (
             <div className="flex items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5">
               <AlertTriangle size={13} className="text-[#F59E0B] shrink-0" />
-              <span className="text-xs font-medium text-[#F59E0B]">Complete verification</span>
+              <span className="text-xs font-medium text-[#F59E0B]">
+                Complete verification
+              </span>
               <button
                 onClick={() => setBannerVisible(false)}
                 className="ml-1 text-[#F59E0B]/60 hover:text-[#F59E0B] transition-colors"
@@ -83,21 +104,28 @@ export default function Topbar({ environment, onEnvToggle, onToggleSidebar, show
             <Bell size={15} />
           </button>
 
-          {/* Sandbox / Live toggle */}
+          {/* Live / Test toggle */}
           <button
-            onClick={onEnvToggle}
+            onClick={handleEnvToggle}
+            disabled={switchMode.isPending}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors border",
+              "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs cursor-pointer font-semibold transition-colors border disabled:opacity-60 disabled:cursor-not-allowed",
               isLive
                 ? "bg-[#052E16]/60 border-[#14532D]/50 text-[#22C55E]"
-                : "bg-[#451A03]/60 border-[#78350F]/50 text-[#F59E0B]"
+                : "bg-[#451A03]/60 border-[#78350F]/50 text-[#F59E0B]",
             )}
           >
-            <span className={cn(
-              "h-1.5 w-1.5 rounded-full",
-              isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]"
-            )} />
-            {isLive ? "LIVE" : "SANDBOX"}
+            {switchMode.isPending ? (
+              <Loader2 size={11} className="animate-spin" />
+            ) : (
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full",
+                  isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
+                )}
+              />
+            )}
+            {isLive ? "LIVE" : "TEST"}
           </button>
 
           {/* Sparkle / what's new */}
@@ -106,7 +134,9 @@ export default function Topbar({ environment, onEnvToggle, onToggleSidebar, show
           </button>
 
           {/* Dropdowns */}
-          {showNotifications && <PendingActionsPanel onClose={() => setShowNotifications(false)} />}
+          {showNotifications && (
+            <PendingActionsPanel onClose={() => setShowNotifications(false)} />
+          )}
         </div>
       </header>
     </>

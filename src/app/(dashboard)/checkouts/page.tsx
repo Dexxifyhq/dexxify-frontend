@@ -15,9 +15,8 @@ import PageHeader from "@/components/dashboard/shared/PageHeader";
 import StatCard from "@/components/dashboard/shared/StatCard";
 import EmptyState from "@/components/dashboard/shared/EmptyState";
 import { FilterSelect } from "@/components/dashboard/shared/FilterBar";
-import CreatePaymentModal, {
-  type PaymentFormValues,
-} from "@/components/dashboard/checkouts/CreatePaymentModal";
+import CreatePaymentModal from "@/components/dashboard/checkouts/CreatePaymentModal";
+import { toast } from "sonner";
 
 const STATUS_OPTIONS = [
   { label: "All Status", value: "all" },
@@ -30,11 +29,6 @@ export default function CheckoutsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
-
-  const handleCreate = async (payload: PaymentFormValues) => {
-    // TODO: wire to backend (POST /checkouts)
-    console.log("create payment", payload);
-  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -105,7 +99,7 @@ export default function CheckoutsPage() {
       <CreatePaymentModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleCreate}
+        onSuccess={() => toast.success("Payment session created.")}
       />
     </div>
   );

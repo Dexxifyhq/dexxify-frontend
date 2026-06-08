@@ -34,7 +34,12 @@ import { toast } from "sonner";
 type NavLeaf = { label: string; href: string; icon: React.ElementType };
 type NavEntry =
   | { kind: "link"; label: string; href: string; icon: React.ElementType }
-  | { kind: "group"; label: string; icon: React.ElementType; children: NavLeaf[] };
+  | {
+      kind: "group";
+      label: string;
+      icon: React.ElementType;
+      children: NavLeaf[];
+    };
 
 const NAV_TOP: NavEntry[] = [
   { kind: "link", label: "Analytics", href: "/dashboard", icon: BarChart3 },
