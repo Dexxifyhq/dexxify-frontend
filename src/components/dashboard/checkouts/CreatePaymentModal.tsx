@@ -1,43 +1,33 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
-
-export interface PaymentFormValues {
-  amount: string;
-  currency: string;
-  customerEmail: string;
-}
+import { Loader2, Copy, Check, ExternalLink } from "lucide-react";
+import { useCreatePaymentSession } from "@/lib/hooks/payment-sessions/usePaymentSessions";
+import { toast } from "sonner";
 
 interface CreatePaymentModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (payload: PaymentFormValues) => void | Promise<void>;
+  onSuccess?: () => void;
 }
-
-const CURRENCIES = [
-  { label: "USD", value: "USD" },
-  { label: "NGN", value: "NGN" },
-  { label: "EUR", value: "EUR" },
-  { label: "GBP", value: "GBP" },
-];
-
-const INITIAL: PaymentFormValues = {
-  amount: "",
-  currency: "USD",
-  customerEmail: "",
-};
 
 export default function CreatePaymentModal({
   open,
   onClose,
-  onSubmit,
+  onSuccess,
 }: CreatePaymentModalProps) {
-  const [values, setValues] = useState<PaymentFormValues>(INITIAL);
-  const [submitting, setSubmitting] = useState(false);
+  const createSession = useCreatePaymentSession();
+  const [amount, setAmount] = useState("");
+  const [payLink, setPayLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (open) setValues(INITIAL);
+    if (open) {
+      setAmount("");
+      setPayLink(null);
+      setCopied(false);
+      createSession.reset();
+    }
   }, [open]);
 
   useEffect(() => {
@@ -51,18 +41,32 @@ export default function CreatePaymentModal({
 
   if (!open) return null;
 
-  const canSubmit = values.amount.trim() !== "" && Number(values.amount) > 0;
+  const canSubmit = amount.trim() !== "" && Number(amount) > 0;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSubmit || submitting) return;
-    try {
-      setSubmitting(true);
-      await onSubmit?.(values);
-      onClose();
-    } finally {
-      setSubmitting(false);
-    }
+    if (!canSubmit) return;
+    createSession.mutate(
+      { amount: Number(amount) },
+      {
+        onSuccess: (res: any) => {
+          const sessionId = res?.id ?? res?.session_id ?? res?.reference;
+          const link = `${window.location.origin}/pay/${sessionId}`;
+          setPayLink(link);
+          onSuccess?.();
+        },
+        onError: (err: any) => {
+          toast.error(err?.message ?? "Failed to create payment session.");
+        },
+      },
+    );
+  };
+
+  const handleCopy = () => {
+    if (!payLink) return;
+    navigator.clipboard.writeText(payLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -78,95 +82,111 @@ export default function CreatePaymentModal({
       />
 
       <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
-        <div className="px-6 pt-5 pb-2">
-          <h2 className="text-base font-semibold text-[#FAFAFA]">
-            Create Payment
-          </h2>
-        </div>
+        {!payLink ? (
+          <>
+            <div className="px-6 pt-5 pb-2">
+              <h2 className="text-base font-semibold text-[#FAFAFA]">
+                Create Payment
+              </h2>
+              <p className="mt-0.5 text-xs text-[#71717A]">
+                Set the amount — your customer will choose how to pay.
+              </p>
+            </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-6 py-5">
-          {/* Big amount display */}
-          <div className="flex items-baseline justify-center gap-2 py-6">
-            <input
-              type="number"
-              inputMode="decimal"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              value={values.amount}
-              onChange={(e) =>
-                setValues((v) => ({ ...v, amount: e.target.value }))
-              }
-              className="w-40 bg-transparent text-center text-4xl font-semibold text-[#FAFAFA] placeholder:text-[#3F3F46] focus:outline-none"
-              required
-            />
-            <span className="text-lg font-medium text-[#71717A]">
-              {values.currency}
-            </span>
-          </div>
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-5 px-6 py-5"
+            >
+              <div className="flex items-baseline justify-center gap-2 py-6">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-40 bg-transparent text-center text-4xl font-semibold text-[#FAFAFA] placeholder:text-[#3F3F46] focus:outline-none"
+                  required
+                />
+                <span className="text-lg font-medium text-[#71717A]">USD</span>
+              </div>
 
-          {/* Currency */}
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
-              Currency
-            </label>
-            <div className="relative">
-              <select
-                value={values.currency}
-                onChange={(e) =>
-                  setValues((v) => ({ ...v, currency: e.target.value }))
-                }
-                className="h-10 w-full appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-9 text-sm text-[#FAFAFA] focus:border-[#2563EB] focus:outline-none transition-colors"
+              <div className="flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="h-9 rounded-lg px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!canSubmit || createSession.isPending}
+                  className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                >
+                  {createSession.isPending && (
+                    <Loader2 size={13} className="animate-spin" />
+                  )}
+                  {createSession.isPending ? "Creating…" : "Create"}
+                </button>
+              </div>
+            </form>
+          </>
+        ) : (
+          /* ── Success state: shareable link ── */
+          <div className="flex flex-col gap-5 px-6 py-6">
+            <div className="flex flex-col items-center gap-2 text-center">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#14532D]/50 bg-[#052E16]/60">
+                <Check size={20} className="text-[#22C55E]" />
+              </div>
+              <h2 className="text-base font-semibold text-[#FAFAFA]">
+                Session Created
+              </h2>
+              <p className="text-xs text-[#71717A]">
+                Share this link with your customer. They&apos;ll enter their
+                details and choose a token to pay with.
+              </p>
+            </div>
+
+            {/* Link box */}
+            <div className="flex items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
+              <span className="flex-1 truncate text-xs text-[#A1A1AA]">
+                {payLink}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="shrink-0 text-[#71717A] hover:text-[#FAFAFA] transition-colors"
               >
-                {CURRENCIES.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={14}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
-              />
+                {copied ? (
+                  <Check size={14} className="text-[#22C55E]" />
+                ) : (
+                  <Copy size={14} />
+                )}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 h-9 rounded-lg border border-[#1C1C1F] bg-transparent text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              >
+                Done
+              </button>
+              <a
+                href={payLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+              >
+                <ExternalLink size={13} />
+                Preview
+              </a>
             </div>
           </div>
-
-          {/* Customer email */}
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-[#A1A1AA]">
-              Customer Email
-              <span className="text-[11px] font-normal text-[#52525B]">
-                optional
-              </span>
-            </label>
-            <input
-              type="email"
-              value={values.customerEmail}
-              onChange={(e) =>
-                setValues((v) => ({ ...v, customerEmail: e.target.value }))
-              }
-              placeholder="customer@example.com"
-              className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
-            />
-          </div>
-
-          <div className="mt-2 flex items-center justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="h-9 rounded-lg px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!canSubmit || submitting}
-              className="h-9 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
-            >
-              {submitting ? "Creating…" : "Create"}
-            </button>
-          </div>
-        </form>
+        )}
       </div>
     </div>
   );

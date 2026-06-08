@@ -1,27 +1,84 @@
 "use client";
 
-import { X, Landmark, Hash } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  X,
+  Landmark,
+  Hash,
+  ChevronDown,
+  Search,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useBanks, useVerifyBank, useSaveBank } from "@/lib/hooks/misc/useMisc";
+
+interface Bank {
+  id: string;
+  name: string;
+  slug: string;
+  redbillerCode: string;
+  anchorCode: string;
+  monnifyCode: string;
+  palmpayCode: string;
+  nombaCode: string;
+  country: string;
+  currency: string;
+  type: string;
+  avatar: string;
+  hasLogo: boolean;
+}
 
 interface LinkBankModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (payload: { bankName: string; accountNumber: string }) => void | Promise<void>;
+  onSuccess?: () => void;
 }
 
 export default function LinkBankModal({
   open,
   onClose,
-  onSubmit,
+  onSuccess,
 }: LinkBankModalProps) {
-  const [bankName, setBankName] = useState("");
+  const { data: { banks } = {} } = useBanks();
+  const bankList: Bank[] = banks?.data ?? [];
+
+  const verifyBank = useVerifyBank();
+  const saveBank = useSaveBank();
+
+  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [search, setSearch] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [verifiedName, setVerifiedName] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const filtered = search.trim()
+    ? bankList.filter((b) =>
+        b.name.toLowerCase().includes(search.trim().toLowerCase()),
+      )
+    : bankList;
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (!dropdownRef.current?.contains(e.target as Node))
+        setDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropdownOpen]);
 
   useEffect(() => {
     if (open) {
-      setBankName("");
+      setSelectedBank(null);
+      setSearch("");
+      setDropdownOpen(false);
       setAccountNumber("");
+      setVerifiedName(null);
+      setError(null);
+      verifyBank.reset();
+      saveBank.reset();
     }
   }, [open]);
 
@@ -36,19 +93,60 @@ export default function LinkBankModal({
 
   if (!open) return null;
 
-  const canSubmit =
-    bankName.trim() !== "" && accountNumber.trim().length >= 6;
+  const canVerify = !!selectedBank && accountNumber.trim().length >= 6;
+  const isVerifying = verifyBank.isPending;
+  const isSaving = saveBank.isPending;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSubmit || submitting) return;
-    try {
-      setSubmitting(true);
-      await onSubmit?.({ bankName, accountNumber });
-      onClose();
-    } finally {
-      setSubmitting(false);
+  const handleBankSelect = (bank: Bank) => {
+    setSelectedBank(bank);
+    setDropdownOpen(false);
+    setSearch("");
+    setVerifiedName(null);
+    setError(null);
+    verifyBank.reset();
+  };
+
+  const handleAccountNumberChange = (value: string) => {
+    setAccountNumber(value);
+    if (verifiedName || error) {
+      setVerifiedName(null);
+      setError(null);
+      verifyBank.reset();
     }
+  };
+
+  const handleVerify = () => {
+    if (!canVerify || !selectedBank) return;
+    setError(null);
+    verifyBank.mutate(
+      { accountNumber: accountNumber.trim(), bankId: selectedBank.id },
+      {
+        onSuccess: (res) => setVerifiedName(res.accountName),
+        onError: (err: any) =>
+          setError(
+            err?.message ??
+              "Could not verify account. Check the details and try again.",
+          ),
+      },
+    );
+  };
+
+  const handleSave = () => {
+    if (!selectedBank || !verifiedName) return;
+    setError(null);
+    saveBank.mutate(
+      { accountNumber: accountNumber.trim(), bankId: selectedBank.id },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+          onClose();
+        },
+        onError: (err: any) =>
+          setError(
+            err?.message ?? "Failed to save bank account. Please try again.",
+          ),
+      },
+    );
   };
 
   return (
@@ -83,27 +181,81 @@ export default function LinkBankModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 py-5">
+        <div className="flex flex-col gap-4 px-6 py-5">
+          {/* Bank selector */}
           <div>
             <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
               Bank Name
             </label>
-            <div className="relative">
-              <Landmark
-                size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
-              />
-              <input
-                type="text"
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
-                placeholder="Search for your bank..."
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
-                required
-              />
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setDropdownOpen((v) => !v)}
+                className="flex h-10 w-full items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-3 pr-3 text-sm transition-colors focus:border-[#2563EB] focus:outline-none"
+              >
+                <Landmark size={14} className="shrink-0 text-[#52525B]" />
+                <span
+                  className={`flex-1 text-left truncate ${selectedBank ? "text-[#FAFAFA]" : "text-[#3F3F46]"}`}
+                >
+                  {selectedBank ? selectedBank.name : "Select your bank…"}
+                </span>
+                <ChevronDown
+                  size={14}
+                  className={`shrink-0 text-[#52525B] transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute z-20 mt-1 w-full rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] shadow-xl">
+                  <div className="flex items-center gap-2 border-b border-[#1C1C1F] px-3 py-2">
+                    <Search size={13} className="shrink-0 text-[#52525B]" />
+                    <input
+                      autoFocus
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search banks…"
+                      className="flex-1 bg-transparent text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:outline-none"
+                    />
+                  </div>
+                  <ul className="max-h-52 overflow-y-auto py-1">
+                    {filtered.length === 0 ? (
+                      <li className="px-3 py-2 text-xs text-[#52525B]">
+                        No banks found
+                      </li>
+                    ) : (
+                      filtered.map((bank) => (
+                        <li key={bank.id}>
+                          <button
+                            type="button"
+                            onClick={() => handleBankSelect(bank)}
+                            className={`flex w-full items-center gap-3 px-3 py-2 text-sm transition-colors hover:bg-[#1C1C1F] ${
+                              selectedBank?.id === bank.id
+                                ? "text-[#FAFAFA]"
+                                : "text-[#A1A1AA]"
+                            }`}
+                          >
+                            {bank.hasLogo && (
+                              <img
+                                src={bank.avatar}
+                                alt=""
+                                width={20}
+                                height={20}
+                                className="h-5 w-5 shrink-0 rounded-full object-cover"
+                              />
+                            )}
+                            <span className="truncate">{bank.name}</span>
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Account number */}
           <div>
             <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
               Account Number
@@ -118,15 +270,35 @@ export default function LinkBankModal({
                 inputMode="numeric"
                 value={accountNumber}
                 onChange={(e) =>
-                  setAccountNumber(e.target.value.replace(/\D/g, ""))
+                  handleAccountNumberChange(e.target.value.replace(/\D/g, ""))
                 }
                 placeholder="0123456789"
                 className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
-                required
               />
             </div>
           </div>
 
+          {/* Verified account name */}
+          {verifiedName && (
+            <div className="flex items-center gap-2 rounded-lg border border-[#166534]/40 bg-[#052e16]/60 px-3 py-2.5">
+              <CheckCircle2 size={14} className="shrink-0 text-[#4ade80]" />
+              <p className="text-xs">
+                <span className="text-[#71717A]">Account name: </span>
+                <span className="font-medium text-[#FAFAFA]">
+                  {verifiedName}
+                </span>
+              </p>
+            </div>
+          )}
+
+          {/* Error */}
+          {error && (
+            <p className="rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/60 px-3 py-2.5 text-xs text-[#f87171]">
+              {error}
+            </p>
+          )}
+
+          {/* Actions */}
           <div className="mt-2 flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
             <button
               type="button"
@@ -135,15 +307,30 @@ export default function LinkBankModal({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={!canSubmit || submitting}
-              className="h-9 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
-            >
-              {submitting ? "Adding…" : "Add Account"}
-            </button>
+
+            {!verifiedName ? (
+              <button
+                type="button"
+                onClick={handleVerify}
+                disabled={!canVerify || isVerifying}
+                className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              >
+                {isVerifying && <Loader2 size={13} className="animate-spin" />}
+                {isVerifying ? "Verifying…" : "Verify Account"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isSaving}
+                className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              >
+                {isSaving && <Loader2 size={13} className="animate-spin" />}
+                {isSaving ? "Saving…" : "Confirm & Save"}
+              </button>
+            )}
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

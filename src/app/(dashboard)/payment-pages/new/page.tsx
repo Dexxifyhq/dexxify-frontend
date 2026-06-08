@@ -1,20 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowLeft, Building2, Save, ChevronDown } from "lucide-react";
-
-const CURRENCIES = [
-  { label: "Nigerian Naira (NGN)", value: "NGN", symbol: "₦" },
-  { label: "US Dollar (USD)", value: "USD", symbol: "$" },
-  { label: "Euro (EUR)", value: "EUR", symbol: "€" },
-  { label: "British Pound (GBP)", value: "GBP", symbol: "£" },
-];
+import {
+  ArrowLeft,
+  Building2,
+  Save,
+  ChevronDown,
+  Copy,
+  Check,
+  ExternalLink,
+  Loader2,
+  X,
+} from "lucide-react";
+import { useCreatePaymentPage } from "@/lib/hooks/payment-pages/usePaymentPages";
+import { toast } from "sonner";
 
 const STATUSES = [
   { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
   { label: "Draft", value: "draft" },
+  { label: "Inactive", value: "inactive" },
 ];
 
 interface PricingOption {
@@ -23,49 +29,111 @@ interface PricingOption {
   amount: string;
 }
 
-export default function CreatePaymentPage() {
-  const [pageTitle, setPageTitle] = useState("");
+export default function CreatePaymentPageForm() {
+  const router = useRouter();
+  const createPage = useCreatePaymentPage();
+
+  // Form state
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [currency, setCurrency] = useState("NGN");
+  const [currency] = useState("USD");
   const [status, setStatus] = useState("active");
-  const [minAmount, setMinAmount] = useState("");
-  const [options, setOptions] = useState<PricingOption[]>([]);
+  const [amount, setAmount] = useState("");
+  const [autoSettlement, setAutoSettlement] = useState(false);
   const [previewAmount, setPreviewAmount] = useState("");
 
-  const symbol =
-    CURRENCIES.find((c) => c.value === currency)?.symbol ?? "";
+  // Success state
+  const [createdPage, setCreatedPage] = useState<any | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const addOption = () => {
-    setOptions((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), label: "", amount: "" },
-    ]);
-  };
-
-  const removeOption = (id: string) =>
-    setOptions((prev) => prev.filter((o) => o.id !== id));
-
-  const updateOption = (
-    id: string,
-    key: "label" | "amount",
-    value: string,
-  ) =>
-    setOptions((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, [key]: value } : o)),
-    );
+  const canCreate = title.trim() !== "" && amount !== "" && Number(amount) > 0;
 
   const handleCreate = () => {
-    // TODO: POST to /payment-pages
-    console.log({
-      pageTitle,
-      description,
-      currency,
-      status,
-      minAmount,
-      options,
-    });
+    if (!canCreate) return;
+    createPage.mutate(
+      {
+        title: title.trim(),
+        description: description.trim(),
+        currency,
+        status,
+        amount: Number(amount),
+        auto_settlement: autoSettlement,
+      },
+      {
+        onSuccess: (res: any) => {
+          setCreatedPage(res);
+        },
+        onError: (err: any) => {
+          toast.error(err?.message ?? "Failed to create payment page.");
+        },
+      },
+    );
   };
 
+  const publicUrl = createdPage
+    ? `${window.location.origin}/p/${createdPage.slug}`
+    : "";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(publicUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // ── Success screen ─────────────────────────────────────────────────────
+  if (createdPage) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 p-6 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#14532D]/50 bg-[#052E16]/60">
+          <Check size={24} className="text-[#22C55E]" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold text-[#FAFAFA]">Page Created</h2>
+          <p className="mt-1 text-sm text-[#71717A]">
+            Share this link — anyone who visits can pay you.
+          </p>
+        </div>
+
+        <div className="w-full max-w-md">
+          <div className="flex items-center gap-2 rounded-xl border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
+            <span className="flex-1 truncate font-mono text-xs text-[#A1A1AA]">
+              {publicUrl}
+            </span>
+            <button
+              onClick={handleCopy}
+              className="shrink-0 text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+            >
+              {copied ? (
+                <Check size={14} className="text-[#22C55E]" />
+              ) : (
+                <Copy size={14} />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push("/payment-pages")}
+            className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+          >
+            View all pages
+          </button>
+          <a
+            href={publicUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+          >
+            <ExternalLink size={13} />
+            Preview page
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Create form ────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -85,38 +153,32 @@ export default function CreatePaymentPage() {
         <button
           type="button"
           onClick={handleCreate}
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+          disabled={!canCreate || createPage.isPending}
+          className="inline-flex h-9 cursor-pointer hover:opacity-70 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
         >
-          <Save size={14} />
-          Create Page
-        </button>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-[#1C1C1F]">
-        <button
-          type="button"
-          className="-mb-px border-b-2 border-[#2563EB] px-1 pb-3 text-sm font-medium text-[#2563EB]"
-        >
-          Configuration
+          {createPage.isPending ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Save size={14} />
+          )}
+          {createPage.isPending ? "Creating…" : "Create Page"}
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         {/* Left column */}
         <div className="flex flex-col gap-5">
-          {/* General Information */}
+          {/* General */}
           <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
             <h2 className="mb-4 text-sm font-semibold text-[#FAFAFA]">
               General Information
             </h2>
-
             <div className="flex flex-col gap-4">
-              <Field label="Page Title">
+              <Field label="Page Title *">
                 <input
                   type="text"
-                  value={pageTitle}
-                  onChange={(e) => setPageTitle(e.target.value)}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Summer Sale Checkout"
                   className={inputCls}
                 />
@@ -124,117 +186,73 @@ export default function CreatePaymentPage() {
 
               <Field label="Description">
                 <textarea
-                  rows={4}
+                  rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Description..."
+                  placeholder="Tell your customers what they're paying for…"
                   className={`${inputCls} h-auto resize-y py-2.5`}
                 />
               </Field>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Currency">
-                  <Select
-                    value={currency}
-                    onChange={setCurrency}
-                    options={CURRENCIES.map((c) => ({
-                      label: c.label,
-                      value: c.value,
-                    }))}
-                  />
-                </Field>
-                <Field label="Status">
-                  <Select
-                    value={status}
-                    onChange={setStatus}
-                    options={STATUSES}
-                  />
-                </Field>
-              </div>
+              <Field label="Status">
+                <SelectField
+                  value={status}
+                  onChange={setStatus}
+                  options={STATUSES}
+                />
+              </Field>
             </div>
           </section>
 
           {/* Pricing */}
           <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#FAFAFA]">Pricing</h2>
-              <button
-                type="button"
-                onClick={addOption}
-                className="text-xs font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
-              >
-                + Add Option
-              </button>
+            <h2 className="mb-4 text-sm font-semibold text-[#FAFAFA]">
+              Pricing
+            </h2>
+            <div className="flex flex-col gap-4">
+              <Field label="Amount (USD) *">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className={inputCls}
+                />
+              </Field>
             </div>
-
-            <Field label="Minimum Amount">
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={minAmount}
-                onChange={(e) => setMinAmount(e.target.value)}
-                placeholder="0.00"
-                className={inputCls}
-              />
-            </Field>
-
-            {options.length > 0 && (
-              <div className="mt-4 flex flex-col gap-3">
-                {options.map((o) => (
-                  <div
-                    key={o.id}
-                    className="grid grid-cols-[1fr_160px_auto] gap-2"
-                  >
-                    <input
-                      type="text"
-                      value={o.label}
-                      onChange={(e) =>
-                        updateOption(o.id, "label", e.target.value)
-                      }
-                      placeholder="Option label"
-                      className={inputCls}
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={o.amount}
-                      onChange={(e) =>
-                        updateOption(o.id, "amount", e.target.value)
-                      }
-                      placeholder="0.00"
-                      className={inputCls}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeOption(o.id)}
-                      className="h-10 rounded-lg px-3 text-xs text-[#EF4444] hover:bg-[#2D0A0A] transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </section>
 
-          {/* Receiving Accounts */}
+          {/* Settlement */}
           <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#FAFAFA]">
-                Receiving Accounts
-              </h2>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-sm font-semibold text-[#FAFAFA]">
+                  Auto Settlement
+                </h2>
+                <p className="mt-0.5 text-xs text-[#71717A]">
+                  Automatically settle received payments to your linked bank
+                  account after each confirmed transaction.
+                </p>
+              </div>
               <button
                 type="button"
-                className="text-xs font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+                role="switch"
+                aria-checked={autoSettlement}
+                onClick={() => setAutoSettlement((v) => !v)}
+                className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none ${
+                  autoSettlement
+                    ? "border-[#14532D]/60 bg-[#22C55E]"
+                    : "border-[#2a2a2e] bg-[#1C1C1F]"
+                }`}
               >
-                + Link Account
+                <span
+                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    autoSettlement ? "translate-x-0.5" : "-translate-x-5"
+                  }`}
+                />
               </button>
-            </div>
-
-            <div className="flex items-center justify-center rounded-lg border border-dashed border-[#1C1C1F] py-8 text-sm text-[#52525B]">
-              No accounts linked.
             </div>
           </section>
         </div>
@@ -242,55 +260,60 @@ export default function CreatePaymentPage() {
         {/* Preview (right column) */}
         <aside className="h-fit">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
-            Preview
+            Live Preview
           </p>
           <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
             <div className="mb-5 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1C1C1F] text-[#A1A1AA]">
                 <Building2 size={18} />
               </div>
-              <div>
-                <p className="text-sm font-semibold text-[#FAFAFA]">
-                  {pageTitle || "Business Name"}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+                  {title || "Page Title"}
                 </p>
-                <p className="text-xs text-[#71717A]">
-                  {description || "Payment Page"}
+                <p className="truncate text-xs text-[#71717A]">
+                  {description || "Description"}
                 </p>
               </div>
             </div>
 
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
-              Enter Amount
-            </p>
-            <div className="relative mb-5">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#71717A]">
-                {symbol}
-              </span>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={previewAmount}
-                onChange={(e) => setPreviewAmount(e.target.value)}
-                placeholder="0.00"
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
-              />
+            {/* Preset options */}
+            {/* {options.filter((o) => o.label && o.amount).length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {options
+                  .filter((o) => o.label && o.amount)
+                  .map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-1.5 text-xs font-medium text-[#A1A1AA]"
+                    >
+                      {o.label} — ${o.amount}
+                    </button>
+                  ))}
+              </div>
+            )} */}
+
+            <div className="mb-4 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5 text-center">
+              <p className="text-xs text-[#71717A]">You pay</p>
+              <p className="text-xl font-bold text-[#FAFAFA]">
+                ${amount || "0.00"}{" "}
+                <span className="text-sm font-normal text-[#71717A]">USD</span>
+              </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="h-9 flex-1 rounded-lg border border-[#1C1C1F] bg-transparent text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="h-9 flex-1 rounded-lg bg-[#FAFAFA] text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
-              >
-                Continue
-              </button>
-            </div>
+            <button
+              type="button"
+              className="h-9 w-full opacity-50 cursor-not-allowed rounded-lg bg-[#FAFAFA] text-sm font-medium text-[#09090B]"
+            >
+              Continue to Pay
+            </button>
+
+            {autoSettlement && (
+              <p className="mt-3 text-center text-[11px] text-[#22C55E]">
+                Auto-settlement enabled
+              </p>
+            )}
           </div>
         </aside>
       </div>
@@ -298,7 +321,7 @@ export default function CreatePaymentPage() {
   );
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────
 
 const inputCls =
   "h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors";
@@ -320,7 +343,7 @@ function Field({
   );
 }
 
-function Select({
+function SelectField({
   value,
   onChange,
   options,
@@ -334,7 +357,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`${inputCls} appearance-none pr-9 cursor-pointer`}
+        className={`${inputCls} cursor-pointer appearance-none pr-9`}
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>

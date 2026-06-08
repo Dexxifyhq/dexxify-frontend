@@ -24,14 +24,19 @@ export type DateRange = "7d" | "30d" | "90d" | "1y" | "all";
 
 // ── Currency ───────────────────────────────────────────────────────────────
 
-export type FiatCurrency = "USD" | "NGN" | "GBP" | "EUR";
+export type FiatCurrency = "USD" | "NGN";
 export type CryptoCurrency = "USDT" | "USDC" | "BTC" | "ETH" | "BNB";
 export type Currency = FiatCurrency | CryptoCurrency;
 
 // ── Environment ────────────────────────────────────────────────────────────
 
-export type Environment = "sandbox" | "live";
+export type Environment = "test" | "live";
 
 // ── Status ─────────────────────────────────────────────────────────────────
 
-export type TxStatus = "pending" | "processing" | "completed" | "failed" | "cancelled";
+export type TxStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "cancelled";

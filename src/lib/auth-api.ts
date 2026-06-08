@@ -46,6 +46,7 @@ export interface UserProfile {
   last_name: string;
   phone: string;
   status: "active" | "inactive" | "suspended";
+  mode: "live" | "test";
   plan: string;
   api_call_count: number;
   monthly_api_limit: number;
@@ -99,4 +100,7 @@ export const authApi = {
   },
 
   getProfile: () => get<UserProfile>("/auth/profile"),
+
+  switchMode: (mode: "live" | "test") =>
+    post<{ message: string }>("/auth/mode", { mode }),
 };

@@ -1,29 +1,38 @@
 // ── Banks ──────────────────────────────────────────────────────────────────
 
-export interface Bank {
-  id: string;
-  name: string;
-  code?: string;
-  slug?: string;
-  country?: string;
-  active?: boolean;
-}
+// export interface Bank {
+//   id: string;
+//   name: string;
+//   code?: string;
+//   slug?: string;
+//   country?: string;
+//   active?: boolean;
+// }
 
 export interface SavedBank {
   id: string;
-  bank_id: string;
+  breet_bank_id: string;
+  developer_id: string;
   bank_name: string;
   account_number: string;
   account_name: string;
+  currency: string;
+  type: string;
+  auto_settlement: boolean;
+  disabled: boolean;
+  integration_id: string;
+  is_business: boolean;
+  primary: boolean;
   narration?: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface BankVerification {
-  account_number: string;
-  account_name: string;
-  bank_id: string;
-  bank_name?: string;
+  accountName: string;
+  accountNumber: string;
+  bankName: string;
+  type: string;
 }
 
 // ── Crypto assets ──────────────────────────────────────────────────────────

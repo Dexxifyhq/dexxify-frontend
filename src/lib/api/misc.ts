@@ -1,6 +1,6 @@
 import { get, post, del } from "@/lib/api-client";
 import type {
-  Bank,
+  // Bank,
   SavedBank,
   BankVerification,
   CryptoAsset,
@@ -19,11 +19,10 @@ export const miscApi = {
   // ── Banks ────────────────────────────────────────────────────────────────
 
   // GET /misc/banks — list of Nigerian banks (cached 24h)
-  getBanks: () => get<Bank[]>("/misc/banks"),
+  getBanks: () => get<any>("/misc/banks"),
 
   // POST /misc/banks — save a bank account
-  saveBank: (payload: AddBankDto) =>
-    post<SavedBank>("/misc/banks", payload),
+  saveBank: (payload: AddBankDto) => post<SavedBank>("/misc/banks", payload),
 
   // GET /misc/banks/saved — saved bank accounts
   getSavedBanks: () => get<SavedBank[]>("/misc/banks/saved"),
@@ -33,13 +32,14 @@ export const miscApi = {
     get<SavedBank>(`/misc/banks/saved/${accountNumber}`),
 
   // GET /misc/banks/breet — banks from Breet API
-  getBreetBanks: () => get<Bank[]>("/misc/banks/breet"),
+  getBreetBanks: () => get<any[]>("/misc/banks/breet"),
 
   // GET /misc/banks/{bankId}
-  getBankById: (bankId: string) => get<Bank>(`/misc/banks/${bankId}`),
+  getBankById: (bankId: string) => get<any>(`/misc/banks/${bankId}`),
 
   // DELETE /misc/banks/{bankId}
-  deleteBank: (bankId: string) => del<{ message: string }>(`/misc/banks/${bankId}`),
+  deleteBank: (bankId: string) =>
+    del<{ message: string }>(`/misc/banks/${bankId}`),
 
   // POST /misc/banks/verify
   verifyBank: (payload: VerifyBankAccountDto) =>
