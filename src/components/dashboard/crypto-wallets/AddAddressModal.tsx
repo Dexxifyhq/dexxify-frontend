@@ -1,51 +1,99 @@
 "use client";
 
-import { X, Info, ChevronDown, CreditCard, Check } from "lucide-react";
+import { X, Wallet, Tag, AlertCircle, Loader2, Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAddWithdrawalAddress } from "@/lib/hooks/wallet/useWallets";
+import type { WithdrawalNetwork, WithdrawalToken } from "@/lib/types/wallet";
+import { cn } from "@/utils/utils";
 
-export interface AddAddressValues {
-  network: string;
-  walletAddress: string;
+// ── Network / token config ─────────────────────────────────────────────────
+
+interface NetworkOption {
+  value: WithdrawalNetwork;
   label: string;
-  isDefault: boolean;
+  chain: string;
+  placeholder: string;
 }
+
+const NETWORK_OPTIONS: NetworkOption[] = [
+  {
+    value: "ERC20",
+    label: "ERC-20",
+    chain: "Ethereum",
+    placeholder: "0x...",
+  },
+  {
+    value: "TRC20",
+    label: "TRC-20",
+    chain: "Tron",
+    placeholder: "T...",
+  },
+  {
+    value: "SOL",
+    label: "Solana",
+    chain: "Solana",
+    placeholder: "Base58 address…",
+  },
+  {
+    value: "BSC",
+    label: "BEP-20",
+    chain: "BSC",
+    placeholder: "0x...",
+  },
+  {
+    value: "TON",
+    label: "TON",
+    chain: "TON",
+    placeholder: "UQ... or EQ...",
+  },
+];
+
+const TOKENS: WithdrawalToken[] = ["USDT", "USDC"];
+
+// USDC is not supported on TON
+function tokensFor(network: WithdrawalNetwork): WithdrawalToken[] {
+  return network === "TON" ? ["USDT"] : TOKENS;
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
 
 interface AddAddressModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (payload: AddAddressValues) => void | Promise<void>;
+  onSuccess?: () => void;
 }
-
-const NETWORKS = [
-  { label: "Select Network", value: "" },
-  { label: "Ethereum", value: "ethereum" },
-  { label: "Polygon", value: "polygon" },
-  { label: "BSC", value: "bsc" },
-  { label: "Base", value: "base" },
-  { label: "Arbitrum", value: "arbitrum" },
-  { label: "Optimism", value: "optimism" },
-  { label: "Bitcoin", value: "bitcoin" },
-  { label: "Solana", value: "solana" },
-  { label: "Tron", value: "tron" },
-];
-
-const INITIAL: AddAddressValues = {
-  network: "",
-  walletAddress: "",
-  label: "",
-  isDefault: false,
-};
 
 export default function AddAddressModal({
   open,
   onClose,
-  onSubmit,
+  onSuccess,
 }: AddAddressModalProps) {
-  const [values, setValues] = useState<AddAddressValues>(INITIAL);
-  const [submitting, setSubmitting] = useState(false);
+  const addAddress = useAddWithdrawalAddress();
+
+  const [network, setNetwork] = useState<WithdrawalNetwork>("ERC20");
+  const [token, setToken] = useState<WithdrawalToken>("USDT");
+  const [address, setAddress] = useState("");
+  const [label, setLabel] = useState("");
+  const [isDefault, setIsDefault] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const selectedNet = NETWORK_OPTIONS.find((n) => n.value === network)!;
+  const availableTokens = tokensFor(network);
+
+  // If the selected token is not available on the new network, reset to USDT
+  useEffect(() => {
+    if (!availableTokens.includes(token)) setToken("USDT");
+  }, [network]);
 
   useEffect(() => {
-    if (open) setValues(INITIAL);
+    if (!open) return;
+    setNetwork("ERC20");
+    setToken("USDT");
+    setAddress("");
+    setLabel("");
+    setIsDefault(false);
+    setError(null);
+    addAddress.reset();
   }, [open]);
 
   useEffect(() => {
@@ -59,31 +107,29 @@ export default function AddAddressModal({
 
   if (!open) return null;
 
-  const update = <K extends keyof AddAddressValues>(
-    key: K,
-    v: AddAddressValues[K],
-  ) => setValues((prev) => ({ ...prev, [key]: v }));
+  const canSubmit = address.trim().length > 10 && label.trim().length > 0;
 
-  const canSubmit =
-    values.network !== "" && values.walletAddress.trim() !== "";
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSubmit || submitting) return;
-    try {
-      setSubmitting(true);
-      await onSubmit?.(values);
-      onClose();
-    } finally {
-      setSubmitting(false);
-    }
+    if (!canSubmit || addAddress.isPending) return;
+    setError(null);
+    addAddress.mutate(
+      { address: address.trim(), network, token, label: label.trim(), isDefault },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+          onClose();
+        },
+        onError: (err: any) =>
+          setError(err?.message ?? "Failed to save address. Please try again."),
+      },
+    );
   };
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Add Address"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       <div
@@ -92,19 +138,19 @@ export default function AddAddressModal({
       />
 
       <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+        {/* Header */}
         <div className="flex items-start justify-between px-6 pb-2 pt-5">
           <div>
             <h2 className="text-base font-semibold text-[#FAFAFA]">
-              Add Address
+              Add Withdrawal Address
             </h2>
             <p className="mt-0.5 text-xs text-[#71717A]">
-              Connect a new wallet for payouts
+              Save a crypto address for stablecoin payouts.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
             className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
           >
             <X size={16} />
@@ -112,113 +158,193 @@ export default function AddAddressModal({
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 py-5">
-          {/* Network */}
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#FAFAFA]">
-              Network
-              <Info size={12} className="text-[#71717A]" />
-            </label>
-            <div className="relative">
-              <select
-                value={values.network}
-                onChange={(e) => update("network", e.target.value)}
-                className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-9 text-sm text-[#FAFAFA] focus:border-[#2563EB] focus:outline-none transition-colors"
-                required
-              >
-                {NETWORKS.map((n) => (
-                  <option key={n.value} value={n.value}>
-                    {n.label}
-                  </option>
+          {/* Network + Token row */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Network */}
+            <div>
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+                Network
+              </label>
+              <div className="flex flex-col gap-1.5">
+                {NETWORK_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setNetwork(opt.value)}
+                    className={cn(
+                      "flex items-center justify-between rounded-lg border px-3 py-2 text-left text-xs transition-colors",
+                      network === opt.value
+                        ? "border-[#2563EB]/60 bg-[#1e3a5f]/40 text-[#FAFAFA]"
+                        : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:text-[#FAFAFA]",
+                    )}
+                  >
+                    <span className="font-medium">{opt.label}</span>
+                    <span className="text-[10px] text-[#52525B]">
+                      {opt.chain}
+                    </span>
+                  </button>
                 ))}
-              </select>
-              <ChevronDown
-                size={14}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
-              />
+              </div>
+            </div>
+
+            {/* Token */}
+            <div>
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+                Token
+              </label>
+              <div className="flex flex-col gap-1.5">
+                {TOKENS.map((t) => {
+                  const unavailable = !availableTokens.includes(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      disabled={unavailable}
+                      onClick={() => !unavailable && setToken(t)}
+                      className={cn(
+                        "flex items-center justify-between rounded-lg border px-3 py-2 text-left text-xs transition-colors",
+                        unavailable
+                          ? "cursor-not-allowed border-[#1C1C1F] bg-[#09090B] opacity-30"
+                          : token === t
+                            ? "border-[#2563EB]/60 bg-[#1e3a5f]/40 text-[#FAFAFA]"
+                            : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:text-[#FAFAFA]",
+                      )}
+                    >
+                      <span className="font-semibold">{t}</span>
+                      {unavailable && (
+                        <span className="text-[10px] text-[#3F3F46]">
+                          N/A
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Wallet Address */}
+          {/* Address */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#FAFAFA]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
               Wallet Address
             </label>
-            <input
-              type="text"
-              value={values.walletAddress}
-              onChange={(e) => update("walletAddress", e.target.value)}
-              placeholder="0x..."
-              className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 font-mono text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
-              required
-            />
-            <div className="mt-2 flex items-start gap-2">
-              <CreditCard
-                size={14}
-                className="mt-0.5 shrink-0 text-[#2563EB]"
+            <div className="relative">
+              <Wallet
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
               />
-              <p className="text-xs leading-relaxed text-[#71717A]">
-                Double-check this address. Payouts sent to incorrect addresses
-                cannot be recovered.
-              </p>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder={selectedNet.placeholder}
+                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 font-mono text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                required
+              />
             </div>
+            <p className="mt-1.5 text-[11px] text-[#52525B]">
+              Double-check this address — payouts to wrong addresses cannot be
+              recovered.
+            </p>
           </div>
 
           {/* Label */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#FAFAFA]">
-              Label{" "}
-              <span className="font-normal text-[#71717A]">(Optional)</span>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+              Label
             </label>
-            <input
-              type="text"
-              value={values.label}
-              onChange={(e) => update("label", e.target.value)}
-              placeholder="e.g. Corporate Treasury"
-              className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
-            />
+            <div className="relative">
+              <Tag
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+              />
+              <input
+                type="text"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                placeholder="e.g. Treasury USDT Wallet"
+                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                required
+              />
+            </div>
           </div>
 
-          {/* Set as Default */}
-          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
-            <span className="relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
-              <input
-                type="checkbox"
-                checked={values.isDefault}
-                onChange={(e) => update("isDefault", e.target.checked)}
-                className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-[#3F3F46] bg-[#09090B] checked:border-[#2563EB] checked:bg-[#2563EB] focus:outline-none"
-              />
-              <Check
-                size={11}
-                className="pointer-events-none absolute text-white opacity-0 peer-checked:opacity-100"
-                strokeWidth={3}
-              />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-[#FAFAFA]">
-                Set as Default
+          {/* Set as default */}
+          <button
+            type="button"
+            onClick={() => setIsDefault((v) => !v)}
+            className={cn(
+              "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
+              isDefault
+                ? "border-[#14532D]/40 bg-[#052e16]/40"
+                : "border-[#1C1C1F] bg-[#09090B]",
+            )}
+          >
+            <Star
+              size={14}
+              className={
+                isDefault ? "fill-[#22C55E] text-[#22C55E]" : "text-[#52525B]"
+              }
+            />
+            <div className="flex-1">
+              <p className="text-xs font-medium text-[#FAFAFA]">
+                Set as default
               </p>
-              <p className="text-xs text-[#71717A]">
-                Auto-select for all payouts (only one default address allowed)
+              <p className="text-[11px] text-[#71717A]">
+                Auto-selected for all payouts
               </p>
             </div>
-          </label>
+            <div
+              className={cn(
+                "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
+                isDefault
+                  ? "border-[#22C55E] bg-[#22C55E]"
+                  : "border-[#3F3F46] bg-transparent",
+              )}
+            >
+              {isDefault && (
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                  <path
+                    d="M1 4l2 2 4-4"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </div>
+          </button>
+
+          {/* Error */}
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/60 px-3 py-2.5">
+              <AlertCircle
+                size={13}
+                className="mt-0.5 shrink-0 text-[#f87171]"
+              />
+              <p className="text-xs text-[#f87171]">{error}</p>
+            </div>
+          )}
 
           {/* Footer */}
-          <div className="mt-2 flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
+          <div className="flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 flex-1 rounded-lg border border-[#1C1C1F] bg-transparent px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={!canSubmit || submitting}
-              className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              disabled={!canSubmit || addAddress.isPending}
+              className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
-              <Check size={14} />
-              {submitting ? "Adding…" : "Add Address"}
+              {addAddress.isPending && (
+                <Loader2 size={13} className="animate-spin" />
+              )}
+              {addAddress.isPending ? "Saving…" : "Save Address"}
             </button>
           </div>
         </form>

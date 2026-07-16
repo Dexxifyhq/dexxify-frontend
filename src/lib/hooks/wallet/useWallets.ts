@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { walletsApi } from "@/lib/api/wallet";
 import type {
   AddWithdrawalAddressDto,
-  BreetWithdrawalFilters,
   CreateWalletDto,
   InitiateFiatWithdrawalDto,
   InitiateStableCoinWithdrawalDto,
@@ -30,9 +29,6 @@ export const walletKeys = {
   walletTransactions: (walletId: string, filters: WalletTransactionFilters) =>
     [...walletKeys.all, "transactions", walletId, filters] as const,
   savedAddresses: () => [...walletKeys.all, "withdrawal-addresses", "saved"] as const,
-  breetAddresses: () => [...walletKeys.all, "withdrawal-addresses", "breet"] as const,
-  breetWithdrawals: (filters: BreetWithdrawalFilters) =>
-    [...walletKeys.all, "withdrawals", "breet", filters] as const,
 };
 
 // ── Queries ────────────────────────────────────────────────────────────────
@@ -159,14 +155,6 @@ export function useSavedWithdrawalAddresses() {
   });
 }
 
-export function useBreetWithdrawalAddresses() {
-  return useQuery({
-    queryKey: walletKeys.breetAddresses(),
-    queryFn: walletsApi.getBreetWithdrawalAddresses,
-    staleTime: 60_000,
-  });
-}
-
 export function useAddWithdrawalAddress() {
   const qc = useQueryClient();
   return useMutation({
@@ -174,7 +162,6 @@ export function useAddWithdrawalAddress() {
       walletsApi.addWithdrawalAddress(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.savedAddresses() });
-      qc.invalidateQueries({ queryKey: walletKeys.breetAddresses() });
     },
   });
 }
@@ -186,7 +173,6 @@ export function useDeleteWithdrawalAddress() {
       walletsApi.deleteWithdrawalAddress(withdrawalAddressId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.savedAddresses() });
-      qc.invalidateQueries({ queryKey: walletKeys.breetAddresses() });
     },
   });
 }
@@ -214,14 +200,6 @@ export function useWithdrawFiat() {
       qc.invalidateQueries({ queryKey: walletKeys.balance() });
       qc.invalidateQueries({ queryKey: walletKeys.all });
     },
-  });
-}
-
-export function useBreetWithdrawals(filters: BreetWithdrawalFilters = {}) {
-  return useQuery({
-    queryKey: walletKeys.breetWithdrawals(filters),
-    queryFn: () => walletsApi.getBreetWithdrawals(filters),
-    staleTime: 15_000,
   });
 }
 

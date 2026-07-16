@@ -56,26 +56,43 @@ export interface WalletBalance {
 export type WalletTxType =
   | "deposit"
   | "withdrawal"
-  | "swap"
+  | "transfer"
+  | "onramp"
+  | "offramp"
   | "payout"
   | "fee"
-  | "credit"
-  | "debit";
+  | "swap"
+  | "refund";
+
+export type LedgerEntryStatus =
+  | "initiated"
+  | "pending"
+  | "completed"
+  | "processing"
+  | "rejected"
+  | "reversed";
 
 export interface WalletTransaction {
   id: string;
-  wallet_id: string;
-  reference: string;
-  tx_hash?: string;
-  type: WalletTxType;
-  amount: number;
-  currency: string;
-  status: TxStatus;
-  description?: string;
+  developer_id: string;
+  tx_type: WalletTxType;
+  wallet_address: string | null;
+  reference_type: string;
+  reference_id: string;
+  debit_ngn: number;
+  credit_ngn: number;
+  debit_usd: number;
+  credit_usd: number;
+  asset: string | null;
+  status: LedgerEntryStatus;
+  amount_usd: number | null;
+  amount_crypto: number | null;
+  description: string | null;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
-export type WalletTransactionsResponse = PaginatedResponse<WalletTransaction>;
+export type WalletTransactionsResponse = WalletTransaction[];
 
 // ── DTOs ───────────────────────────────────────────────────────────────────
 
@@ -114,22 +131,28 @@ export interface WalletTransactionFilters {
 
 // ── Withdrawal addresses ─────────────────────────────────────────────────────
 
+export type WithdrawalNetwork = "ERC20" | "TRC20" | "SOL" | "BSC" | "TON";
+export type WithdrawalToken = "USDT" | "USDC";
+
 export interface WithdrawalAddress {
   id: string;
+  developer_id: string;
   address: string;
-  network: string;
-  token: string;
+  network: WithdrawalNetwork;
+  token: WithdrawalToken;
   label: string;
-  created_at?: string;
-  // Response shape isn't declared in the spec — keep it forgiving.
-  [key: string]: unknown;
+  primary: boolean;
+  avatar: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AddWithdrawalAddressDto {
   address: string;
-  network: string;
-  token: string;
+  network: WithdrawalNetwork;
+  token: WithdrawalToken;
   label: string;
+  isDefault: boolean;
 }
 
 // ── Withdrawals ──────────────────────────────────────────────────────────────
@@ -148,11 +171,6 @@ export interface InitiateFiatWithdrawalDto {
   amount: number;
   narration?: string;
   pin?: string;
-}
-
-export interface BreetWithdrawalFilters {
-  page?: number;
-  size?: number;
 }
 
 /** Withdrawal / mock-trade results aren't typed in the spec — kept permissive. */

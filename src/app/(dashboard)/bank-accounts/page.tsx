@@ -57,7 +57,7 @@ function BankDetailDrawer({
     },
     {
       label: "Account Type",
-      value: bank.type.toUpperCase(),
+      value: bank.type?.toUpperCase() ?? "—",
       icon: <Building2 size={13} className="text-[#52525B]" />,
     },
     {
@@ -103,19 +103,9 @@ function BankDetailDrawer({
               Primary
             </span>
           )}
-          {/* {bank.is_business && (
+          {bank.is_trusted && (
             <span className="rounded-full border border-[#1d3461]/50 bg-[#0f172a]/60 px-2.5 py-0.5 text-[11px] font-semibold text-[#60A5FA]">
-              Business
-            </span>
-          )} */}
-          {bank.auto_settlement && (
-            <span className="rounded-full border border-[#78350F]/50 bg-[#451A03]/60 px-2.5 py-0.5 text-[11px] font-semibold text-[#F59E0B]">
-              Auto-settle
-            </span>
-          )}
-          {bank.disabled && (
-            <span className="rounded-full border border-[#7f1d1d]/50 bg-[#450a0a]/60 px-2.5 py-0.5 text-[11px] font-semibold text-[#f87171]">
-              Disabled
+              Trusted
             </span>
           )}
         </div>

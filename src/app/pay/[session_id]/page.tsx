@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { payApi } from "@/lib/api/pay";
+import { useEstimatePayment } from "@/lib/hooks/payment-sessions/usePaymentSessions";
+import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
+import { useCountdown } from "@/lib/hooks/useCountdown";
 import {
   ChevronDown,
   Search,
@@ -11,21 +14,21 @@ import {
   Copy,
   Check,
   AlertTriangle,
+  Clock,
 } from "lucide-react";
 
-// ── Steps ──────────────────────────────────────────────────────────────────
 type Step = "form" | "deposit" | "error";
 
-// ── Asset dropdown ─────────────────────────────────────────────────────────
+// ── Asset picker ───────────────────────────────────────────────────────────
 
 function AssetPicker({
   assets,
   selected,
   onSelect,
 }: {
-  assets: any[];
-  selected: any | null;
-  onSelect: (a: any) => void;
+  assets: FlatAsset[];
+  selected: FlatAsset | null;
+  onSelect: (a: FlatAsset) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -34,9 +37,9 @@ function AssetPicker({
   const filtered = search.trim()
     ? assets.filter(
         (a) =>
-          a.symbol?.toLowerCase().includes(search.toLowerCase()) ||
-          a.name?.toLowerCase().includes(search.toLowerCase()) ||
-          a.network?.toLowerCase().includes(search.toLowerCase()),
+          a.symbol.toLowerCase().includes(search.toLowerCase()) ||
+          a.name.toLowerCase().includes(search.toLowerCase()) ||
+          a.networkDisplay.toLowerCase().includes(search.toLowerCase()),
       )
     : assets;
 
@@ -54,27 +57,25 @@ function AssetPicker({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 text-sm transition-colors hover:border-white/20 focus:outline-none"
+        className="flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 text-sm transition-colors hover:border-white/20"
       >
         {selected ? (
           <>
-            <img
-              src={selected.icon}
-              alt=""
-              width={22}
-              height={22}
-              className="h-[22px] w-[22px] shrink-0 rounded-full object-cover"
-            />
             <span className="flex-1 text-left font-medium text-white">
               {selected.symbol}
+              <span className="ml-1.5 text-xs font-normal text-white/40">
+                {selected.name}
+              </span>
             </span>
-            <span className="text-xs text-white/40">{selected.network}</span>
+            <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">
+              {selected.networkDisplay}
+            </span>
           </>
         ) : (
           <span className="flex-1 text-left text-white/30">Choose token…</span>
         )}
         <ChevronDown
-          size={15}
+          size={14}
           className={`shrink-0 text-white/30 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
@@ -92,40 +93,31 @@ function AssetPicker({
               className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
             />
           </div>
-          <ul className="max-h-56 overflow-y-auto py-1">
+          <ul className="max-h-52 overflow-y-auto py-1">
             {filtered.length === 0 ? (
               <li className="px-3 py-2 text-xs text-white/30">
                 No tokens found
               </li>
             ) : (
-              filtered.map((asset: any) => (
-                <li key={asset.id ?? asset.identifier}>
+              filtered.map((a) => (
+                <li key={a.key}>
                   <button
                     type="button"
                     onClick={() => {
-                      onSelect(asset);
+                      onSelect(a);
                       setOpen(false);
                       setSearch("");
                     }}
-                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-white/5 ${
-                      selected?.id === asset.id ? "text-white" : "text-white/70"
-                    }`}
+                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-white/5 ${selected?.key === a.key ? "text-white" : "text-white/70"}`}
                   >
-                    <img
-                      src={asset.icon}
-                      alt=""
-                      width={22}
-                      height={22}
-                      className="h-[22px] w-[22px] shrink-0 rounded-full object-cover"
-                    />
                     <span className="flex-1 truncate font-medium">
-                      {asset.symbol}
+                      {a.symbol}
                       <span className="ml-1.5 text-xs font-normal text-white/40">
-                        {asset.name}
+                        {a.name}
                       </span>
                     </span>
-                    <span className="shrink-0 text-xs text-white/30">
-                      {asset.network}
+                    <span className="shrink-0 rounded bg-white/6 px-1.5 py-0.5 text-[10px] text-white/30">
+                      {a.networkDisplay}
                     </span>
                   </button>
                 </li>
@@ -140,7 +132,7 @@ function AssetPicker({
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
-export default function PayPage() {
+export default function CheckoutSessionPage() {
   const { session_id } = useParams<{ session_id: string }>();
 
   const {
@@ -160,48 +152,71 @@ export default function PayPage() {
     staleTime: 60 * 60 * 1000,
   });
 
-  const initiateMutation = useMutation({
-    mutationFn: (payload: any) =>
-      payApi.initiatePagePayment(session_id, payload),
+  const depositMutation = useMutation({
+    mutationFn: (payload: { crypto_asset: string; network: string }) =>
+      payApi.generateDepositAddress(session_id, payload),
   });
 
-  const assets: any[] = Array.isArray(assetsData)
-    ? assetsData
-    : ((assetsData as any)?.data ?? []);
+  const assets: FlatAsset[] = flattenAssets(
+    (assetsData as any)?.data ?? assetsData ?? {},
+  );
 
   const [step, setStep] = useState<Step>("form");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [selectedAsset, setSelectedAsset] = useState<any | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<FlatAsset | null>(null);
   const [depositInfo, setDepositInfo] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
+  const { count, start: startCountdown } = useCountdown(0);
 
-  const sessionAmount: number = session?.amount ?? 0;
-  const ngnRate: number = selectedAsset?.rate?.NGN ?? 0;
-  const ngnValue =
-    sessionAmount > 0 && ngnRate > 0
-      ? (sessionAmount * ngnRate).toLocaleString("en-NG", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : null;
+  const { data: estimateData, isFetching: estimating } = useEstimatePayment(
+    selectedAsset && session
+      ? {
+          amount: String(session.amount ?? 0),
+          currency: session.currency ?? "USD",
+          crypto_asset: selectedAsset.symbol,
+          network: selectedAsset.network,
+          reference: session.provider_session_reference,
+        }
+      : null,
+  );
+  // console.log(session);
 
-  const minDeposit: number | null = selectedAsset?.minimum ?? null;
+  // If session already has a deposit address (e.g. page refresh), skip to deposit step
+  useEffect(() => {
+    if (!session) return;
+    if (session.deposit_address) {
+      setDepositInfo({ session });
+      setStep("deposit");
+    }
+  }, [session]);
 
-  const canPay =
-    name.trim() !== "" &&
-    email.trim() !== "" &&
-    !!selectedAsset &&
-    !initiateMutation.isPending;
+  useEffect(() => {
+    if (!session?.expires_at) return;
+    const secondsLeft = Math.max(
+      0,
+      Math.floor((new Date(session.expires_at).getTime() - Date.now()) / 1000),
+    );
+    startCountdown(secondsLeft);
+  }, [session]);
 
-  const handlePay = (e: React.FormEvent<HTMLFormElement>) => {
+  // const expired =
+  //   depositInfo && count === 0 && !!depositInfo.session?.expires_at;
+  const expired = session && count === 0 && !!session?.expires_at;
+
+  const timerDisplay = (() => {
+    const m = Math.floor(count / 60);
+    const s = count % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  })();
+
+  const sessionAmount: number = Number(session?.amount ?? 0);
+  const canPay = !!selectedAsset && !depositMutation.isPending;
+
+  const handlePay = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canPay || !selectedAsset) return;
-    initiateMutation.mutate(
+    depositMutation.mutate(
       {
-        name: name.trim(),
-        email: email.trim(),
-        asset: selectedAsset.identifier,
+        crypto_asset: selectedAsset.symbol,
         network: selectedAsset.network,
       },
       {
@@ -222,7 +237,15 @@ export default function PayPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ── Loading state ──────────────────────────────────────────────────────
+  const depositAddress =
+    depositInfo?.session?.deposit_address ??
+    // depositInfo?.cc?.payment?.address ??
+    null;
+
+  const cryptoAsset =
+    depositInfo?.session?.crypto_asset ?? selectedAsset?.symbol;
+  const network = depositInfo?.session?.network ?? selectedAsset?.network;
+
   if (sessionLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#09090B]">
@@ -231,7 +254,6 @@ export default function PayPage() {
     );
   }
 
-  // ── Session not found / error ──────────────────────────────────────────
   if (sessionError || !session) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#09090B] p-6 text-center">
@@ -246,64 +268,64 @@ export default function PayPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#09090B] p-4">
-      {/* Brand */}
       <p className="mb-8 text-sm font-semibold tracking-widest text-white/20 uppercase">
         Dexxify
       </p>
 
+      {/* Expiry timer */}
+      {session?.expires_at && (
+        <div
+          className={`flex items-center justify-center gap-4 rounded-xl border px-4 py-2.5 mb-4 ${
+            expired
+              ? "border-red-900/40 bg-red-950/30"
+              : count <= 120
+                ? "border-yellow-900/40 bg-yellow-950/30"
+                : "border-white/10 bg-white/5"
+          }`}
+        >
+          <Clock
+            size={13}
+            className={
+              expired
+                ? "text-red-400"
+                : count <= 120
+                  ? "text-yellow-400"
+                  : "text-white/40"
+            }
+          />
+          {expired ? (
+            <span className="text-xs font-semibold text-red-400">
+              Session expired — please go back and try again
+            </span>
+          ) : (
+            <span
+              className={`font-mono text-sm font-semibold tabular-nums ${
+                count <= 120 ? "text-yellow-400" : "text-white/70"
+              }`}
+            >
+              {timerDisplay}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0D0D0F] shadow-2xl">
-        {/* ── Amount header ── */}
+        {/* Amount header */}
         <div className="flex flex-col items-center gap-1 border-b border-white/10 px-6 py-6 text-center">
           <p className="text-xs text-white/40 uppercase tracking-wider">
             Amount Due
           </p>
           <p className="text-4xl font-bold text-white">
-            ${sessionAmount.toFixed(2)}
+            {sessionAmount.toFixed(2)}
             <span className="ml-1.5 text-lg font-normal text-white/40">
-              USD
+              {session.currency?.toUpperCase() ?? "USD"}
             </span>
           </p>
-          {ngnValue && (
-            <p className="mt-1 text-xs text-white/40">
-              ≈ <span className="text-white/60">₦{ngnValue}</span>
-            </p>
-          )}
         </div>
 
         {/* ── Step: form ── */}
         {step === "form" && (
           <form onSubmit={handlePay} className="flex flex-col gap-4 px-6 py-6">
-            {/* Name */}
-            <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                required
-                className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
-              />
-            </div>
-
-            {/* Asset */}
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
                 Pay With
@@ -320,20 +342,32 @@ export default function PayPage() {
                   onSelect={setSelectedAsset}
                 />
               )}
-              {selectedAsset && minDeposit !== null && (
-                <p className="mt-1.5 text-xs text-white/30">
-                  Min. deposit:{" "}
-                  <span className="text-white/50">
-                    ₦{minDeposit.toLocaleString()}
-                  </span>
-                </p>
-              )}
             </div>
 
-            {/* Error */}
-            {initiateMutation.isError && (
+            {/* Estimate */}
+            {selectedAsset && (
+              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                <span className="text-xs text-white/40">
+                  You&apos;ll send approx.
+                </span>
+                {estimating ? (
+                  <Loader2 size={13} className="animate-spin text-white/30" />
+                ) : estimateData?.crypto ? (
+                  <span className="text-sm font-semibold text-white">
+                    {Number(estimateData.crypto.amount).toFixed(6)}{" "}
+                    <span className="font-normal text-white/50">
+                      {estimateData.crypto.asset}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-xs text-white/30">—</span>
+                )}
+              </div>
+            )}
+
+            {depositMutation.isError && (
               <p className="rounded-xl border border-red-900/40 bg-red-950/40 px-3 py-2.5 text-xs text-red-400">
-                {(initiateMutation.error as any)?.message ??
+                {(depositMutation.error as any)?.message ??
                   "Something went wrong. Please try again."}
               </p>
             )}
@@ -343,15 +377,17 @@ export default function PayPage() {
               disabled={!canPay}
               className="mt-2 flex h-11 items-center justify-center gap-2 rounded-xl bg-white text-sm font-semibold text-[#09090B] hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
-              {initiateMutation.isPending ? (
+              {depositMutation.isPending ? (
                 <Loader2 size={15} className="animate-spin" />
               ) : null}
-              {initiateMutation.isPending ? "Processing…" : "Continue to Pay"}
+              {depositMutation.isPending
+                ? "Processing…"
+                : "Get Deposit Address"}
             </button>
           </form>
         )}
 
-        {/* ── Step: deposit address ── */}
+        {/* ── Step: deposit ── */}
         {step === "deposit" && depositInfo && (
           <div className="flex flex-col gap-5 px-6 py-6">
             <div className="text-center">
@@ -361,16 +397,39 @@ export default function PayPage() {
               </p>
             </div>
 
-            {/* Asset + amount to send */}
-            {depositInfo.amountToPay && (
+            {/* Crypto amount to send */}
+            {(estimateData?.crypto || session?.metadata?.estimate?.crypto) && (
               <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center">
-                <p className="text-xs text-white/40">Amount to send</p>
-                <p className="mt-0.5 text-xl font-bold text-white">
-                  {depositInfo.amountToPay}{" "}
-                  <span className="text-base font-normal text-white/50">
-                    {selectedAsset?.symbol}
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                  Amount to Send
+                </p>
+                <p className="mt-1 text-2xl font-bold text-white">
+                  {Number(
+                    estimateData?.crypto.amount ||
+                      session?.metadata?.estimate?.crypto.amount,
+                  ).toFixed(6)}{" "}
+                  <span className="text-base font-normal text-white/40">
+                    {estimateData?.crypto.asset ||
+                      session?.metadata?.estimate?.crypto.asset}
                   </span>
                 </p>
+                {(estimateData?.fees?.networkFee ||
+                  session?.metadata?.estimate?.fees?.networkFee) && (
+                  <p className="mt-1 text-[11px] text-white/30">
+                    Network fee:{" "}
+                    <span className="text-white/50">
+                      {estimateData?.fees?.networkFee ||
+                        session?.metadata?.estimate?.fees?.networkFee}{" "}
+                      {estimateData?.crypto?.asset ||
+                        session?.metadata?.estimate?.crypto?.asset}
+                    </span>{" "}
+                    · paid by{" "}
+                    <span className="text-white/50">
+                      {estimateData?.fees?.paidBy ||
+                        session?.metadata?.estimate?.fees?.paidBy}
+                    </span>
+                  </p>
+                )}
               </div>
             )}
 
@@ -380,16 +439,12 @@ export default function PayPage() {
                 Deposit Address
               </p>
               <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
-                <span className="flex-1 break-all text-xs font-mono text-white/70">
-                  {depositInfo.address ?? depositInfo.deposit_address}
+                <span className="flex-1 break-all font-mono text-xs text-white/70">
+                  {depositAddress}
                 </span>
                 <button
                   type="button"
-                  onClick={() =>
-                    handleCopy(
-                      depositInfo.address ?? depositInfo.deposit_address,
-                    )
-                  }
+                  onClick={() => depositAddress && handleCopy(depositAddress)}
                   className="shrink-0 text-white/30 hover:text-white transition-colors"
                 >
                   {copied ? (
@@ -408,11 +463,9 @@ export default function PayPage() {
                 className="mt-0.5 shrink-0 text-yellow-500"
               />
               <p className="text-xs text-yellow-500/80">
-                Only send{" "}
-                <span className="font-semibold">{selectedAsset?.symbol}</span>{" "}
-                on the{" "}
-                <span className="font-semibold">{selectedAsset?.network}</span>{" "}
-                network to this address.
+                Only send <span className="font-semibold">{cryptoAsset}</span>{" "}
+                on the <span className="font-semibold">{network}</span> network
+                to this address.
               </p>
             </div>
           </div>
@@ -428,14 +481,13 @@ export default function PayPage() {
             />
             <p className="text-sm font-semibold text-white">Payment Failed</p>
             <p className="text-xs text-white/40">
-              We couldn&apos;t initiate your payment. Please go back and try
-              again.
+              We couldn&apos;t generate a deposit address. Please try again.
             </p>
             <button
               type="button"
               onClick={() => {
                 setStep("form");
-                initiateMutation.reset();
+                depositMutation.reset();
               }}
               className="mt-2 h-9 rounded-xl border border-white/10 px-4 text-sm text-white/60 hover:bg-white/5 transition-colors"
             >

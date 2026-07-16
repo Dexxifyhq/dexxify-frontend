@@ -15,8 +15,7 @@ import type {
   AddWithdrawalAddressDto,
   InitiateStableCoinWithdrawalDto,
   InitiateFiatWithdrawalDto,
-  BreetWithdrawalFilters,
-  WithdrawalResult,
+WithdrawalResult,
   MockTradeDto,
 } from "@/lib/types/wallet";
 
@@ -62,9 +61,9 @@ export const walletsApi = {
 
   // GET /wallets/transactions/all
   getAllTransactions: (filters: WalletTransactionFilters = {}) =>
-    get<PaginatedResponse<WalletTransaction>>("/wallets/transactions/all", {
+    get<WalletTransaction[]>("/wallets/transactions/all", {
       page: filters.page ?? 1,
-      limit: filters.limit ?? 20,
+      limit: filters.limit ?? 100,
     }),
 
   // GET /wallets/{wallet_id}/transactions — transactions for a single wallet
@@ -72,11 +71,11 @@ export const walletsApi = {
     walletId: string,
     filters: WalletTransactionFilters = {},
   ) =>
-    get<PaginatedResponse<WalletTransaction>>(
+    get<WalletTransaction[]>(
       `/wallets/${walletId}/transactions`,
       {
         page: filters.page ?? 1,
-        limit: filters.limit ?? 20,
+        limit: filters.limit ?? 100,
       },
     ),
 
@@ -89,10 +88,6 @@ export const walletsApi = {
   // GET /wallets/withdrawal-addresses/saved — user-saved addresses
   getSavedWithdrawalAddresses: () =>
     get<WithdrawalAddress[]>("/wallets/withdrawal-addresses/saved"),
-
-  // GET /wallets/withdrawal-addresses/breet — Breet-whitelisted addresses
-  getBreetWithdrawalAddresses: () =>
-    get<WithdrawalAddress[]>("/wallets/withdrawal-addresses/breet"),
 
   // DELETE /wallets/withdrawal-addresses/{id}
   deleteWithdrawalAddress: (withdrawalAddressId: string) =>
@@ -109,14 +104,6 @@ export const walletsApi = {
   // POST /wallets/withdrawals/local-currencies — fiat payout to a bank
   withdrawFiat: (payload: InitiateFiatWithdrawalDto) =>
     post<WithdrawalResult>("/wallets/withdrawals/local-currencies", payload),
-
-  // GET /wallets/withdrawals/breet — Breet withdrawal history.
-  // NOTE: the spec mislabels page/size as path params; they are query params.
-  getBreetWithdrawals: (filters: BreetWithdrawalFilters = {}) =>
-    get<PaginatedResponse<WithdrawalResult>>("/wallets/withdrawals/breet", {
-      page: filters.page ?? 1,
-      size: filters.size ?? 20,
-    }),
 
   // ── Sandbox testing ──────────────────────────────────────────────────────────
 
