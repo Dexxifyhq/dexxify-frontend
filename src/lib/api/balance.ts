@@ -64,45 +64,47 @@ function mapLedgerToHistory(tx: LedgerTransaction): BalanceHistoryItem {
       ? "debit"
       : (tx.tx_type as BalanceTxType);
 
+  const amount = Number(tx.amount_usd ?? tx.credit_usd ?? tx.debit_usd ?? tx.credit_ngn ?? tx.debit_ngn) || 0;
   return {
     id: tx.id,
-    reference: tx.reference,
-    tx_hash: tx.tx_hash,
+    reference: tx.reference_id,
     type: uiType,
-    amount: tx.amount,
-    currency: tx.currency as CryptoCurrency,
-    status: (tx.status ?? STATUS_FALLBACK) as TxStatus,
+    amount,
+    currency: (tx.asset ?? "USD") as CryptoCurrency,
+    status: "pending" as TxStatus,
     description: tx.description ?? "",
     created_at: tx.created_at,
   };
 }
 
 function mapLedgerToSwap(tx: LedgerTransaction): SwapItem {
-  // Best-effort mapping — when backend ships richer swap metadata, refine here.
   const meta = (tx.metadata ?? {}) as Record<string, unknown>;
+  const asset = tx.asset ?? "USDT";
+  const amount = Number(tx.amount_usd ?? tx.amount_crypto ?? tx.debit_usd ?? tx.credit_usd) || 0;
   return {
     id: tx.id,
-    from_currency: (meta.from_currency ?? tx.currency) as CryptoCurrency,
-    to_currency: (meta.to_currency ?? tx.currency) as CryptoCurrency,
-    from_amount: Number(meta.from_amount ?? tx.amount) || 0,
-    to_amount: Number(meta.to_amount ?? tx.amount) || 0,
+    from_currency: (meta.from_currency ?? asset) as CryptoCurrency,
+    to_currency: (meta.to_currency ?? asset) as CryptoCurrency,
+    from_amount: Number(meta.from_amount ?? amount) || 0,
+    to_amount: Number(meta.to_amount ?? amount) || 0,
     rate: Number(meta.rate ?? 1) || 1,
-    status: tx.status,
+    status: tx.status as unknown as TxStatus,
     created_at: tx.created_at,
   };
 }
 
 function mapLedgerToPayout(tx: LedgerTransaction): PayoutItem {
   const meta = (tx.metadata ?? {}) as Record<string, unknown>;
+  const amount = Number(tx.amount_usd ?? tx.debit_usd ?? tx.debit_ngn ?? 0);
   return {
     id: tx.id,
-    reference: tx.reference,
-    amount: tx.amount,
-    currency: tx.currency as CryptoCurrency,
+    reference: tx.reference_id,
+    amount,
+    currency: (tx.asset ?? "USDT") as CryptoCurrency,
     destination: String(
       meta.destination ?? meta.account_number ?? tx.description ?? "—",
     ),
-    status: tx.status,
+    status: tx.status as unknown as TxStatus,
     created_at: tx.created_at,
   };
 }
@@ -110,7 +112,7 @@ function mapLedgerToPayout(tx: LedgerTransaction): PayoutItem {
 function emptyPage<T>(): PaginatedResponse<T> {
   return {
     data: [],
-    meta: { total: 0, page: 1, limit: 20, total_pages: 0 },
+    meta: { total: 0, page: 1, limit: 20, total_pages: 0, has_next: false, has_prev: false },
   };
 }
 

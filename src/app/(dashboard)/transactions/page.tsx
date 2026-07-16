@@ -10,6 +10,7 @@ import {
   X,
   Copy,
   Check,
+  ChevronLeft,
   ChevronRight,
   Loader2,
   AlertCircle,
@@ -17,54 +18,103 @@ import {
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import StatCard from "@/components/dashboard/shared/StatCard";
 import { FilterSelect } from "@/components/dashboard/shared/FilterBar";
-import { useWalletTransactions } from "@/lib/hooks/wallet/useWallets";
-import type { WalletTransaction, WalletTxType, LedgerEntryStatus } from "@/lib/types/wallet";
+import { useLedgerTransactions } from "@/lib/hooks/ledger/useLedger";
+import type {
+  LedgerTransaction,
+  LedgerTxType,
+  LedgerEntryStatus,
+} from "@/lib/types/ledger";
 import { cn } from "@/utils/utils";
 
 // ── Config maps ─────────────────────────────────────────────────────────────
 
-const TX_TYPE_CFG: Record<WalletTxType, { label: string; cls: string }> = {
-  deposit:    { label: "Deposit",    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  onramp:     { label: "Onramp",     cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  refund:     { label: "Refund",     cls: "bg-[#052e16]/60 text-[#86efac] border-[#14532D]/50" },
-  withdrawal: { label: "Withdrawal", cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  offramp:    { label: "Offramp",    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  payout:     { label: "Payout",     cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50" },
-  fee:        { label: "Fee",        cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50" },
-  transfer:   { label: "Transfer",   cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50" },
-  swap:       { label: "Swap",       cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50" },
+const TX_TYPE_CFG: Record<LedgerTxType, { label: string; cls: string }> = {
+  deposit: {
+    label: "Deposit",
+    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+  },
+  onramp: {
+    label: "Onramp",
+    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+  },
+  refund: {
+    label: "Refund",
+    cls: "bg-[#052e16]/60 text-[#86efac] border-[#14532D]/50",
+  },
+  withdrawal: {
+    label: "Withdrawal",
+    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+  },
+  offramp: {
+    label: "Offramp",
+    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+  },
+  payout: {
+    label: "Payout",
+    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+  },
+  fee: {
+    label: "Fee",
+    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+  },
+  transfer: {
+    label: "Transfer",
+    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+  },
+  swap: {
+    label: "Swap",
+    cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50",
+  },
 };
 
 const STATUS_CFG: Record<LedgerEntryStatus, { label: string; cls: string }> = {
-  completed:  { label: "Completed",  cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  pending:    { label: "Pending",    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50" },
-  initiated:  { label: "Initiated",  cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50" },
-  processing: { label: "Processing", cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50" },
-  rejected:   { label: "Rejected",   cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  reversed:   { label: "Reversed",   cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50" },
+  completed: {
+    label: "Completed",
+    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+  },
+  pending: {
+    label: "Pending",
+    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+  },
+  initiated: {
+    label: "Initiated",
+    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+  },
+  processing: {
+    label: "Processing",
+    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+  },
+  rejected: {
+    label: "Rejected",
+    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+  },
+  reversed: {
+    label: "Reversed",
+    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+  },
 };
 
 const TX_TYPE_OPTIONS = [
-  { label: "All Types",   value: "all" },
-  { label: "Deposit",     value: "deposit" },
-  { label: "Withdrawal",  value: "withdrawal" },
-  { label: "Payout",      value: "payout" },
-  { label: "Fee",         value: "fee" },
-  { label: "Transfer",    value: "transfer" },
-  { label: "Swap",        value: "swap" },
-  { label: "Onramp",      value: "onramp" },
-  { label: "Offramp",     value: "offramp" },
-  { label: "Refund",      value: "refund" },
+  { label: "All Types", value: "all" },
+  { label: "Deposit", value: "deposit" },
+  { label: "Withdrawal", value: "withdrawal" },
+  { label: "Payout", value: "payout" },
+  { label: "Fee", value: "fee" },
+  { label: "Transfer", value: "transfer" },
+  { label: "Swap", value: "swap" },
+  { label: "Onramp", value: "onramp" },
+  { label: "Offramp", value: "offramp" },
+  { label: "Refund", value: "refund" },
 ];
 
 const STATUS_OPTIONS = [
-  { label: "All Status",  value: "all" },
-  { label: "Completed",   value: "completed" },
-  { label: "Pending",     value: "pending" },
-  { label: "Processing",  value: "processing" },
-  { label: "Initiated",   value: "initiated" },
-  { label: "Rejected",    value: "rejected" },
-  { label: "Reversed",    value: "reversed" },
+  { label: "All Status", value: "all" },
+  { label: "Completed", value: "completed" },
+  { label: "Pending", value: "pending" },
+  { label: "Processing", value: "processing" },
+  { label: "Initiated", value: "initiated" },
+  { label: "Rejected", value: "rejected" },
+  { label: "Reversed", value: "reversed" },
 ];
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -91,7 +141,10 @@ function fmtDate(d: string) {
   });
 }
 
-function getMainAmount(tx: WalletTransaction): { value: string; positive: boolean } {
+function getMainAmount(tx: LedgerTransaction): {
+  value: string;
+  positive: boolean;
+} {
   // Crypto amount takes precedence
   if (tx.amount_crypto != null && Number(tx.amount_crypto) > 0) {
     const isCredit = Number(tx.credit_usd) > 0 || Number(tx.credit_ngn) > 0;
@@ -117,19 +170,35 @@ function getMainAmount(tx: WalletTransaction): { value: string; positive: boolea
 
 // ── Badges ───────────────────────────────────────────────────────────────────
 
-function TxTypeBadge({ type }: { type: WalletTxType }) {
-  const cfg = TX_TYPE_CFG[type] ?? { label: type, cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50" };
+function TxTypeBadge({ type }: { type: LedgerTxType }) {
+  const cfg = TX_TYPE_CFG[type] ?? {
+    label: type,
+    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+  };
   return (
-    <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold", cfg.cls)}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+        cfg.cls,
+      )}
+    >
       {cfg.label}
     </span>
   );
 }
 
 function StatusBadge({ status }: { status: LedgerEntryStatus }) {
-  const cfg = STATUS_CFG[status] ?? { label: status, cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50" };
+  const cfg = STATUS_CFG[status] ?? {
+    label: status,
+    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+  };
   return (
-    <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold", cfg.cls)}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+        cfg.cls,
+      )}
+    >
       {cfg.label}
     </span>
   );
@@ -151,17 +220,29 @@ function CopyButton({ value }: { value: string }) {
       onClick={copy}
       className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded text-[#52525B] hover:text-[#A1A1AA] transition-colors"
     >
-      {copied ? <Check size={11} className="text-[#4ade80]" /> : <Copy size={11} />}
+      {copied ? (
+        <Check size={11} className="text-[#4ade80]" />
+      ) : (
+        <Copy size={11} />
+      )}
     </button>
   );
 }
 
 // ── Detail drawer ─────────────────────────────────────────────────────────────
 
-function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-0.5 py-3 border-b border-[#1C1C1F] last:border-0">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+        {label}
+      </span>
       <div className="text-sm text-[#FAFAFA]">{children}</div>
     </div>
   );
@@ -171,7 +252,7 @@ function TransactionDrawer({
   tx,
   onClose,
 }: {
-  tx: WalletTransaction | null;
+  tx: LedgerTransaction | null;
   onClose: () => void;
 }) {
   if (!tx) return null;
@@ -199,12 +280,22 @@ function TransactionDrawer({
 
         {/* Amount hero */}
         <div className="border-b border-[#1C1C1F] px-5 py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">Amount</p>
-          <p className={cn("mt-1 text-3xl font-bold tracking-tight", positive ? "text-[#4ade80]" : "text-[#FAFAFA]")}>
-            {positive ? "+" : "−"}{amtValue}
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+            Amount
+          </p>
+          <p
+            className={cn(
+              "mt-1 text-3xl font-bold tracking-tight",
+              positive ? "text-[#4ade80]" : "text-[#FAFAFA]",
+            )}
+          >
+            {positive ? "+" : "−"}
+            {amtValue}
           </p>
           {tx.amount_usd != null && (
-            <p className="mt-0.5 text-sm text-[#71717A]">≈ ${fmtNum(Number(tx.amount_usd))} USD</p>
+            <p className="mt-0.5 text-sm text-[#71717A]">
+              ≈ ${fmtNum(Number(tx.amount_usd))} USD
+            </p>
           )}
         </div>
 
@@ -223,7 +314,9 @@ function TransactionDrawer({
           </DetailRow>
           {tx.wallet_address && (
             <DetailRow label="Wallet Address">
-              <span className="break-all font-mono text-xs">{tx.wallet_address}</span>
+              <span className="break-all font-mono text-xs">
+                {tx.wallet_address}
+              </span>
               <CopyButton value={tx.wallet_address} />
             </DetailRow>
           )}
@@ -279,24 +372,41 @@ export default function TransactionsPage() {
   const [search, setSearch] = useState("");
   const [txTypeFilter, setTxTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selected, setSelected] = useState<WalletTransaction | null>(null);
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<LedgerTransaction | null>(null);
 
-  const { data, isLoading, isError } = useWalletTransactions();
+  const { data, isLoading, isError } = useLedgerTransactions({
+    ...(txTypeFilter !== "all"
+      ? { tx_type: txTypeFilter as LedgerTxType }
+      : {}),
+    page,
+  });
+  // console.log("data", data);
 
-  const txList: WalletTransaction[] = Array.isArray(data) ? data : ((data as any)?.data ?? []);
+  const txList: LedgerTransaction[] = data?.data ?? [];
+  const meta = data?.meta;
 
-  const stats = useMemo(() => {
-    const total = txList.length;
-    const completed = txList.filter((t) => t.status === "completed").length;
-    const pending = txList.filter((t) => ["initiated", "pending", "processing"].includes(t.status)).length;
-    const failed = txList.filter((t) => ["rejected", "reversed"].includes(t.status)).length;
-    return { total, completed, pending, failed };
-  }, [txList]);
+  const handleTxTypeChange = (val: string) => {
+    setTxTypeFilter(val);
+    setPage(1);
+  };
+
+  const stats = useMemo(
+    () => ({
+      total: meta?.total ?? txList.length,
+      completed: txList.filter((t) => t.status === "completed").length,
+      pending: txList.filter((t) =>
+        ["initiated", "pending", "processing"].includes(t.status),
+      ).length,
+      failed: txList.filter((t) => ["rejected", "reversed"].includes(t.status))
+        .length,
+    }),
+    [txList, meta],
+  );
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return txList.filter((tx) => {
-      if (txTypeFilter !== "all" && tx.tx_type !== txTypeFilter) return false;
       if (statusFilter !== "all" && tx.status !== statusFilter) return false;
       if (!q) return true;
       return (
@@ -307,7 +417,7 @@ export default function TransactionsPage() {
         tx.id.toLowerCase().includes(q)
       );
     });
-  }, [txList, search, txTypeFilter, statusFilter]);
+  }, [txList, search, statusFilter]);
 
   return (
     <>
@@ -319,19 +429,40 @@ export default function TransactionsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Total Transactions" value={String(stats.total)} icon={<ArrowLeftRight size={15} />} />
-          <StatCard label="Completed"           value={String(stats.completed)} icon={<CheckCircle2 size={15} />} />
-          <StatCard label="Pending"             value={String(stats.pending)}   icon={<Clock size={15} />} />
-          <StatCard label="Failed / Reversed"   value={String(stats.failed)}    icon={<XCircle size={15} />} />
+          <StatCard
+            label="Total Transactions"
+            value={String(stats.total)}
+            icon={<ArrowLeftRight size={15} />}
+          />
+          <StatCard
+            label="Completed"
+            value={String(stats.completed)}
+            icon={<CheckCircle2 size={15} />}
+          />
+          <StatCard
+            label="Pending"
+            value={String(stats.pending)}
+            icon={<Clock size={15} />}
+          />
+          <StatCard
+            label="Failed / Reversed"
+            value={String(stats.failed)}
+            icon={<XCircle size={15} />}
+          />
         </div>
 
         {/* Table */}
         <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1C1C1F] px-5 py-4">
-            <h2 className="text-sm font-semibold text-[#FAFAFA]">All Transactions</h2>
+            <h2 className="text-sm font-semibold text-[#FAFAFA]">
+              All Transactions
+            </h2>
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]" />
+                <Search
+                  size={13}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                />
                 <input
                   type="text"
                   value={search}
@@ -344,7 +475,7 @@ export default function TransactionsPage() {
                 label="All Types"
                 options={TX_TYPE_OPTIONS}
                 value={txTypeFilter}
-                onChange={setTxTypeFilter}
+                onChange={handleTxTypeChange}
               />
               <FilterSelect
                 label="All Status"
@@ -361,12 +492,22 @@ export default function TransactionsPage() {
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
-              <AlertCircle size={24} className="text-[#3F3F46]" strokeWidth={1.5} />
-              <p className="text-sm text-[#71717A]">Failed to load transactions.</p>
+              <AlertCircle
+                size={24}
+                className="text-[#3F3F46]"
+                strokeWidth={1.5}
+              />
+              <p className="text-sm text-[#71717A]">
+                Failed to load transactions.
+              </p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
-              <ArrowLeftRight size={28} className="text-[#3F3F46]" strokeWidth={1.5} />
+              <ArrowLeftRight
+                size={28}
+                className="text-[#3F3F46]"
+                strokeWidth={1.5}
+              />
               <p className="text-sm font-semibold text-[#FAFAFA]">
                 {search || txTypeFilter !== "all" || statusFilter !== "all"
                   ? "No transactions match your filters."
@@ -378,7 +519,15 @@ export default function TransactionsPage() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-[#1C1C1F]">
-                    {["Type", "Asset", "Amount", "Status", "Reference", "Date", ""].map((h) => (
+                    {[
+                      "Type",
+                      "Asset",
+                      "Amount",
+                      "Status",
+                      "Reference",
+                      "Date",
+                      "",
+                    ].map((h) => (
                       <th
                         key={h}
                         className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
@@ -435,6 +584,32 @@ export default function TransactionsPage() {
                   })}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {meta && meta.total_pages > 1 && (
+            <div className="flex items-center justify-between border-t border-[#1C1C1F] px-5 py-3">
+              <p className="text-xs text-[#52525B]">
+                Page {meta.page} of {meta.total_pages} &middot; {meta.total}{" "}
+                total
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={!meta.has_prev || isLoading}
+                  className="flex h-8 items-center gap-1 rounded-lg border border-[#1C1C1F] px-3 text-xs font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] disabled:pointer-events-none disabled:opacity-30 transition-colors"
+                >
+                  <ChevronLeft size={13} /> Prev
+                </button>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!meta.has_next || isLoading}
+                  className="flex h-8 items-center gap-1 rounded-lg border border-[#1C1C1F] px-3 text-xs font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] disabled:pointer-events-none disabled:opacity-30 transition-colors"
+                >
+                  Next <ChevronRight size={13} />
+                </button>
+              </div>
             </div>
           )}
         </section>
