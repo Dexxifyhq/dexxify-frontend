@@ -1,7 +1,6 @@
-import { get } from "@/lib/api-client";
+import { get, getPaginated } from "@/lib/api-client";
 import type {
   LedgerTransaction,
-  LedgerTransactionList,
   LedgerBalance,
   SettlementReport,
   LedgerFilters,
@@ -11,23 +10,20 @@ import type {
 export const ledgerApi = {
   // GET /transactions
   getTransactions: (filters: LedgerFilters = {}) =>
-    get<LedgerTransactionList>("/transactions", {
+    getPaginated<LedgerTransaction>("/transactions", {
       ...(filters.tx_type ? { tx_type: filters.tx_type } : {}),
-      ...(filters.currency ? { currency: filters.currency } : {}),
-      ...(filters.reference_type
-        ? { reference_type: filters.reference_type }
-        : {}),
+      ...(filters.reference_type ? { reference_type: filters.reference_type } : {}),
       ...(filters.from_date ? { from_date: filters.from_date } : {}),
       ...(filters.to_date ? { to_date: filters.to_date } : {}),
       page: filters.page ?? 1,
       limit: filters.limit ?? 20,
     }),
 
-  // GET /transactions/{tx_id}
+  // GET /transactions/:tx_id
   getTransaction: (txId: string) =>
     get<LedgerTransaction>(`/transactions/${txId}`),
 
-  // GET /balance — global ledger balance
+  // GET /balance
   getBalance: () => get<LedgerBalance>("/balance"),
 
   // GET /reports/settlement

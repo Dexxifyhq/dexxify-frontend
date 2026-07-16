@@ -14,6 +14,7 @@ import {
   Check,
   AlertTriangle,
   FileText,
+  Clock,
 } from "lucide-react";
 
 type Step = "form" | "deposit" | "error";
@@ -141,22 +142,9 @@ export default function InvoicePayPage() {
     staleTime: 60 * 60 * 1000,
   });
 
-  // After creating the invoice session, get the deposit address
   const sessionMutation = useMutation({
     mutationFn: (dto: { crypto_asset: string; network: string }) =>
       invoicesApi.createPaymentSession(invoice_number, dto),
-  });
-
-  const depositMutation = useMutation({
-    mutationFn: ({
-      sessionId,
-      crypto_asset,
-      network,
-    }: {
-      sessionId: string;
-      crypto_asset: string;
-      network: string;
-    }) => payApi.generateDepositAddress(sessionId, { crypto_asset, network }),
   });
 
   const assets: FlatAsset[] = flattenAssets(
@@ -167,10 +155,24 @@ export default function InvoicePayPage() {
   const [selectedAsset, setSelectedAsset] = useState<FlatAsset | null>(null);
   const [depositInfo, setDepositInfo] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (step !== "deposit" || !depositInfo?.expires_at) return;
+    const calc = () =>
+      Math.max(0, Math.floor((new Date(depositInfo.expires_at).getTime() - Date.now()) / 1000));
+    setTimeLeft(calc());
+    const id = setInterval(() => {
+      const s = calc();
+      setTimeLeft(s);
+      if (s === 0) clearInterval(id);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [step, depositInfo?.expires_at]);
 
   const handlePay = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedAsset || sessionMutation.isPending || depositMutation.isPending) return;
+    if (!selectedAsset || sessionMutation.isPending) return;
 
     sessionMutation.mutate(
       {
@@ -179,24 +181,9 @@ export default function InvoicePayPage() {
       },
       {
         onSuccess: (session: any) => {
-          // session = the PaymentSession record; now get deposit address
-          const sessionId = session?.id ?? session?.data?.id;
-          if (!sessionId) { setStep("error"); return; }
-
-          depositMutation.mutate(
-            {
-              sessionId,
-              crypto_asset: selectedAsset.symbol,
-              network: selectedAsset.network,
-            },
-            {
-              onSuccess: (res: any) => {
-                setDepositInfo(res);
-                setStep("deposit");
-              },
-              onError: () => setStep("error"),
-            },
-          );
+          if (!session?.deposit_address) { setStep("error"); return; }
+          setDepositInfo(session);
+          setStep("deposit");
         },
         onError: () => setStep("error"),
       },
@@ -209,14 +196,15 @@ export default function InvoicePayPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const isPending = sessionMutation.isPending || depositMutation.isPending;
-  const depositAddress =
-    depositInfo?.session?.deposit_address ??
-    depositInfo?.deposit_address ??
-    null;
+  const isPending = sessionMutation.isPending;
+  const depositAddress = depositInfo?.deposit_address ?? null;
+  const cryptoAsset = depositInfo?.crypto_asset ?? selectedAsset?.symbol;
+  const network = depositInfo?.network ?? selectedAsset?.networkDisplay;
+  const payment = depositInfo?.metadata?.payment ?? null;
 
-  const cryptoAsset = depositInfo?.session?.crypto_asset ?? selectedAsset?.symbol;
-  const network = depositInfo?.session?.network ?? selectedAsset?.networkDisplay;
+  const fmtTime = (s: number) =>
+    `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  const timerExpired = timeLeft === 0;
 
   // ── Loading / error ────────────────────────────────────────────────────────
 
@@ -374,9 +362,9 @@ export default function InvoicePayPage() {
                 )}
               </div>
 
-              {(sessionMutation.isError || depositMutation.isError) && (
+              {sessionMutation.isError && (
                 <p className="rounded-xl border border-red-900/40 bg-red-950/40 px-3 py-2.5 text-xs text-red-400">
-                  {((sessionMutation.error ?? depositMutation.error) as any)?.message ??
+                  {(sessionMutation.error as any)?.message ??
                     "Something went wrong. Please try again."}
                 </p>
               )}
@@ -394,13 +382,49 @@ export default function InvoicePayPage() {
 
           {/* ── Step: deposit ── */}
           {step === "deposit" && depositInfo && (
-            <div className="flex flex-col gap-5 px-5 py-5">
-              <div className="text-center">
-                <p className="text-sm font-semibold text-white">Send Payment</p>
-                <p className="mt-0.5 text-xs text-white/40">
-                  Send exactly the amount to this address.
-                </p>
-              </div>
+            <div className="flex flex-col gap-4 px-5 py-5">
+              {/* Timer */}
+              {timeLeft !== null && (
+                <div className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 ${
+                  timerExpired
+                    ? "border-red-900/40 bg-red-950/30"
+                    : timeLeft < 120
+                    ? "border-orange-900/40 bg-orange-950/20"
+                    : "border-white/10 bg-white/5"
+                }`}>
+                  <Clock size={12} className={timerExpired ? "text-red-400" : timeLeft < 120 ? "text-orange-400" : "text-white/30"} />
+                  <span className={`font-mono text-sm font-semibold tabular-nums ${
+                    timerExpired ? "text-red-400" : timeLeft < 120 ? "text-orange-400" : "text-white/50"
+                  }`}>
+                    {timerExpired ? "Expired" : fmtTime(timeLeft)}
+                  </span>
+                  {!timerExpired && (
+                    <span className="text-[10px] text-white/30">remaining</span>
+                  )}
+                </div>
+              )}
+
+              {/* Crypto amount + fee */}
+              {payment && (
+                <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-white/30">Send exactly</span>
+                  </div>
+                  <p className="mt-1 font-mono text-lg font-bold text-white">
+                    {payment.amount}
+                    <span className="ml-1.5 text-sm font-normal text-white/40">{payment.asset}</span>
+                  </p>
+                  {(Number(payment.gasFee) > 0 || payment.feePaidBy) && (
+                    <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2 text-[11px] text-white/30">
+                      <span>Network fee</span>
+                      <span className="font-mono">
+                        {Number(payment.gasFee) > 0 ? `${payment.gasFee} ${payment.asset}` : "included"}
+                        {payment.feePaidBy === "customer" && " (paid by you)"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Address */}
               <div>
@@ -452,7 +476,6 @@ export default function InvoicePayPage() {
                 onClick={() => {
                   setStep("form");
                   sessionMutation.reset();
-                  depositMutation.reset();
                 }}
                 className="mt-2 h-9 rounded-xl border border-white/10 px-4 text-sm text-white/60 hover:bg-white/5 transition-colors"
               >

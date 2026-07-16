@@ -209,9 +209,9 @@ export const dashboardApi = {
     return res.data.map((tx) => ({
       id: tx.id,
       type: mapType(tx.tx_type),
-      description: tx.description ?? tx.reference,
-      amount: num(tx.amount),
-      currency: tx.currency,
+      description: tx.description ?? tx.reference_id,
+      amount: num(tx.amount_usd ?? tx.credit_usd ?? tx.debit_usd ?? tx.credit_ngn ?? tx.debit_ngn),
+      currency: tx.asset ?? "USD",
       status: mapStatus(tx.status),
       created_at: tx.created_at,
     }));

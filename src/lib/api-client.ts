@@ -208,6 +208,24 @@ export async function get<T>(
   }
 }
 
+// For paginated endpoints where the backend puts `data` and `meta` as siblings
+// in the envelope: { success, data: T[], meta: { total, page, ... }, timestamp }
+export async function getPaginated<T>(
+  url: string,
+  params?: Record<string, unknown>,
+): Promise<{ data: T[]; meta: { total: number; page: number; limit: number; total_pages: number; has_next: boolean; has_prev: boolean } }> {
+  try {
+    const res = await apiClient.get(url, { params });
+    const body = res.data ?? {};
+    return {
+      data: body.data ?? [],
+      meta: body.meta ?? { total: 0, page: 1, limit: 20, total_pages: 0, has_next: false, has_prev: false },
+    };
+  } catch (err) {
+    throw toApiError(err);
+  }
+}
+
 export async function post<T>(url: string, body?: unknown): Promise<T> {
   try {
     const res = await apiClient.post(url, body);
