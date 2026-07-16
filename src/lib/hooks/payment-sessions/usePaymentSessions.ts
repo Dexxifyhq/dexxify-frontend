@@ -42,6 +42,29 @@ export function useCreatePaymentSession() {
   });
 }
 
+export function useEstimatePayment(
+  params: {
+    amount: string;
+    currency: string;
+    crypto_asset: string;
+    network: string;
+    reference?: string;
+  } | null,
+) {
+  return useQuery({
+    queryKey: [
+      "session-estimate",
+      params?.crypto_asset,
+      params?.network,
+      params?.amount,
+      params?.currency,
+    ],
+    queryFn: () => paymentSessionsApi.getEstimate(params!),
+    enabled: !!params?.crypto_asset && !!params?.network && !!params?.amount,
+    staleTime: 30_000,
+  });
+}
+
 export function useCancelPaymentSession() {
   const qc = useQueryClient();
   return useMutation({

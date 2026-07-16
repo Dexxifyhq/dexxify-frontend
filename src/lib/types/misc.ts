@@ -1,38 +1,38 @@
 // ── Banks ──────────────────────────────────────────────────────────────────
 
-// export interface Bank {
-//   id: string;
-//   name: string;
-//   code?: string;
-//   slug?: string;
-//   country?: string;
-//   active?: boolean;
-// }
+export interface Bank {
+  name: string;
+  slug: string;
+  code: string;
+  country: string;
+}
 
 export interface SavedBank {
   id: string;
-  breet_bank_id: string;
+  provider_recipient_id: string;
   developer_id: string;
   bank_name: string;
   account_number: string;
   account_name: string;
+  bank_code: string;
   currency: string;
-  type: string;
-  auto_settlement: boolean;
-  disabled: boolean;
-  integration_id: string;
-  is_business: boolean;
+  type: string | null;
+  label: string | null;
+  is_trusted: boolean;
   primary: boolean;
-  narration?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface BankVerification {
-  accountName: string;
-  accountNumber: string;
-  bankName: string;
+  valid: boolean;
   type: string;
+  resolved: {
+    accountName: string;
+    bankName: string;
+    bankCode: string;
+    accountNumber: string;
+  };
 }
 
 // ── Crypto assets ──────────────────────────────────────────────────────────
@@ -81,13 +81,14 @@ export interface ConversionResult {
 
 export interface AddBankDto {
   accountNumber: string;
-  bankId: string;
-  narration?: string;
+  bankCode: string;
+  label?: string;
+  isDefault: boolean;
 }
 
 export interface VerifyBankAccountDto {
   accountNumber: string;
-  bankId: string;
+  bankCode: string;
 }
 
 export interface GetRateQueryDto {

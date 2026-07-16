@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { customersApi } from "@/lib/api/customers";
+import type { CreateCustomerDto, UpdateCustomerDto } from "@/lib/types/customers";
 
 export const customerKeys = {
   all: ["customers"] as const,
@@ -27,7 +28,7 @@ export function useCustomer(customerId: string) {
 export function useCreateCustomer() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: any) => customersApi.create(payload),
+    mutationFn: (payload: CreateCustomerDto) => customersApi.create(payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: customerKeys.list() }),
   });
 }
@@ -35,8 +36,13 @@ export function useCreateCustomer() {
 export function useUpdateCustomer() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ customerId, payload }: { customerId: string; payload: any }) =>
-      customersApi.update(customerId, payload),
+    mutationFn: ({
+      customerId,
+      payload,
+    }: {
+      customerId: string;
+      payload: UpdateCustomerDto;
+    }) => customersApi.update(customerId, payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: customerKeys.all }),
   });
 }

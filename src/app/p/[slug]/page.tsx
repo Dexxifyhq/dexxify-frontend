@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { payApi } from "@/lib/api/pay";
+import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
 import {
   ChevronDown,
   Search,
@@ -25,9 +26,9 @@ function AssetPicker({
   selected,
   onSelect,
 }: {
-  assets: any[];
-  selected: any | null;
-  onSelect: (a: any) => void;
+  assets: FlatAsset[];
+  selected: FlatAsset | null;
+  onSelect: (a: FlatAsset) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -36,9 +37,9 @@ function AssetPicker({
   const filtered = search.trim()
     ? assets.filter(
         (a) =>
-          a.symbol?.toLowerCase().includes(search.toLowerCase()) ||
-          a.name?.toLowerCase().includes(search.toLowerCase()) ||
-          a.network?.toLowerCase().includes(search.toLowerCase()),
+          a.symbol.toLowerCase().includes(search.toLowerCase()) ||
+          a.name.toLowerCase().includes(search.toLowerCase()) ||
+          a.networkDisplay.toLowerCase().includes(search.toLowerCase()),
       )
     : assets;
 
@@ -60,17 +61,15 @@ function AssetPicker({
       >
         {selected ? (
           <>
-            <img
-              src={selected.icon}
-              alt=""
-              width={20}
-              height={20}
-              className="h-5 w-5 shrink-0 rounded-full object-cover"
-            />
             <span className="flex-1 text-left font-medium text-white">
               {selected.symbol}
+              <span className="ml-1.5 text-xs font-normal text-white/40">
+                {selected.name}
+              </span>
             </span>
-            <span className="text-xs text-white/40">{selected.network}</span>
+            <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">
+              {selected.networkDisplay}
+            </span>
           </>
         ) : (
           <span className="flex-1 text-left text-white/30">Choose token…</span>
@@ -100,8 +99,8 @@ function AssetPicker({
                 No tokens found
               </li>
             ) : (
-              filtered.map((a: any) => (
-                <li key={a.id ?? a.identifier}>
+              filtered.map((a) => (
+                <li key={a.key}>
                   <button
                     type="button"
                     onClick={() => {
@@ -109,23 +108,16 @@ function AssetPicker({
                       setOpen(false);
                       setSearch("");
                     }}
-                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-white/5 ${selected?.id === a.id ? "text-white" : "text-white/70"}`}
+                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-white/5 ${selected?.key === a.key ? "text-white" : "text-white/70"}`}
                   >
-                    <img
-                      src={a.icon}
-                      alt=""
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 shrink-0 rounded-full object-cover"
-                    />
                     <span className="flex-1 truncate font-medium">
                       {a.symbol}
                       <span className="ml-1.5 text-xs font-normal text-white/40">
                         {a.name}
                       </span>
                     </span>
-                    <span className="shrink-0 text-xs text-white/30">
-                      {a.network}
+                    <span className="shrink-0 rounded bg-white/6 px-1.5 py-0.5 text-[10px] text-white/30">
+                      {a.networkDisplay}
                     </span>
                   </button>
                 </li>
@@ -157,7 +149,7 @@ export default function PublicPaymentPage() {
     retry: 1,
   });
 
-  const { data: assetsData, isLoading: assetsLoading } = useQuery({
+  const { data: assetsRaw, isLoading: assetsLoading } = useQuery({
     queryKey: ["pay-deposit-assets"],
     queryFn: payApi.getDepositAssets,
     staleTime: 60 * 60 * 1000,
@@ -176,9 +168,9 @@ export default function PublicPaymentPage() {
     mutationFn: (payload: any) => payApi.initiatePagePayment(slug, payload),
   });
 
-  const assets: any[] = Array.isArray(assetsData)
-    ? assetsData
-    : ((assetsData as any)?.data ?? []);
+  const assets: FlatAsset[] = flattenAssets(
+    (assetsRaw as any)?.data ?? assetsRaw ?? {},
+  );
 
   const fixedAmount: number = page?.amount ?? 0;
 
@@ -186,10 +178,11 @@ export default function PublicPaymentPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [selectedAsset, setSelectedAsset] = useState<any | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<FlatAsset | null>(null);
   const [depositInfo, setDepositInfo] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
   const { count, start: startCountdown } = useCountdown(0);
+  // console.log("selectedAsset", selectedAsset);
 
   useEffect(() => {
     if (!depositInfo?.session?.expires_at) return;
@@ -205,10 +198,7 @@ export default function PublicPaymentPage() {
 
   useEffect(() => {
     if (!restoredSession) return;
-    const normalized = { session: restoredSession };
-    // console.log(restoredSession);
-    // console.log(normalized);
-    setDepositInfo(normalized);
+    setDepositInfo({ session: restoredSession });
     setStep("deposit");
   }, [restoredSession]);
 
@@ -221,16 +211,6 @@ export default function PublicPaymentPage() {
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   })();
 
-  const displayAmount = fixedAmount;
-  const ngnRate: number = selectedAsset?.rate?.NGN ?? 0;
-  const ngnValue =
-    displayAmount > 0 && ngnRate > 0
-      ? (displayAmount * ngnRate).toLocaleString("en-NG", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : null;
-
   const canPay =
     firstName.trim() !== "" &&
     lastName.trim() !== "" &&
@@ -238,21 +218,17 @@ export default function PublicPaymentPage() {
     !!selectedAsset &&
     !payMutation.isPending;
 
-  const handlePay = (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePay = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canPay) return;
+    if (!canPay || !selectedAsset) return;
     payMutation.mutate(
       {
-        last_name: firstName.trim(),
-        first_name: lastName.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
         email: email.trim(),
         amount: fixedAmount,
-        asset: selectedAsset.symbol,
-        asset_id: selectedAsset.id,
-        network: selectedAsset.network,
-        metadata: {
-          selectedAsset,
-        },
+        asset: selectedAsset.symbol, // WalletAsset enum value e.g. "USDT"
+        network: selectedAsset.network, // WalletNetwork enum value e.g. "Tron"
       },
       {
         onSuccess: (res: any) => {
@@ -277,6 +253,12 @@ export default function PublicPaymentPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const depositAddress = depositInfo?.session?.deposit_address ?? null;
+  const cryptoAsset =
+    depositInfo?.session?.crypto_asset ?? selectedAsset?.symbol;
+  const network =
+    depositInfo?.session?.network ?? selectedAsset?.networkDisplay;
 
   if (pageLoading || restoring) {
     return (
@@ -311,54 +293,48 @@ export default function PublicPaymentPage() {
           {page.description && (
             <p className="mt-1 text-xs text-white/40">{page.description}</p>
           )}
-
-          {/* Fixed amount display */}
           <div className="mt-3">
             <p className="text-3xl font-bold text-white">
-              ${fixedAmount}
+              {Number(fixedAmount).toFixed(2)}
               <span className="ml-1 text-base font-normal text-white/40">
-                USD
+                {page.currency?.toUpperCase() ?? "USD"}
               </span>
             </p>
-            {ngnValue && (
-              <p className="mt-0.5 text-xs text-white/40">
-                ≈ <span className="text-white/60">₦{ngnValue}</span>
-              </p>
-            )}
           </div>
         </div>
 
         {/* ── Step: form ── */}
         {step === "form" && (
           <form onSubmit={handlePay} className="flex flex-col gap-4 px-6 py-6">
-            {/* Name */}
-            <div className="space-y-3">
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
-                First Name
-              </label>
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="James"
-                required
-                className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
-              />
-
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
-                Last Name
-              </label>
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Wilson"
-                required
-                className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="James"
+                  required
+                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Wilson"
+                  required
+                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
+                />
+              </div>
             </div>
 
-            {/* Email */}
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
                 Email
@@ -373,7 +349,6 @@ export default function PublicPaymentPage() {
               />
             </div>
 
-            {/* Token */}
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
                 Pay With
@@ -388,14 +363,6 @@ export default function PublicPaymentPage() {
                   selected={selectedAsset}
                   onSelect={setSelectedAsset}
                 />
-              )}
-              {selectedAsset?.minimum != null && (
-                <p className="mt-1.5 text-xs text-white/30">
-                  Min. deposit:{" "}
-                  <span className="text-white/50">
-                    ${selectedAsset.minimum.toLocaleString()}
-                  </span>
-                </p>
               )}
             </div>
 
@@ -424,7 +391,7 @@ export default function PublicPaymentPage() {
             <div className="text-center">
               <p className="text-sm font-semibold text-white">Send Payment</p>
               <p className="mt-0.5 text-xs text-white/40">
-                Send exactly the amount below to the address shown.
+                Send the exact crypto amount shown to the address below.
               </p>
             </div>
 
@@ -465,31 +432,35 @@ export default function PublicPaymentPage() {
               </div>
             )}
 
-            {depositInfo.session.amount && (
+            {/* Total amount to send */}
+            {depositInfo.session?.metadata?.payment?.amount && (
               <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center">
-                <p className="text-xs text-white/40">Warning</p>
-                <p className="mt-0.5 text-xl font-bold text-white">
-                  <span className="text-base font-normal text-white/50">
-                    Do not send less than{" "}
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                  Total to Send (incl. fees)
+                </p>
+                <p className="mt-1 text-2xl font-bold text-white">
+                  {Number(depositInfo.session.metadata.payment.amount).toFixed(
+                    2,
+                  )}{" "}
+                  <span className="text-base font-normal text-white/40">
+                    {cryptoAsset}
                   </span>
-                  ${depositInfo.session.metadata.selectedAsset.minimum}{" "}
                 </p>
               </div>
             )}
 
+            {/* Deposit address */}
             <div>
               <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/30">
                 Deposit Address
               </p>
               <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                 <span className="flex-1 break-all font-mono text-xs text-white/70">
-                  {depositInfo.session.deposit_address}
+                  {depositAddress}
                 </span>
                 <button
                   type="button"
-                  onClick={() =>
-                    handleCopy(depositInfo.session.deposit_address)
-                  }
+                  onClick={() => depositAddress && handleCopy(depositAddress)}
                   className="shrink-0 text-white/30 hover:text-white transition-colors"
                 >
                   {copied ? (
@@ -501,23 +472,16 @@ export default function PublicPaymentPage() {
               </div>
             </div>
 
+            {/* Network warning */}
             <div className="flex items-start gap-2 rounded-xl border border-yellow-900/40 bg-yellow-950/30 px-3 py-2.5">
               <AlertTriangle
                 size={13}
                 className="mt-0.5 shrink-0 text-yellow-500"
               />
               <p className="text-xs text-yellow-500/80">
-                Only send{" "}
-                {/* <span className="font-semibold">{selectedAsset?.symbol}</span>{" "} */}
-                <span className="font-semibold">
-                  {depositInfo.session.crypto_asset}
-                </span>{" "}
-                on the{" "}
-                {/* <span className="font-semibold">{selectedAsset?.network}</span>{" "} */}
-                <span className="font-semibold">
-                  {depositInfo.session.network}
-                </span>{" "}
-                network to this address.
+                Only send <span className="font-semibold">{cryptoAsset}</span>{" "}
+                on the <span className="font-semibold">{network}</span> network
+                to this address.
               </p>
             </div>
           </div>
@@ -552,7 +516,7 @@ export default function PublicPaymentPage() {
       </div>
 
       <p className="mt-6 text-xs text-white/20">
-        Powered by <span className="font-semibold text-white/30">Breet</span>
+        Powered by <span className="font-semibold text-white/30">Dexxify</span>
       </p>
     </div>
   );

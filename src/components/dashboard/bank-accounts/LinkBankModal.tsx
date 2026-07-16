@@ -8,25 +8,12 @@ import {
   Search,
   CheckCircle2,
   Loader2,
+  Tag,
+  Star,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useBanks, useVerifyBank, useSaveBank } from "@/lib/hooks/misc/useMisc";
-
-interface Bank {
-  id: string;
-  name: string;
-  slug: string;
-  redbillerCode: string;
-  anchorCode: string;
-  monnifyCode: string;
-  palmpayCode: string;
-  nombaCode: string;
-  country: string;
-  currency: string;
-  type: string;
-  avatar: string;
-  hasLogo: boolean;
-}
+import type { Bank } from "@/lib/types/misc";
 
 interface LinkBankModalProps {
   open: boolean;
@@ -39,8 +26,10 @@ export default function LinkBankModal({
   onClose,
   onSuccess,
 }: LinkBankModalProps) {
-  const { data: { banks } = {} } = useBanks();
-  const bankList: Bank[] = banks?.data ?? [];
+  const { data: banksData } = useBanks();
+  // console.log(banksData);
+  // Response shape after unwrap: { banks: {data: Bank[]}, cached: boolean }
+  const bankList: Bank[] = banksData?.banks?.data ?? [];
 
   const verifyBank = useVerifyBank();
   const saveBank = useSaveBank();
@@ -49,6 +38,8 @@ export default function LinkBankModal({
   const [search, setSearch] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
+  const [label, setLabel] = useState("");
+  const [isDefault, setIsDefault] = useState(false);
   const [verifiedName, setVerifiedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -70,16 +61,17 @@ export default function LinkBankModal({
   }, [dropdownOpen]);
 
   useEffect(() => {
-    if (open) {
-      setSelectedBank(null);
-      setSearch("");
-      setDropdownOpen(false);
-      setAccountNumber("");
-      setVerifiedName(null);
-      setError(null);
-      verifyBank.reset();
-      saveBank.reset();
-    }
+    if (!open) return;
+    setSelectedBank(null);
+    setSearch("");
+    setDropdownOpen(false);
+    setAccountNumber("");
+    setLabel("");
+    setIsDefault(false);
+    setVerifiedName(null);
+    setError(null);
+    verifyBank.reset();
+    saveBank.reset();
   }, [open]);
 
   useEffect(() => {
@@ -93,7 +85,8 @@ export default function LinkBankModal({
 
   if (!open) return null;
 
-  const canVerify = !!selectedBank && accountNumber.trim().length >= 6;
+  const canVerify =
+    !!selectedBank && accountNumber.trim().length >= 6 && !verifiedName;
   const isVerifying = verifyBank.isPending;
   const isSaving = saveBank.isPending;
 
@@ -119,9 +112,16 @@ export default function LinkBankModal({
     if (!canVerify || !selectedBank) return;
     setError(null);
     verifyBank.mutate(
-      { accountNumber: accountNumber.trim(), bankId: selectedBank.id },
+      { accountNumber: accountNumber.trim(), bankCode: selectedBank.code },
       {
-        onSuccess: (res) => setVerifiedName(res.accountName),
+        onSuccess: (res) => {
+          const name = res.resolved?.accountName;
+          if (name) {
+            setVerifiedName(name);
+          } else {
+            setError("Could not resolve account name. Please try again.");
+          }
+        },
         onError: (err: any) =>
           setError(
             err?.message ??
@@ -135,7 +135,12 @@ export default function LinkBankModal({
     if (!selectedBank || !verifiedName) return;
     setError(null);
     saveBank.mutate(
-      { accountNumber: accountNumber.trim(), bankId: selectedBank.id },
+      {
+        accountNumber: accountNumber.trim(),
+        bankCode: selectedBank.code,
+        label: label.trim() || undefined,
+        isDefault,
+      },
       {
         onSuccess: () => {
           onSuccess?.();
@@ -162,6 +167,7 @@ export default function LinkBankModal({
       />
 
       <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+        {/* Header */}
         <div className="flex items-start justify-between px-6 pb-2 pt-5">
           <div>
             <h2 className="text-base font-semibold text-[#FAFAFA]">
@@ -225,26 +231,20 @@ export default function LinkBankModal({
                       </li>
                     ) : (
                       filtered.map((bank) => (
-                        <li key={bank.id}>
+                        <li key={bank.code}>
                           <button
                             type="button"
                             onClick={() => handleBankSelect(bank)}
                             className={`flex w-full items-center gap-3 px-3 py-2 text-sm transition-colors hover:bg-[#1C1C1F] ${
-                              selectedBank?.id === bank.id
+                              selectedBank?.code === bank.code
                                 ? "text-[#FAFAFA]"
                                 : "text-[#A1A1AA]"
                             }`}
                           >
-                            {bank.hasLogo && (
-                              <img
-                                src={bank.avatar}
-                                alt=""
-                                width={20}
-                                height={20}
-                                className="h-5 w-5 shrink-0 rounded-full object-cover"
-                              />
-                            )}
                             <span className="truncate">{bank.name}</span>
+                            <span className="ml-auto shrink-0 font-mono text-[10px] text-[#3F3F46]">
+                              {bank.code}
+                            </span>
                           </button>
                         </li>
                       ))
@@ -272,6 +272,7 @@ export default function LinkBankModal({
                 onChange={(e) =>
                   handleAccountNumberChange(e.target.value.replace(/\D/g, ""))
                 }
+                maxLength={10}
                 placeholder="0123456789"
                 className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
               />
@@ -280,15 +281,85 @@ export default function LinkBankModal({
 
           {/* Verified account name */}
           {verifiedName && (
-            <div className="flex items-center gap-2 rounded-lg border border-[#166534]/40 bg-[#052e16]/60 px-3 py-2.5">
-              <CheckCircle2 size={14} className="shrink-0 text-[#4ade80]" />
-              <p className="text-xs">
-                <span className="text-[#71717A]">Account name: </span>
-                <span className="font-medium text-[#FAFAFA]">
-                  {verifiedName}
-                </span>
-              </p>
-            </div>
+            <>
+              <div className="flex items-center gap-2 rounded-lg border border-[#166534]/40 bg-[#052e16]/60 px-3 py-2.5">
+                <CheckCircle2 size={14} className="shrink-0 text-[#4ade80]" />
+                <p className="text-xs">
+                  <span className="text-[#71717A]">Account name: </span>
+                  <span className="font-medium text-[#FAFAFA]">
+                    {verifiedName}
+                  </span>
+                </p>
+              </div>
+
+              {/* Optional label */}
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+                  Label{" "}
+                  <span className="normal-case text-[#3F3F46]">(optional)</span>
+                </label>
+                <div className="relative">
+                  <Tag
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                  />
+                  <input
+                    type="text"
+                    value={label}
+                    onChange={(e) => setLabel(e.target.value)}
+                    placeholder="e.g. My GTBank"
+                    className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Set as primary */}
+              <button
+                type="button"
+                onClick={() => setIsDefault((v) => !v)}
+                className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                  isDefault
+                    ? "border-[#14532D]/40 bg-[#052e16]/40"
+                    : "border-[#1C1C1F] bg-[#09090B]"
+                }`}
+              >
+                <Star
+                  size={14}
+                  className={
+                    isDefault
+                      ? "fill-[#22C55E] text-[#22C55E]"
+                      : "text-[#52525B]"
+                  }
+                />
+                <div>
+                  <p className="text-xs font-medium text-[#FAFAFA]">
+                    Set as primary account
+                  </p>
+                  <p className="text-[11px] text-[#71717A]">
+                    Payouts default to this account
+                  </p>
+                </div>
+                <div
+                  className={`ml-auto h-4 w-4 shrink-0 rounded border transition-colors ${
+                    isDefault
+                      ? "border-[#22C55E] bg-[#22C55E]"
+                      : "border-[#3F3F46] bg-transparent"
+                  } flex items-center justify-center`}
+                >
+                  {isDefault && (
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                      <path
+                        d="M1 4l2 2 4-4"
+                        stroke="white"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </button>
+            </>
           )}
 
           {/* Error */}
