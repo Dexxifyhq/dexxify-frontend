@@ -1,7 +1,8 @@
 "use client";
 
-import { Send, X, Info, ChevronDown } from "lucide-react";
+import { Send, X, Info, ChevronDown, Check } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/utils/utils";
 
 export interface StaffPermissionDef {
   key: string;
@@ -49,12 +50,12 @@ const GROUPS: StaffPermissionGroup[] = [
       {
         key: "withdraw_crypto",
         title: "Withdraw Crypto",
-        description: "Initiate crypto withdrawals to external addresses",
+        description: "Initiate crypto withdrawals",
       },
       {
         key: "swap_balance",
         title: "Swap Balance",
-        description: "Swap between balance currencies",
+        description: "Swap between currencies",
       },
       {
         key: "initiate_refunds",
@@ -170,12 +171,12 @@ export default function InviteStaffModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#1F1F23] bg-[#111113] shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Send size={16} className="text-[#2563EB]" />
-            <h2 className="text-base font-semibold text-[#FAFAFA]">
+        <div className="flex items-center justify-between px-7 py-6">
+          <div className="flex items-center gap-3">
+            <Send size={18} className="text-[#2563EB]" />
+            <h2 className="text-xl font-bold text-[#FAFAFA]">
               Invite Staff Member
             </h2>
           </div>
@@ -183,21 +184,18 @@ export default function InviteStaffModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
           >
-            <X size={16} />
+            <X size={17} />
           </button>
         </div>
 
         {/* Body (scrollable) */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex min-h-0 flex-1 flex-col"
-        >
-          <div className="flex-1 overflow-y-auto px-6 py-5">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="flex-1 overflow-y-auto border-y border-[#1F1F23] px-7 py-6">
             {/* Work Email */}
-            <div className="mb-5">
-              <label className="mb-1.5 block text-sm font-semibold text-[#FAFAFA]">
+            <div className="mb-6">
+              <label className="mb-2 block text-sm font-semibold text-[#FAFAFA]">
                 Work Email
               </label>
               <input
@@ -205,7 +203,7 @@ export default function InviteStaffModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="colleague@company.com"
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                className="h-11 w-full rounded-lg border border-[#26262B] bg-[#0A0B0E] px-3.5 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
                 required
               />
               <p className="mt-2 text-xs leading-relaxed text-[#71717A]">
@@ -215,8 +213,8 @@ export default function InviteStaffModal({
             </div>
 
             {/* Role */}
-            <div className="mb-6">
-              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-[#FAFAFA]">
+            <div className="mb-7">
+              <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#FAFAFA]">
                 Role
                 <Info size={13} className="text-[#71717A]" />
               </label>
@@ -224,21 +222,21 @@ export default function InviteStaffModal({
             </div>
 
             {/* Permissions */}
-            <div className="mb-6">
-              <h3 className="mb-3 text-sm font-semibold text-[#FAFAFA]">
+            <div className="mb-7">
+              <h3 className="mb-4 text-[15px] font-semibold text-[#FAFAFA]">
                 Permissions
               </h3>
 
               {GROUPS.map((g) => (
-                <div key={g.key} className="mb-5 last:mb-0">
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+                <div key={g.key} className="mb-6 last:mb-0">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#71717A]">
                       {g.label}
                     </p>
-                    <label className="flex cursor-pointer items-center gap-2 text-xs text-[#A1A1AA]">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm text-[#FAFAFA]">
                       <input
                         type="checkbox"
-                        className="h-3.5 w-3.5 cursor-pointer rounded border-[#3F3F46] bg-[#09090B] accent-[#2563EB]"
+                        className="h-4 w-4 cursor-pointer rounded border-[#3F3F46] bg-transparent accent-[#2563EB]"
                         checked={groupAllChecked[g.key] ?? false}
                         onChange={(e) => setGroupAll(g, e.target.checked)}
                       />
@@ -246,23 +244,23 @@ export default function InviteStaffModal({
                     </label>
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="divide-y divide-[#1F1F23] rounded-xl border border-[#26262B]">
                     {g.permissions.map((perm) => {
                       const on = !!perms[perm.key];
                       return (
                         <div
                           key={perm.key}
-                          className="flex items-center justify-between gap-3 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3"
+                          className="flex items-center justify-between gap-4 px-5 py-4"
                         >
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-[#FAFAFA]">
+                            <p className="text-[15px] font-semibold text-[#FAFAFA]">
                               {perm.title}
                             </p>
-                            <p className="text-xs text-[#71717A]">
+                            <p className="mt-0.5 text-sm text-[#71717A]">
                               {perm.description}
                             </p>
                           </div>
-                          <Toggle
+                          <PermPill
                             checked={on}
                             onChange={() => togglePerm(perm.key)}
                           />
@@ -276,7 +274,7 @@ export default function InviteStaffModal({
 
             {/* Account Status */}
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-[#FAFAFA]">
+              <label className="mb-2 block text-sm font-semibold text-[#FAFAFA]">
                 Account Status
               </label>
               <Select value={status} onChange={setStatus} options={STATUSES} />
@@ -284,18 +282,18 @@ export default function InviteStaffModal({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2 border-t border-[#1C1C1F] px-6 py-4">
+          <div className="flex items-center justify-end gap-3 px-7 py-5">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-lg border border-[#1C1C1F] bg-transparent px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              className="h-11 rounded-lg border border-[#26262B] bg-transparent px-6 text-sm font-semibold text-[#FAFAFA] transition-colors hover:bg-[#1C1C1F]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit || submitting}
-              className="h-9 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="h-11 rounded-lg bg-[#FAFAFA] px-6 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
             >
               {submitting ? "Sending…" : "Send Invitation"}
             </button>
@@ -322,7 +320,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-9 text-sm text-[#FAFAFA] focus:border-[#2563EB] focus:outline-none transition-colors"
+        className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-[#26262B] bg-[#0A0B0E] px-3.5 pr-10 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -332,13 +330,13 @@ function Select({
       </select>
       <ChevronDown
         size={14}
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
       />
     </div>
   );
 }
 
-function Toggle({
+function PermPill({
   checked,
   onChange,
 }: {
@@ -351,18 +349,15 @@ function Toggle({
       role="switch"
       aria-checked={checked}
       onClick={onChange}
-      className={`relative inline-flex h-[22px] w-[40px] shrink-0 items-center rounded-full border px-0.5 text-[9px] font-semibold uppercase tracking-wide transition-colors ${
+      className={cn(
+        "inline-flex h-9 min-w-[64px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-4 text-[13px] font-semibold transition-colors",
         checked
-          ? "justify-start border-[#2563EB] bg-[#2563EB] text-white"
-          : "justify-end border-[#1C1C1F] bg-[#09090B] text-[#52525B]"
-      }`}
+          ? "border-[#3F3F46] bg-[#1C1C1F] text-[#FAFAFA]"
+          : "border-[#26262B] bg-transparent text-[#52525B] hover:border-[#3F3F46] hover:text-[#A1A1AA]",
+      )}
     >
-      <span className="px-1">{checked ? "On" : "Off"}</span>
-      <span
-        className={`absolute top-1/2 h-[16px] w-[16px] -translate-y-1/2 rounded-full bg-white transition-all ${
-          checked ? "right-[2px]" : "left-[2px] bg-[#52525B]"
-        }`}
-      />
+      {checked && <Check size={13} />}
+      {checked ? "On" : "Off"}
     </button>
   );
 }

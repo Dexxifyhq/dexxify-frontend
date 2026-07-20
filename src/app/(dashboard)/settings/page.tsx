@@ -14,11 +14,9 @@ import {
   ChevronDown,
   HelpCircle,
   Info,
-  AlertTriangle,
   Send,
   Users,
   Receipt,
-  FileSpreadsheet,
   ExternalLink,
   Lock,
   ShieldCheck,
@@ -26,56 +24,108 @@ import {
   IdCard,
   Building2,
   ArrowRight,
+  User,
+  UserPlus,
+  Clock,
+  Zap,
 } from "lucide-react";
-import PageHeader from "@/components/dashboard/shared/PageHeader";
 import Toggle from "@/components/dashboard/shared/Toggle";
+import InviteStaffModal from "@/components/dashboard/teams/InviteStaffModal";
+import { cn } from "@/utils/utils";
 
-const TABS = [
-  { key: "general", label: "General", icon: SettingsIcon },
-  { key: "settlements", label: "Settlements", icon: FileText },
-  { key: "notifications", label: "Notifications", icon: Bell },
-  { key: "security", label: "Security", icon: Shield },
-  { key: "verification", label: "Verification", icon: BadgeCheck },
+// ── Navigation ───────────────────────────────────────────────────────────────
+
+type TabKey =
+  | "general"
+  | "settlements"
+  | "notifications"
+  | "verification"
+  | "security"
+  | "team";
+
+const NAV_GROUPS: {
+  label: string;
+  items: { key: TabKey; label: string; icon: React.ElementType }[];
+}[] = [
+  {
+    label: "Business",
+    items: [
+      { key: "general", label: "General", icon: SettingsIcon },
+      { key: "settlements", label: "Settlements", icon: FileText },
+      { key: "notifications", label: "Notifications", icon: Bell },
+      { key: "verification", label: "Verification", icon: BadgeCheck },
+    ],
+  },
+  {
+    label: "Workspace",
+    items: [
+      { key: "security", label: "Security", icon: Shield },
+      { key: "team", label: "Team", icon: User },
+    ],
+  },
 ];
 
 export default function SettingsPage() {
-  const [tab, setTab] = useState("general");
+  const [tab, setTab] = useState<TabKey>("general");
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-      <PageHeader
-        title="Settings"
-        description="Manage your business profile, preferences, and security."
-      />
+    <div className="mx-auto w-full max-w-6xl px-2 py-4 sm:px-4">
+      <div className="flex flex-col gap-10 lg:flex-row">
+        {/* Title + sub-navigation — pinned while the content scrolls */}
+        <div className="w-full shrink-0 self-start lg:sticky lg:top-0 lg:w-60">
+          <h1 className="text-3xl font-bold tracking-tight text-[#FAFAFA]">
+            Settings
+          </h1>
 
-      {/* Tabs */}
-      <div className="mx-auto flex flex-wrap items-center justify-center gap-1 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-1">
-        {TABS.map((t) => {
-          const Icon = t.icon;
-          const active = tab === t.key;
-          return (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setTab(t.key)}
-              className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-[#2563EB] text-white"
-                  : "text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
-              }`}
-            >
-              <Icon size={14} />
-              {t.label}
-            </button>
-          );
-        })}
+          <nav className="mt-8">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className="mb-6">
+              <p className="mb-2 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+                {group.label}
+              </p>
+              <div className="flex flex-col gap-1">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = tab === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => setTab(item.key)}
+                      className={cn(
+                        "relative flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
+                        active
+                          ? "bg-[#0F1626] text-[#FAFAFA]"
+                          : "text-[#A1A1AA] hover:bg-[#101013] hover:text-[#FAFAFA]",
+                      )}
+                    >
+                      {active && (
+                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[#2563EB]" />
+                      )}
+                      <Icon
+                        size={16}
+                        className={active ? "text-[#2563EB]" : "text-[#71717A]"}
+                      />
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          </nav>
+        </div>
+
+        {/* Content */}
+        <div className="min-w-0 flex-1 pb-16 lg:pt-[68px]">
+          {tab === "general" && <GeneralTab />}
+          {tab === "settlements" && <SettlementsTab />}
+          {tab === "notifications" && <NotificationsTab />}
+          {tab === "verification" && <VerificationTab />}
+          {tab === "security" && <SecurityTab />}
+          {tab === "team" && <TeamTab />}
+        </div>
       </div>
-
-      {tab === "general" && <GeneralTab />}
-      {tab === "settlements" && <SettlementsTab />}
-      {tab === "notifications" && <NotificationsTab />}
-      {tab === "security" && <SecurityTab />}
-      {tab === "verification" && <VerificationTab />}
     </div>
   );
 }
@@ -86,153 +136,108 @@ function GeneralTab() {
   const [firstName, setFirstName] = useState("Samuel");
   const [lastName, setLastName] = useState("Uzor");
   const [email] = useState("samueluzor80@gmail.com");
-  const [phone, setPhone] = useState("+2348135492141");
+  const [phone, setPhone] = useState("2348110015132");
   const [businessName, setBusinessName] = useState("");
   const [supportEmail, setSupportEmail] = useState("");
   const [showBranding, setShowBranding] = useState(false);
   const [theme, setTheme] = useState("system");
 
   return (
-    <div className="flex flex-col gap-8 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-8">
-      {/* Personal Information */}
-      <section>
-        <h3 className="text-sm font-semibold text-[#FAFAFA]">
-          Personal Information
-        </h3>
-        <p className="mb-4 text-xs text-[#71717A]">
-          Your personal identification details.
-        </p>
+    <div>
+      <SectionHeading
+        title="Personal Information"
+        description="Manage your personal identification and contact details."
+      />
 
-        <div className="grid grid-cols-1 gap-4 rounded-xl border border-[#1C1C1F] bg-[#09090B] p-5 sm:grid-cols-2">
-          <Field label="First Name">
-            <Input value={firstName} onChange={setFirstName} />
-          </Field>
-          <Field label="Last Name">
-            <Input value={lastName} onChange={setLastName} />
-          </Field>
-          <Field label="Email Address">
-            <div className="flex h-10 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] px-3 text-sm">
-              <span className="flex-1 truncate text-[#A1A1AA]">{email}</span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#052E16] px-2 py-0.5 text-[11px] font-medium text-[#22C55E]">
-                <CheckCircle2 size={10} /> Verified
-              </span>
-            </div>
-          </Field>
-          <Field label="Phone Number">
-            <div className="flex items-center gap-2">
-              <Input value={phone} onChange={setPhone} />
-              <button
-                type="button"
-                className="h-10 rounded-lg bg-[#2563EB]/15 px-3 text-xs font-semibold text-[#2563EB] hover:bg-[#2563EB]/25 transition-colors"
-              >
-                Verify
-              </button>
-            </div>
-          </Field>
+      <div className="mt-8 grid grid-cols-1 gap-x-12 gap-y-7 sm:grid-cols-2">
+        <Field label="First name">
+          <Input value={firstName} onChange={setFirstName} />
+        </Field>
+        <Field label="Last name">
+          <Input value={lastName} onChange={setLastName} />
+        </Field>
+        <Field label="Email address" badge={<VerifiedBadge />}>
+          <Input value={email} readOnly />
+        </Field>
+        <Field label="Phone number" badge={<VerifiedBadge />}>
+          <Input value={phone} onChange={setPhone} />
+        </Field>
+      </div>
+
+      <Divider />
+
+      <SectionHeading
+        title="Business Profile"
+        description="Information used to identify your business on checkout and receipts."
+      />
+
+      <div className="mt-8 grid grid-cols-1 gap-x-12 gap-y-7 sm:grid-cols-2">
+        <Field label="Business name">
+          <Input value={businessName} onChange={setBusinessName} />
+        </Field>
+        <Field
+          label="Support email"
+          badge={<HelpCircle size={13} className="text-[#52525B]" />}
+        >
+          <Input
+            value={supportEmail}
+            onChange={setSupportEmail}
+            placeholder="support@yourbusiness.com"
+            type="email"
+          />
+        </Field>
+      </div>
+
+      <div className="mt-8">
+        <p className="mb-2 text-sm font-semibold text-[#FAFAFA]">Brand logo</p>
+        <div className="flex items-center gap-4 rounded-xl border border-dashed border-[#26262B] bg-[#0A0B0E] p-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#15151A] text-[#52525B]">
+            <ImageIcon size={20} />
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#1C1C1F] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#27272A]"
+          >
+            <Upload size={14} /> Upload Logo
+          </button>
+          <p className="text-xs text-[#52525B]">Max 2MB · PNG, JPEG, WEBP</p>
         </div>
-      </section>
+      </div>
 
-      {/* Business Profile */}
-      <section>
-        <h3 className="text-sm font-semibold text-[#FAFAFA]">
-          Business Profile
-        </h3>
-        <p className="mb-4 text-xs text-[#71717A]">
-          Manage how your business appears to customers.
-        </p>
-
-        <div className="flex flex-col gap-5 rounded-xl border border-[#1C1C1F] bg-[#09090B] p-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Business Name">
-              <Input value={businessName} onChange={setBusinessName} />
-            </Field>
-            <Field
-              label={
-                <>
-                  Support Email
-                  <HelpCircle size={11} className="text-[#52525B]" />
-                </>
-              }
-            >
-              <Input
-                value={supportEmail}
-                onChange={setSupportEmail}
-                placeholder="support@yourbusiness.com"
-                type="email"
-              />
-            </Field>
-          </div>
-
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-[#A1A1AA]">
-              Brand Logo
-            </p>
-            <div className="flex items-center gap-3 rounded-lg border border-dashed border-[#1C1C1F] bg-[#0D0D0F] p-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#1C1C1F] text-[#52525B]">
-                <ImageIcon size={18} />
-              </div>
-              <button
-                type="button"
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#1C1C1F] px-3 text-xs font-medium text-[#FAFAFA] hover:bg-[#27272A] transition-colors"
-              >
-                <Upload size={12} /> Upload Logo
-              </button>
-              <p className="text-xs text-[#52525B]">
-                Max 2MB · PNG, JPEG, WEBP
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start justify-between gap-4 border-t border-[#1C1C1F] pt-4">
-            <div>
-              <p className="text-sm font-medium text-[#FAFAFA]">
-                Show Branding on Checkout
-              </p>
-              <p className="text-xs text-[#71717A]">
-                Display your business name and logo on the checkout page header.
-              </p>
-            </div>
-            <Toggle
-              checked={showBranding}
-              onChange={setShowBranding}
-              size="sm"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Preferences */}
-      <section>
-        <h3 className="mb-4 text-sm font-semibold text-[#FAFAFA]">
-          Preferences
-        </h3>
-
-        <div className="rounded-xl border border-[#1C1C1F] bg-[#09090B] p-5">
-          <Field label="Interface Theme">
-            <Select
-              value={theme}
-              onChange={setTheme}
-              options={[
-                { label: "System Preference", value: "system" },
-                { label: "Dark", value: "dark" },
-                { label: "Light", value: "light" },
-              ]}
-            />
-          </Field>
-          <p className="mt-2 text-xs text-[#71717A]">
-            System (Dark) · Follows your device settings
+      <div className="mt-8 flex items-start justify-between gap-6">
+        <div>
+          <p className="text-sm font-semibold text-[#FAFAFA]">
+            Show Branding on Checkout
+          </p>
+          <p className="mt-1 text-sm text-[#71717A]">
+            Display your business name and logo on the checkout page header.
           </p>
         </div>
-      </section>
-
-      <div className="flex justify-end">
-        <button
-          type="button"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#2563EB] px-4 text-sm font-medium text-white hover:bg-[#1D4ED8] transition-colors"
-        >
-          <Save size={14} /> Save Changes
-        </button>
+        <Toggle checked={showBranding} onChange={setShowBranding} color="blue" />
       </div>
+
+      <Divider />
+
+      <SectionHeading
+        title="Preferences"
+        description="Customize how the dashboard looks for you."
+      />
+
+      <div className="mt-8 grid grid-cols-1 gap-x-12 sm:grid-cols-2">
+        <Field label="Interface theme">
+          <Select
+            value={theme}
+            onChange={setTheme}
+            options={[
+              { label: "System Preference", value: "system" },
+              { label: "Dark", value: "dark" },
+              { label: "Light", value: "light" },
+            ]}
+          />
+        </Field>
+      </div>
+
+      <SaveBar label="Save Changes" />
     </div>
   );
 }
@@ -262,7 +267,7 @@ const NETWORKS = [
 function SettlementsTab() {
   const [currency, setCurrency] = useState("usdt");
   const [payout, setPayout] = useState("crypto");
-  const [gasFees, setGasFees] = useState("customer");
+  const [networkFees, setNetworkFees] = useState("customer");
   const [instantPayouts, setInstantPayouts] = useState(false);
   const [partialPayments, setPartialPayments] = useState(true);
   const [underpayment, setUnderpayment] = useState("0");
@@ -279,179 +284,132 @@ function SettlementsTab() {
     );
 
   return (
-    <div className="flex flex-col gap-8 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-8">
-      <section>
-        <h3 className="text-sm font-semibold text-[#FAFAFA]">
-          Settlement Configuration
-        </h3>
-        <p className="mb-4 text-xs text-[#71717A]">
-          Define how you receive funds and how customer payments are processed.
-        </p>
+    <div>
+      <SectionHeading
+        title="Settlement Configuration"
+        description="Define your receiving currency and default payout preferences."
+      />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field
-            label={
-              <>
-                Settlement Currency <HelpCircle size={11} className="text-[#52525B]" />
-              </>
-            }
-          >
-            <Select
-              value={currency}
-              onChange={setCurrency}
-              options={[
-                { label: "USDT (Tether)", value: "usdt" },
-                { label: "USDC (Circle)", value: "usdc" },
-                { label: "NGN (Nigerian Naira)", value: "ngn" },
-                { label: "USD (US Dollar)", value: "usd" },
-              ]}
-            />
-          </Field>
-          <Field
-            label={
-              <>
-                Default Payout Method <HelpCircle size={11} className="text-[#52525B]" />
-              </>
-            }
-          >
-            <Select
-              value={payout}
-              onChange={setPayout}
-              options={[
-                { label: "Crypto Wallet", value: "crypto" },
-                { label: "Bank Account", value: "bank" },
-              ]}
-            />
-          </Field>
-        </div>
-
-        <div className="mt-4">
-          <Field
-            label={
-              <>
-                Gas Fee Responsibility <HelpCircle size={11} className="text-[#52525B]" />
-              </>
-            }
-          >
-            <Select
-              value={gasFees}
-              onChange={setGasFees}
-              options={[
-                { label: "Customer Pays Fees", value: "customer" },
-                { label: "Merchant Pays Fees", value: "merchant" },
-              ]}
-            />
-          </Field>
-        </div>
-      </section>
-
-      <section>
-        <h3 className="mb-4 text-sm font-semibold text-[#FAFAFA]">
-          Payment Logic
-        </h3>
-
-        <div className="flex flex-col gap-3">
-          <Row
-            icon={<FileSpreadsheet size={14} className="text-[#A1A1AA]" />}
-            title="Instant Payouts"
-            description="Automatically initiate payouts immediately after successful payments."
-            control={
-              <Toggle
-                checked={instantPayouts}
-                onChange={setInstantPayouts}
-                size="sm"
-              />
-            }
-          />
-          <Row
-            icon={<Info size={14} className="text-[#A1A1AA]" />}
-            title="Enable Partial Payments"
-            description="Allow customers to make multiple payments to complete a single session."
-            control={
-              <Toggle
-                checked={partialPayments}
-                onChange={setPartialPayments}
-                size="sm"
-              />
-            }
-          />
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
-            <div>
-              <p className="text-sm font-medium text-[#FAFAFA]">
-                Underpayment Tolerance
-              </p>
-              <p className="text-xs text-[#71717A]">
-                Auto-complete sessions if paid at least 100%
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                value={underpayment}
-                onChange={(e) => setUnderpayment(e.target.value)}
-                className="h-9 w-16 rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] px-2 text-center text-sm text-[#FAFAFA] focus:border-[#2563EB] focus:outline-none"
-              />
-              <span className="text-sm text-[#71717A]">%</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h3 className="text-sm font-semibold text-[#FAFAFA]">Accepted Assets</h3>
-        <p className="mb-4 text-xs text-[#71717A]">
-          Tap to toggle. When none are selected, all options are accepted.
-        </p>
-
-        <div className="mb-3">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
-            Cryptocurrencies
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {CRYPTOS.map((c) => {
-              const on = assets.includes(c.label);
-              return (
-                <Chip
-                  key={c.label}
-                  label={c.label}
-                  color={c.color}
-                  active={on}
-                  onClick={() => toggle(assets, setAssets, c.label)}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
-            Networks
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {NETWORKS.map((n) => {
-              const on = networks.includes(n.label);
-              return (
-                <Chip
-                  key={n.label}
-                  label={n.label}
-                  color={n.color}
-                  active={on}
-                  onClick={() => toggle(networks, setNetworks, n.label)}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <div className="flex justify-end">
-        <button
-          type="button"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#2563EB] px-4 text-sm font-medium text-white hover:bg-[#1D4ED8] transition-colors"
+      <div className="mt-8 grid grid-cols-1 gap-x-12 gap-y-7 sm:grid-cols-2">
+        <Field
+          label="Settlement Currency"
+          badge={<HelpCircle size={13} className="text-[#52525B]" />}
+          inlineBadge
         >
-          <Save size={14} /> Save Preferences
-        </button>
+          <Select
+            value={currency}
+            onChange={setCurrency}
+            options={[
+              { label: "USDT (Tether)", value: "usdt" },
+              { label: "USDC (Circle)", value: "usdc" },
+              { label: "NGN (Nigerian Naira)", value: "ngn" },
+              { label: "USD (US Dollar)", value: "usd" },
+            ]}
+          />
+        </Field>
+        <Field label="Default Payout Method">
+          <Select
+            value={payout}
+            onChange={setPayout}
+            options={[
+              { label: "Crypto Wallet", value: "crypto" },
+              { label: "Bank Account", value: "bank" },
+            ]}
+          />
+        </Field>
+        <Field label="Network Fee Responsibility">
+          <Select
+            value={networkFees}
+            onChange={setNetworkFees}
+            options={[
+              { label: "Customer Pays Fees", value: "customer" },
+              { label: "Merchant Pays Fees", value: "merchant" },
+            ]}
+          />
+        </Field>
       </div>
+
+      <Divider />
+
+      <SectionHeading title="Payment Logic" />
+
+      <div className="mt-2 divide-y divide-[#17171A]">
+        <ToggleRow
+          title="Instant Payouts"
+          description="Initiate payouts immediately once a payment is completed."
+          checked={instantPayouts}
+          onChange={setInstantPayouts}
+        />
+        <ToggleRow
+          title="Enable Partial Payments"
+          description="Allow customers to make multiple payments to complete a single session."
+          checked={partialPayments}
+          onChange={setPartialPayments}
+        />
+        <div className="flex items-center justify-between gap-6 py-6">
+          <div>
+            <p className="text-[15px] font-semibold text-[#FAFAFA]">
+              Underpayment Tolerance
+            </p>
+            <p className="mt-1 text-sm text-[#71717A]">
+              Auto-complete sessions if paid at least{" "}
+              {100 - (Number(underpayment) || 0)}%
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <input
+              type="number"
+              value={underpayment}
+              onChange={(e) => setUnderpayment(e.target.value)}
+              className="h-11 w-20 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-2 text-center text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+            />
+            <span className="text-sm text-[#71717A]">%</span>
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+
+      <SectionHeading
+        title="Accepted Assets"
+        description="Tap to toggle. When none are selected, all options are accepted."
+      />
+
+      <div className="mt-8">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+          Cryptocurrencies
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {CRYPTOS.map((c) => (
+            <Chip
+              key={c.label}
+              label={c.label}
+              color={c.color}
+              active={assets.includes(c.label)}
+              onClick={() => toggle(assets, setAssets, c.label)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+          Networks
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {NETWORKS.map((n) => (
+            <Chip
+              key={n.label}
+              label={n.label}
+              color={n.color}
+              active={networks.includes(n.label)}
+              onClick={() => toggle(networks, setNetworks, n.label)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <SaveBar label="Save Preferences" />
     </div>
   );
 }
@@ -459,226 +417,81 @@ function SettlementsTab() {
 // ── Notifications ────────────────────────────────────────────────────────────
 
 function NotificationsTab() {
-  const [accountEmails, setAccountEmails] = useState(true);
+  const [emailNotifs, setEmailNotifs] = useState(true);
   const [telegramAlerts, setTelegramAlerts] = useState(false);
   const [telegramGroup, setTelegramGroup] = useState(false);
   const [balanceAlerts, setBalanceAlerts] = useState(false);
-  const [customerReceipts, setCustomerReceipts] = useState(true);
-  const [invoiceNotifs, setInvoiceNotifs] = useState(true);
+  const [receipts, setReceipts] = useState(true);
+  const [invoiceFollowups, setInvoiceFollowups] = useState(true);
 
   return (
-    <div className="flex flex-col gap-8 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-8">
-      <section>
-        <h3 className="text-sm font-semibold text-[#FAFAFA]">Notifications</h3>
-        <p className="mb-4 text-xs text-[#71717A]">
-          Control what emails and messages you receive.
-        </p>
+    <div>
+      <SectionHeading
+        title="Notifications"
+        description="Choose how and where you want to stay informed about your business activity."
+      />
 
-        <p className="mb-3 text-xs font-semibold text-[#FAFAFA]">
-          Merchant Alerts
-        </p>
-        <div className="flex flex-col gap-3">
-          <Row
-            icon={
-              <AlertTriangle size={14} className="text-[#F59E0B]" />
-            }
-            iconBg="rgba(245,158,11,0.12)"
-            title="Account Emails"
-            description="Receive notifications via email"
-            control={
-              <Toggle
-                checked={accountEmails}
-                onChange={setAccountEmails}
-                size="sm"
-              />
-            }
-          />
-          <Row
-            icon={<Send size={14} className="text-[#2563EB]" />}
-            iconBg="rgba(37,99,235,0.12)"
-            title="Telegram Alerts"
-            description="Receive notifications through Telegram"
-            control={
-              <Toggle
-                checked={telegramAlerts}
-                onChange={setTelegramAlerts}
-                size="sm"
-              />
-            }
-          />
-          <Row
-            icon={<Users size={14} className="text-[#A78BFA]" />}
-            iconBg="rgba(167,139,250,0.12)"
-            title="Telegram Group Alerts"
-            description="Send notifications to your Telegram group"
-            control={
-              <Toggle
-                checked={telegramGroup}
-                onChange={setTelegramGroup}
-                size="sm"
-              />
-            }
-          />
-          <Row
-            icon={<Bell size={14} className="text-[#2563EB]" />}
-            iconBg="rgba(37,99,235,0.12)"
-            title="Balance Notifications"
-            description="Email me when my balance drops below a certain threshold."
-            control={
-              <Toggle
-                checked={balanceAlerts}
-                onChange={setBalanceAlerts}
-                size="sm"
-              />
-            }
-          />
-        </div>
-      </section>
+      <p className="mb-2 mt-10 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+        Merchant Alerts
+      </p>
+      <div className="divide-y divide-[#17171A]">
+        <ToggleRow
+          icon={<Bell size={17} className="text-[#F59E0B]" />}
+          iconBg="rgba(245,158,11,0.10)"
+          title="Email Notifications"
+          description="Receive summary reports and critical alerts via email."
+          checked={emailNotifs}
+          onChange={setEmailNotifs}
+        />
+        <ToggleRow
+          icon={<Send size={17} className="text-[#2563EB]" />}
+          iconBg="rgba(37,99,235,0.10)"
+          title="Direct Telegram Alerts"
+          info
+          description="Instant transaction notifications via our Telegram bot."
+          checked={telegramAlerts}
+          onChange={setTelegramAlerts}
+        />
+        <ToggleRow
+          icon={<Users size={17} className="text-[#60A5FA]" />}
+          iconBg="rgba(96,165,250,0.10)"
+          title="Telegram Group Alerts"
+          info
+          description="Keep your whole team informed in a shared group."
+          checked={telegramGroup}
+          onChange={setTelegramGroup}
+        />
+        <ToggleRow
+          icon={<Bell size={17} className="text-[#2563EB]" />}
+          iconBg="rgba(37,99,235,0.10)"
+          title="Low Balance Alerts"
+          description="Get notified when your operating balance reaches a limit."
+          checked={balanceAlerts}
+          onChange={setBalanceAlerts}
+        />
+      </div>
 
-      <section>
-        <p className="mb-2 text-xs font-semibold text-[#FAFAFA]">
-          Telegram Group
-        </p>
-        <div className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-4 text-center text-xs text-[#71717A]">
-          Add the bot to a group for team collaboration and group notifications.
-          <br />
-          <Send
-            size={10}
-            className="mx-1 inline -translate-y-px text-[#2563EB]"
-          />
-          Message the bot{" "}
-          <code className="rounded bg-[#1C1C1F] px-1.5 py-0.5 font-mono text-[11px] text-[#FAFAFA]">
-            /setup
-          </code>{" "}
-          to link a group to your account.
-        </div>
-      </section>
-
-      <section>
-        <p className="mb-3 text-xs font-semibold text-[#FAFAFA]">Customer</p>
-        <div className="flex flex-col gap-3">
-          <Row
-            icon={<Receipt size={14} className="text-[#2563EB]" />}
-            iconBg="rgba(37,99,235,0.12)"
-            title="Customer Receipts"
-            description="Send payment receipts to customers"
-            control={
-              <Toggle
-                checked={customerReceipts}
-                onChange={setCustomerReceipts}
-                size="sm"
-              />
-            }
-          />
-          <Row
-            icon={<FileText size={14} className="text-[#A1A1AA]" />}
-            title="Invoice Notifications"
-            description="Send invoice details and payment links to customers"
-            control={
-              <Toggle
-                checked={invoiceNotifs}
-                onChange={setInvoiceNotifs}
-                size="sm"
-              />
-            }
-          />
-        </div>
-      </section>
-    </div>
-  );
-}
-
-// ── Security ─────────────────────────────────────────────────────────────────
-
-function SecurityTab() {
-  return (
-    <div className="flex flex-col gap-8 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-8">
-      <h3 className="text-base font-semibold text-[#FAFAFA]">
-        Security &amp; Integrations
-      </h3>
-
-      {/* Telegram */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Send size={14} className="text-[#2563EB]" />
-            <p className="text-sm font-semibold text-[#FAFAFA]">Telegram</p>
-          </div>
-          <a
-            href="#"
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors"
-          >
-            <ExternalLink size={11} /> Open Bot
-          </a>
-        </div>
-
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-[#1C1C1F] bg-[#09090B] p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563EB]/15 text-[#2563EB]">
-              <Send size={16} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#FAFAFA]">
-                Not connected
-              </p>
-              <p className="text-xs text-[#71717A]">
-                Link your account to receive notifications and use the bot.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#2563EB] px-3.5 text-sm font-medium text-white hover:bg-[#1D4ED8] transition-colors"
-          >
-            <Send size={13} /> Connect
-          </button>
-        </div>
-      </section>
-
-      <div className="border-t border-[#1C1C1F]" />
-
-      {/* Password */}
-      <section className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Lock size={14} className="text-[#2563EB]" />
-          <p className="text-sm font-semibold text-[#FAFAFA]">Password</p>
-        </div>
-        <button
-          type="button"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3.5 text-sm font-medium text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
-        >
-          <Key size={13} /> Change password
-        </button>
-      </section>
-
-      {/* 2FA */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={14} className="text-[#2563EB]" />
-            <p className="text-sm font-semibold text-[#FAFAFA]">
-              Two-Factor Authentication
-            </p>
-          </div>
-          <button
-            type="button"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3.5 text-sm font-medium text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
-          >
-            <Key size={13} /> Enable
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
-          <p className="text-xs text-[#71717A]">
-            Use an Authenticator app instead of email OTP for login and
-            withdrawals.
-          </p>
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#71717A]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#71717A]" />
-            Inactive
-          </span>
-        </div>
-      </section>
+      <p className="mb-2 mt-12 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+        Customer Experience
+      </p>
+      <div className="divide-y divide-[#17171A]">
+        <ToggleRow
+          icon={<Receipt size={17} className="text-[#2563EB]" />}
+          iconBg="rgba(37,99,235,0.10)"
+          title="Automated Receipts"
+          description="Email a professional receipt after every successful payment."
+          checked={receipts}
+          onChange={setReceipts}
+        />
+        <ToggleRow
+          icon={<FileText size={17} className="text-[#A1A1AA]" />}
+          iconBg="rgba(161,161,170,0.08)"
+          title="Invoice Follow-ups"
+          description="Send invoice details and payment link reminders to customers."
+          checked={invoiceFollowups}
+          onChange={setInvoiceFollowups}
+        />
+      </div>
     </div>
   );
 }
@@ -687,84 +500,313 @@ function SecurityTab() {
 
 function VerificationTab() {
   return (
-    <div className="flex flex-col gap-5 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-8">
-      <div>
-        <h3 className="text-lg font-semibold text-[#2563EB]">
-          Account Verification
-        </h3>
-        <p className="mt-1 text-sm text-[#A1A1AA]">
-          Complete verification to unlock all features and start accepting
-          payments.
-        </p>
-      </div>
+    <div>
+      <SectionHeading
+        title="Account Verification"
+        description="Complete verification to unlock all features and start accepting payments."
+      />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mt-10 flex flex-col gap-10">
         {/* Identity */}
-        <article className="rounded-xl border border-[#1C1C1F] bg-[#09090B] p-5">
-          <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563EB]/15 text-[#2563EB]">
-            <IdCard size={18} />
+        <div className="flex items-start gap-5">
+          <IconTile>
+            <IdCard size={20} className="text-[#22C55E]" />
+          </IconTile>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h3 className="text-[15px] font-semibold text-[#FAFAFA]">
+                Identity Verification
+              </h3>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#052E16] px-2.5 py-0.5 text-xs font-medium text-[#22C55E]">
+                <CheckCircle2 size={11} /> Verified
+              </span>
+            </div>
+            <p className="mt-1.5 text-sm text-[#71717A]">
+              Your identity has been verified. You can start processing live
+              transactions.
+            </p>
           </div>
-          <h4 className="text-sm font-semibold text-[#FAFAFA]">
-            Identity Verification
-          </h4>
-          <p className="mt-1 text-xs leading-relaxed text-[#71717A]">
-            Verify your personal identity with a government-issued ID. Required
-            for all accounts.
-          </p>
-          <a
-            href="#"
-            className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
-          >
-            Start Verification <ArrowRight size={13} />
-          </a>
-        </article>
+        </div>
 
         {/* Business */}
-        <article className="relative rounded-xl border border-[#1C1C1F] bg-[#09090B] p-5">
-          <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-[#1C1C1F] px-2 py-0.5 text-[10px] font-medium text-[#A1A1AA]">
-            <Lock size={9} /> KYC required
-          </span>
-          <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563EB]/15 text-[#2563EB]">
-            <Building2 size={18} />
+        <div className="flex items-start gap-5">
+          <IconTile>
+            <Building2 size={20} className="text-[#2563EB]" />
+          </IconTile>
+          <div className="min-w-0">
+            <h3 className="text-[15px] font-semibold text-[#FAFAFA]">
+              Business Verification
+            </h3>
+            <p className="mt-1.5 text-sm text-[#71717A]">
+              Verify your registered business to unlock higher transaction
+              limits and business features.
+            </p>
+            <a
+              href="#"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2563EB] transition-colors hover:text-[#1D4ED8]"
+            >
+              Verify Business <ArrowRight size={14} />
+            </a>
           </div>
-          <h4 className="text-sm font-semibold text-[#FAFAFA]">
-            Business Verification
-          </h4>
-          <p className="mt-1 text-xs leading-relaxed text-[#71717A]">
-            Verify your registered business to unlock higher transaction limits
-            and business features.
-          </p>
-          <p className="mt-3 text-xs italic text-[#52525B]">
-            Complete Identity Verification first to unlock this step.
-          </p>
-          <a
-            href="#"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
-          >
-            Verify Business <ArrowRight size={13} />
-          </a>
-        </article>
+        </div>
       </div>
     </div>
   );
 }
 
+// ── Security ─────────────────────────────────────────────────────────────────
+
+function SecurityTab() {
+  return (
+    <div>
+      <SectionHeading
+        title="Security"
+        description="Manage your password, two-factor authentication and connected integrations."
+      />
+
+      <div className="mt-6 divide-y divide-[#17171A]">
+        {/* Telegram */}
+        <div className="flex flex-wrap items-center justify-between gap-4 py-6">
+          <div className="flex min-w-0 items-start gap-5">
+            <IconTile>
+              <Send size={19} className="text-[#2563EB]" />
+            </IconTile>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-[15px] font-semibold text-[#FAFAFA]">
+                  Telegram
+                </p>
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+                >
+                  <ExternalLink size={11} /> Open Bot
+                </a>
+              </div>
+              <p className="mt-1.5 text-sm text-[#71717A]">
+                Not connected. Link your account to receive notifications and
+                use the bot.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-[#2563EB] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8]"
+          >
+            <Send size={14} /> Connect
+          </button>
+        </div>
+
+        {/* Password */}
+        <div className="flex flex-wrap items-center justify-between gap-4 py-6">
+          <div className="flex min-w-0 items-start gap-5">
+            <IconTile>
+              <Lock size={19} className="text-[#A1A1AA]" />
+            </IconTile>
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold text-[#FAFAFA]">
+                Password
+              </p>
+              <p className="mt-1.5 text-sm text-[#71717A]">
+                Set a strong, unique password to keep your account secure.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#15151A]"
+          >
+            <Key size={14} /> Change password
+          </button>
+        </div>
+
+        {/* 2FA */}
+        <div className="flex flex-wrap items-center justify-between gap-4 py-6">
+          <div className="flex min-w-0 items-start gap-5">
+            <IconTile>
+              <ShieldCheck size={19} className="text-[#2563EB]" />
+            </IconTile>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5">
+                <p className="text-[15px] font-semibold text-[#FAFAFA]">
+                  Two-Factor Authentication
+                </p>
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#71717A]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#71717A]" />
+                  Inactive
+                </span>
+              </div>
+              <p className="mt-1.5 text-sm text-[#71717A]">
+                Use an Authenticator app instead of email OTP for login and
+                withdrawals.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#15151A]"
+          >
+            <Zap size={14} /> Enable
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Team ─────────────────────────────────────────────────────────────────────
+
+function TeamTab() {
+  const [view, setView] = useState<"members" | "pending">("members");
+  const [inviteOpen, setInviteOpen] = useState(false);
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <SectionHeading
+          title="Team"
+          description="Manage access controls and permissions for your organization."
+        />
+        <button
+          type="button"
+          onClick={() => setInviteOpen(true)}
+          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white"
+        >
+          <UserPlus size={15} /> Invite Member
+        </button>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="mt-8 flex gap-8 border-b border-[#1C1C1F]">
+        <TeamViewTab
+          icon={<Users size={15} />}
+          label="Members"
+          active={view === "members"}
+          onClick={() => setView("members")}
+        />
+        <TeamViewTab
+          icon={<Clock size={15} />}
+          label="Pending Invitations"
+          active={view === "pending"}
+          onClick={() => setView("pending")}
+        />
+      </div>
+
+      {/* Empty states */}
+      {view === "members" ? (
+        <div className="flex flex-col items-center justify-center gap-5 py-24">
+          <User size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
+          <p className="text-sm text-[#A1A1AA]">No team members yet.</p>
+          <button
+            type="button"
+            onClick={() => setInviteOpen(true)}
+            className="inline-flex h-11 items-center rounded-lg bg-[#FAFAFA] px-5 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white"
+          >
+            Invite your first member
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center gap-5 py-24">
+          <Clock size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
+          <p className="text-sm text-[#A1A1AA]">No pending invitations.</p>
+        </div>
+      )}
+
+      <InviteStaffModal
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        onSubmit={(payload) => {
+          // TODO: POST /teams/invite
+          console.log("invite staff", payload);
+        }}
+      />
+    </div>
+  );
+}
+
+function TeamViewTab({
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "-mb-px inline-flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors",
+        active
+          ? "border-[#2563EB] text-[#2563EB]"
+          : "border-transparent text-[#A1A1AA] hover:text-[#FAFAFA]",
+      )}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
 // ── Primitives ───────────────────────────────────────────────────────────────
+
+function SectionHeading({
+  title,
+  description,
+}: {
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div>
+      <h2 className="text-xl font-semibold text-[#FAFAFA]">{title}</h2>
+      {description && (
+        <p className="mt-2 text-[15px] text-[#71717A]">{description}</p>
+      )}
+    </div>
+  );
+}
+
+function Divider() {
+  return <div className="my-12 border-t border-[#17171A]" />;
+}
 
 function Field({
   label,
+  badge,
+  inlineBadge,
   children,
 }: {
-  label: React.ReactNode;
+  label: string;
+  badge?: React.ReactNode;
+  inlineBadge?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-[#A1A1AA]">
-        {label}
-      </label>
+      <div
+        className={cn(
+          "mb-2.5 flex items-center gap-2",
+          !inlineBadge && "justify-between",
+        )}
+      >
+        <label className="text-sm font-semibold text-[#FAFAFA]">{label}</label>
+        {badge}
+      </div>
       {children}
     </div>
+  );
+}
+
+function VerifiedBadge() {
+  return (
+    <span className="rounded-md bg-[#052E16] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#22C55E]">
+      Verified
+    </span>
   );
 }
 
@@ -773,19 +815,25 @@ function Input({
   onChange,
   placeholder,
   type = "text",
+  readOnly,
 }: {
   value: string;
-  onChange: (v: string) => void;
+  onChange?: (v: string) => void;
   placeholder?: string;
   type?: string;
+  readOnly?: boolean;
 }) {
   return (
     <input
       type={type}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
-      className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+      readOnly={readOnly}
+      className={cn(
+        "h-12 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none",
+        readOnly && "cursor-default text-[#A1A1AA]",
+      )}
     />
   );
 }
@@ -804,7 +852,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-9 text-sm text-[#FAFAFA] focus:border-[#2563EB] focus:outline-none transition-colors"
+        className="h-12 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 pr-10 text-sm font-medium text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -813,43 +861,71 @@ function Select({
         ))}
       </select>
       <ChevronDown
-        size={14}
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+        size={15}
+        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
       />
     </div>
   );
 }
 
-function Row({
+function ToggleRow({
   icon,
   iconBg,
   title,
+  info,
   description,
-  control,
+  checked,
+  onChange,
 }: {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   iconBg?: string;
   title: string;
+  info?: boolean;
   description: string;
-  control: React.ReactNode;
+  checked: boolean;
+  onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
-      <div className="flex min-w-0 items-center gap-3">
+    <div className="flex items-center justify-between gap-6 py-6">
+      <div className="flex min-w-0 items-start gap-4">
         {icon && (
           <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
             style={{ backgroundColor: iconBg ?? "rgba(161,161,170,0.08)" }}
           >
             {icon}
           </div>
         )}
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[#FAFAFA]">{title}</p>
-          <p className="text-xs text-[#71717A]">{description}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-[15px] font-semibold text-[#FAFAFA]">{title}</p>
+            {info && <Info size={12} className="text-[#52525B]" />}
+          </div>
+          <p className="mt-0.5 text-sm text-[#71717A]">{description}</p>
         </div>
       </div>
-      <div className="shrink-0">{control}</div>
+      <Toggle checked={checked} onChange={onChange} color="blue" />
+    </div>
+  );
+}
+
+function IconTile({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#10151F]">
+      {children}
+    </div>
+  );
+}
+
+function SaveBar({ label }: { label: string }) {
+  return (
+    <div className="mt-12 flex justify-end">
+      <button
+        type="button"
+        className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8]"
+      >
+        <Save size={14} /> {label}
+      </button>
     </div>
   );
 }
@@ -869,11 +945,12 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors ${
+      className={cn(
+        "inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-xs font-medium transition-colors",
         active
           ? "border-[#2563EB] bg-[#2563EB]/15 text-[#FAFAFA]"
-          : "border-[#1C1C1F] bg-[#09090B] text-[#A1A1AA] hover:border-[#2563EB]/40"
-      }`}
+          : "border-[#1C1C1F] bg-[#0A0B0E] text-[#A1A1AA] hover:border-[#2563EB]/40",
+      )}
     >
       <span
         className="inline-block h-2 w-2 rounded-full"

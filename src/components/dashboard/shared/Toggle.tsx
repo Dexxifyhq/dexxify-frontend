@@ -4,6 +4,7 @@ interface ToggleProps {
   checked: boolean;
   onChange: (v: boolean) => void;
   size?: "sm" | "md";
+  color?: "green" | "blue";
   ariaLabel?: string;
 }
 
@@ -11,8 +12,13 @@ export default function Toggle({
   checked,
   onChange,
   size = "md",
+  color = "green",
   ariaLabel,
 }: ToggleProps) {
+  const onColors =
+    color === "blue"
+      ? "border-[#2563EB] bg-[#2563EB]"
+      : "border-[#22C55E] bg-[#22C55E]";
   const dims =
     size === "sm"
       ? "h-5 w-9"
@@ -27,9 +33,7 @@ export default function Toggle({
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex shrink-0 items-center rounded-full border transition-colors ${dims} ${
-        checked
-          ? "border-[#22C55E] bg-[#22C55E]"
-          : "border-[#1C1C1F] bg-[#09090B]"
+        checked ? onColors : "border-[#1C1C1F] bg-[#09090B]"
       }`}
     >
       <span
