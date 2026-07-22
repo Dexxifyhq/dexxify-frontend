@@ -3,6 +3,7 @@ import { walletsApi } from "@/lib/api/wallet";
 import type {
   AddWithdrawalAddressDto,
   CreateWalletDto,
+  IssueDepositIdentityDto,
   InitiateFiatWithdrawalDto,
   InitiateStableCoinWithdrawalDto,
   MockTradeDto,
@@ -28,19 +29,11 @@ export const walletKeys = {
     [...walletKeys.all, "transactions", filters] as const,
   walletTransactions: (walletId: string, filters: WalletTransactionFilters) =>
     [...walletKeys.all, "transactions", walletId, filters] as const,
-  savedAddresses: () => [...walletKeys.all, "withdrawal-addresses", "saved"] as const,
+  savedAddresses: () =>
+    [...walletKeys.all, "withdrawal-addresses", "saved"] as const,
 };
 
 // ── Queries ────────────────────────────────────────────────────────────────
-
-export function useWalletBalance() {
-  return useQuery({
-    queryKey: walletKeys.balance(),
-    queryFn: walletsApi.getBalance,
-    staleTime: 20_000,
-    refetchInterval: 60_000,
-  });
-}
 
 export function useWallets(filters: WalletListFilters = {}) {
   return useQuery({
@@ -102,6 +95,18 @@ export function useCreateWallet() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.all });
     },
+  });
+}
+
+export function useIssueIdentity() {
+  return useMutation({
+    mutationFn: ({
+      walletId,
+      dto,
+    }: {
+      walletId: string;
+      dto: IssueDepositIdentityDto;
+    }) => walletsApi.issueIdentity(walletId, dto),
   });
 }
 

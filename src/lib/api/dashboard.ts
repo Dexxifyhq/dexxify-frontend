@@ -149,7 +149,7 @@ export const dashboardApi = {
     const tally = new Map<string, number>();
     for (const w of wallets) {
       const symbol = String(w.asset_symbol ?? "UNKNOWN").toUpperCase();
-      const balanceUsd = num(w.balance);
+      const balanceUsd = num((w as any).balance);
       tally.set(symbol, (tally.get(symbol) ?? 0) + balanceUsd);
     }
 

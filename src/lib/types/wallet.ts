@@ -8,14 +8,6 @@ export interface Wallet {
   asset_id: string;
   asset_symbol?: CryptoCurrency | string;
   address?: string;
-  balance?: number;
-  available_balance?: number;
-  pending_balance?: number;
-  auto_settlement?: boolean;
-  bank_id?: string;
-  account_number?: string;
-  account_name?: string;
-  bank_name?: string;
   created_at: string;
   updated_at?: string;
 }
@@ -39,16 +31,6 @@ export interface WalletAddress {
   asset_symbol: string;
   qr_code?: string;
   memo?: string;
-}
-
-// ── Wallet balance summary ─────────────────────────────────────────────────
-
-export interface WalletBalance {
-  total_balance: number;
-  available_balance: number;
-  pending_balance: number;
-  currency: string;
-  wallets?: Wallet[];
 }
 
 // ── Wallet transaction ─────────────────────────────────────────────────────
@@ -97,11 +79,26 @@ export type WalletTransactionsResponse = WalletTransaction[];
 // ── DTOs ───────────────────────────────────────────────────────────────────
 
 export interface CreateWalletDto {
-  label: string;
-  asset_id: string;
-  bank_id?: string;
-  account_number?: string;
-  auto_settlement?: boolean;
+  customer_id?: string;
+}
+
+export type DepositIdentityType =
+  | "static_deposit_address"
+  | "ngn_virtual_account";
+
+export type DepositIdentityChain =
+  | "bitcoin"
+  | "ethereum"
+  | "solana"
+  | "bsc"
+  | "tron"
+  | "base"
+  | "arbitrum";
+
+export interface IssueDepositIdentityDto {
+  type: DepositIdentityType;
+  chain?: DepositIdentityChain;
+  bvn?: string;
 }
 
 export interface UpdateWalletBankDetailsDto {
