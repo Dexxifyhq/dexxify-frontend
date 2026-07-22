@@ -15,7 +15,6 @@ export type WalletAsset =
 // ── DTOs ─────────────────────────────────────────────────────────────────────
 
 export interface CreateOfframpDto {
-  wallet_id: string;
   crypto_asset: WalletAsset;
   crypto_amount: number;
   recipient_id: string;

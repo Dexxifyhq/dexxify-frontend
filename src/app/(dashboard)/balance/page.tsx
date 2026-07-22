@@ -22,14 +22,21 @@ import PageHeader from "@/components/dashboard/shared/PageHeader";
 import StatCard from "@/components/dashboard/shared/StatCard";
 import { FilterSelect } from "@/components/dashboard/shared/FilterBar";
 import { cn } from "@/utils/utils";
-import { useLedgerBalance, useLedgerTransactions } from "@/lib/hooks/ledger/useLedger";
+import {
+  useLedgerBalance,
+  useLedgerTransactions,
+} from "@/lib/hooks/ledger/useLedger";
 import {
   useWallets,
   useWalletAddress,
+  useCreateWallet,
+  useIssueIdentity,
   useSavedWithdrawalAddresses,
   useWithdrawStableCoin,
   useWithdrawFiat,
 } from "@/lib/hooks/wallet/useWallets";
+import { walletsApi } from "@/lib/api/wallet";
+import { useSavedBanks } from "@/lib/hooks/misc/useMisc";
 import {
   useSwapEstimate,
   useCreateSwapQuotation,
@@ -37,39 +44,99 @@ import {
   useCreateOfframp,
   useSwapList,
 } from "@/lib/hooks/swaps/useSwaps";
-import type { LedgerTransaction, LedgerTxType, LedgerEntryStatus } from "@/lib/types/ledger";
+import type {
+  LedgerTransaction,
+  LedgerTxType,
+  LedgerEntryStatus,
+} from "@/lib/types/ledger";
 import type { WithdrawalAddress } from "@/lib/types/wallet";
+import type { SavedBank } from "@/lib/types/misc";
 import type { WalletAsset } from "@/lib/api/offramp";
 import type { SwapQuotation } from "@/lib/api/swaps";
+import { useQuery } from "@tanstack/react-query";
+import { payApi } from "@/lib/api/pay";
+import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
-type Currency = "NGN" | "USD";
+type Currency = "NGN" | "USD" | "USDT" | "USDC";
 type ActiveTab = "history" | "swaps";
 
 const TX_TYPE_CFG: Record<LedgerTxType, { label: string; cls: string }> = {
-  deposit: { label: "Deposit", cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  onramp: { label: "Onramp", cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  refund: { label: "Refund", cls: "bg-[#052e16]/60 text-[#86efac] border-[#14532D]/50" },
-  withdrawal: { label: "Withdrawal", cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  offramp: { label: "Offramp", cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  payout: { label: "Payout", cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50" },
-  fee: { label: "Fee", cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50" },
-  transfer: { label: "Transfer", cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50" },
-  swap: { label: "Swap", cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50" },
+  deposit: {
+    label: "Deposit",
+    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+  },
+  onramp: {
+    label: "Onramp",
+    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+  },
+  refund: {
+    label: "Refund",
+    cls: "bg-[#052e16]/60 text-[#86efac] border-[#14532D]/50",
+  },
+  withdrawal: {
+    label: "Withdrawal",
+    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+  },
+  offramp: {
+    label: "Offramp",
+    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+  },
+  payout: {
+    label: "Payout",
+    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+  },
+  fee: {
+    label: "Fee",
+    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+  },
+  transfer: {
+    label: "Transfer",
+    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+  },
+  swap: {
+    label: "Swap",
+    cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50",
+  },
 };
 
 const STATUS_CFG: Record<LedgerEntryStatus, { label: string; cls: string }> = {
-  completed: { label: "Completed", cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  pending: { label: "Pending", cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50" },
-  initiated: { label: "Initiated", cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50" },
-  processing: { label: "Processing", cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50" },
-  rejected: { label: "Rejected", cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  reversed: { label: "Reversed", cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50" },
+  completed: {
+    label: "Completed",
+    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+  },
+  pending: {
+    label: "Pending",
+    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+  },
+  initiated: {
+    label: "Initiated",
+    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+  },
+  processing: {
+    label: "Processing",
+    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+  },
+  rejected: {
+    label: "Rejected",
+    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+  },
+  reversed: {
+    label: "Reversed",
+    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+  },
 };
 
 const WALLET_ASSET_OPTIONS: WalletAsset[] = [
-  "BTC", "TRX", "BNB", "TON", "USDT", "ETH", "USDC", "SOL",
+  "BTC",
+  "TRX",
+  "BNB",
+  "TON",
+  "USDT",
+  "ETH",
+  "USDC",
+  "SOL",
 ];
 
 const SWAP_QUOTATION_CURRENCIES = ["NGN", "USDT", "USDC"] as const;
@@ -156,7 +223,11 @@ function CopyButton({ value }: { value: string }) {
       onClick={copy}
       className="ml-1.5 inline-flex h-6 w-6 items-center justify-center rounded text-[#52525B] hover:text-[#A1A1AA] transition-colors"
     >
-      {copied ? <Check size={12} className="text-[#4ade80]" /> : <Copy size={12} />}
+      {copied ? (
+        <Check size={12} className="text-[#4ade80]" />
+      ) : (
+        <Copy size={12} />
+      )}
     </button>
   );
 }
@@ -225,9 +296,7 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Input({
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+function Input({ ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
@@ -294,129 +363,248 @@ function PrimaryButton({
 
 // ── Deposit Modal ─────────────────────────────────────────────────────────────
 
-function DepositModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [selectedWalletId, setSelectedWalletId] = useState("");
-  const { data: walletsData, isLoading: walletsLoading } = useWallets();
-  const { data: addressData, isLoading: addressLoading } = useWalletAddress(selectedWalletId);
+type DepositStep = "select" | "address";
 
-  const wallets = walletsData?.data ?? [];
-  const selectedWallet = wallets.find((w) => w.id === selectedWalletId);
+interface DepositAddress {
+  chain: string;
+  address: string;
+  createdAt?: string;
+}
+interface NgnVirtualAccount {
+  currency: string;
+  accountNumber: string;
+  accountName: string;
+  bankName?: string;
+}
+interface WalletResult {
+  id: string;
+  deposit_addresses: string | DepositAddress[];
+  ngn_virtual_accounts: string | NgnVirtualAccount[];
+}
+
+function parseJsonField<T>(field: string | T[]): T[] {
+  if (Array.isArray(field)) return field;
+  if (!field) return [];
+  try {
+    return JSON.parse(field as string) as T[];
+  } catch {
+    return [];
+  }
+}
+
+function DepositModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const [step, setStep] = useState<DepositStep>("select");
+  const [selectedKey, setSelectedKey] = useState("");
+  const [walletResult, setWalletResult] = useState<WalletResult | null>(null);
+
+  const { data: rawAssets, isLoading: assetsLoading } = useQuery({
+    queryKey: ["deposit-assets"],
+    queryFn: payApi.getDepositAssets,
+    staleTime: 5 * 60_000,
+  });
+
+  const createWallet = useCreateWallet();
+  const issueIdentity = useIssueIdentity();
+
+  const assets: FlatAsset[] = flattenAssets(
+    (rawAssets as any)?.data ?? rawAssets ?? {},
+  );
+
+  const selectedAsset = assets.find((a) => a.key === selectedKey) ?? null;
+
+  const handleCreate = async () => {
+    if (!selectedAsset) return;
+    try {
+      // 1. Create the deposit account
+      const wallet = await createWallet.mutateAsync({ customer_id: undefined });
+      const walletId: string = wallet.id;
+
+      // 2. Issue a deposit identity for the selected chain
+      await issueIdentity.mutateAsync({
+        walletId,
+        dto: {
+          type: "static_deposit_address",
+          chain: selectedAsset.chainKey as import("@/lib/types/wallet").DepositIdentityChain,
+        },
+      });
+
+      // 3. Re-fetch wallet to get the updated deposit_addresses
+      const updated = await walletsApi.getById(walletId);
+      setWalletResult(updated as unknown as WalletResult);
+      setStep("address");
+    } catch {
+      // errors shown inline
+    }
+  };
+
+  const handleClose = () => {
+    setStep("select");
+    setSelectedKey("");
+    setWalletResult(null);
+    createWallet.reset();
+    issueIdentity.reset();
+    onClose();
+  };
+
+  // Derive address for the selected chain
+  const depositAddresses = walletResult
+    ? parseJsonField<DepositAddress>(walletResult.deposit_addresses)
+    : [];
+  const ngnAccounts = walletResult
+    ? parseJsonField<NgnVirtualAccount>(walletResult.ngn_virtual_accounts)
+    : [];
+
+  const matchedAddress = selectedAsset
+    ? depositAddresses.find((da) => da.chain === selectedAsset.chainKey)
+    : null;
+
+  const createError =
+    createWallet.error instanceof Error
+      ? createWallet.error.message
+      : issueIdentity.error instanceof Error
+        ? issueIdentity.error.message
+        : null;
+
+  const isCreating = createWallet.isPending || issueIdentity.isPending;
 
   return (
-    <ModalShell open={open} onClose={onClose} title="Deposit Funds">
-      <div className="flex flex-col gap-4">
-        <div>
-          <Label>Select Wallet</Label>
-          {walletsLoading ? (
-            <div className="h-9 animate-pulse rounded-lg bg-[#1C1C1F]" />
-          ) : (
-            <Select
-              value={selectedWalletId}
-              onChange={(e) => setSelectedWalletId(e.target.value)}
-            >
-              <option value="">Choose a wallet…</option>
-              {wallets.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.label} ({w.asset_symbol ?? w.asset_id})
-                </option>
-              ))}
-            </Select>
+    <ModalShell open={open} onClose={handleClose} title="Deposit Funds">
+      {step === "select" ? (
+        <div className="flex flex-col gap-4">
+          <div>
+            <Label>Asset &amp; Network</Label>
+            {assetsLoading ? (
+              <div className="h-9 animate-pulse rounded-lg bg-[#1C1C1F]" />
+            ) : (
+              <Select
+                value={selectedKey}
+                onChange={(e) => setSelectedKey(e.target.value)}
+              >
+                <option value="">Select asset &amp; network…</option>
+                {assets.map((a) => (
+                  <option key={a.key} value={a.key}>
+                    {a.symbol} — {a.networkDisplay}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </div>
+
+          {selectedAsset && (
+            <div className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3 space-y-1">
+              <p className="text-xs text-[#52525B]">Selected</p>
+              <p className="text-sm font-semibold text-[#FAFAFA]">
+                {selectedAsset.name} ({selectedAsset.symbol})
+              </p>
+              <p className="text-xs text-[#71717A]">
+                Network: {selectedAsset.networkDisplay}
+              </p>
+            </div>
           )}
+
+          <ErrorMsg message={createError} />
+
+          <PrimaryButton
+            type="button"
+            disabled={!selectedKey}
+            loading={isCreating}
+            onClick={handleCreate}
+            className="mt-1"
+          >
+            {createWallet.isPending
+              ? "Creating wallet…"
+              : issueIdentity.isPending
+                ? "Issuing address…"
+                : "Generate Deposit Address"}
+          </PrimaryButton>
         </div>
-
-        {selectedWalletId && (
-          <>
-            {/* Deposit address */}
-            {addressLoading ? (
-              <div className="h-16 animate-pulse rounded-lg bg-[#1C1C1F]" />
-            ) : addressData ? (
+      ) : (
+        <div className="flex flex-col gap-4">
+          {/* Asset + Network summary */}
+          {selectedAsset && (
+            <div className="flex items-center justify-between rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
               <div>
-                <Label>Deposit Address ({addressData.network})</Label>
-                <div className="flex items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2">
-                  <span className="flex-1 break-all font-mono text-xs text-[#A1A1AA]">
-                    {addressData.address}
-                  </span>
-                  <CopyButton value={addressData.address} />
-                </div>
-                {addressData.memo && (
-                  <p className="mt-1.5 text-xs text-[#71717A]">
-                    Memo: <span className="font-mono text-[#A1A1AA]">{String(addressData.memo)}</span>
-                    <CopyButton value={String(addressData.memo)} />
-                  </p>
-                )}
+                <p className="text-xs text-[#52525B]">Asset</p>
+                <p className="text-sm font-semibold text-[#FAFAFA]">
+                  {selectedAsset.symbol}
+                </p>
               </div>
-            ) : null}
+              <div className="text-right">
+                <p className="text-xs text-[#52525B]">Network</p>
+                <p className="text-sm font-semibold text-[#FAFAFA]">
+                  {selectedAsset.networkDisplay}
+                </p>
+              </div>
+            </div>
+          )}
 
-            {/* deposit_addresses from wallet object */}
-            {selectedWallet && Array.isArray((selectedWallet as unknown as Record<string, unknown>).deposit_addresses) && (
-              <div>
-                <Label>All Chain Addresses</Label>
-                <div className="flex flex-col gap-2">
-                  {(
-                    (selectedWallet as unknown as {
-                      deposit_addresses: Array<{ chain: string; address: string }>;
-                    }).deposit_addresses
-                  ).map((da, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start justify-between gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2"
-                    >
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[#52525B]">
-                          {da.chain}
-                        </p>
-                        <p className="break-all font-mono text-xs text-[#A1A1AA]">{da.address}</p>
-                      </div>
-                      <CopyButton value={da.address} />
+          {/* Filtered deposit address */}
+          {matchedAddress ? (
+            <div>
+              <Label>Deposit Address</Label>
+              <div className="flex items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
+                <span className="flex-1 break-all font-mono text-xs text-[#A1A1AA]">
+                  {matchedAddress.address}
+                </span>
+                <CopyButton value={matchedAddress.address} />
+              </div>
+              <p className="mt-1.5 text-[10px] text-[#52525B]">
+                Only send {selectedAsset?.symbol} on the{" "}
+                {selectedAsset?.networkDisplay} network to this address.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-[#27272A] bg-[#18181B] px-4 py-3">
+              <p className="text-xs text-[#71717A]">
+                No deposit address found for the selected network. Try a
+                different asset or network.
+              </p>
+            </div>
+          )}
+
+          {/* NGN virtual accounts */}
+          {ngnAccounts.length > 0 && (
+            <div>
+              <Label>NGN Virtual Accounts</Label>
+              <div className="flex flex-col gap-2">
+                {ngnAccounts.map((va, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5 space-y-0.5"
+                  >
+                    {va.bankName && (
+                      <p className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+                        {va.bankName}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <p className="font-mono text-sm text-[#FAFAFA]">
+                        {va.accountNumber}
+                      </p>
+                      <CopyButton value={va.accountNumber} />
                     </div>
-                  ))}
-                </div>
+                    <p className="text-xs text-[#71717A]">{va.accountName}</p>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* NGN virtual accounts */}
-            {selectedWallet && Array.isArray((selectedWallet as unknown as Record<string, unknown>).ngn_virtual_accounts) && (
-              <div>
-                <Label>NGN Virtual Accounts</Label>
-                <div className="flex flex-col gap-2">
-                  {(
-                    (selectedWallet as unknown as {
-                      ngn_virtual_accounts: Array<{
-                        currency: string;
-                        accountNumber: string;
-                        accountName: string;
-                        bankName?: string;
-                      }>;
-                    }).ngn_virtual_accounts
-                  ).map((va, i) => (
-                    <div
-                      key={i}
-                      className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5 space-y-0.5"
-                    >
-                      {va.bankName && (
-                        <p className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
-                          {va.bankName}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <p className="font-mono text-sm text-[#FAFAFA]">{va.accountNumber}</p>
-                        <CopyButton value={va.accountNumber} />
-                      </div>
-                      <p className="text-xs text-[#71717A]">{va.accountName}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {!selectedWalletId && !walletsLoading && wallets.length === 0 && (
-          <p className="text-center text-sm text-[#52525B] py-4">
-            No wallets found. Create a wallet first.
-          </p>
-        )}
-      </div>
+          <button
+            type="button"
+            onClick={() => setStep("select")}
+            className="text-xs text-[#52525B] hover:text-[#A1A1AA] transition-colors text-center"
+          >
+            ← Choose a different asset
+          </button>
+        </div>
+      )}
     </ModalShell>
   );
 }
@@ -425,7 +613,13 @@ function DepositModal({ open, onClose }: { open: boolean; onClose: () => void })
 
 type WithdrawTab = "stablecoin" | "fiat";
 
-function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function WithdrawModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const [tab, setTab] = useState<WithdrawTab>("stablecoin");
 
   // Stablecoin state
@@ -433,7 +627,7 @@ function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }
   const [scAmount, setScAmount] = useState("");
   const [scNetwork, setScNetwork] = useState("ERC20");
   const [scToken, setScToken] = useState("USDT");
-  const [scExternalId, setScExternalId] = useState(() => generateUUID());
+  // const [scExternalId, setScExternalId] = useState(() => generateUUID());
   const [scSuccess, setScSuccess] = useState(false);
 
   // Fiat state
@@ -445,6 +639,7 @@ function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }
   const withdrawStableCoin = useWithdrawStableCoin();
   const withdrawFiat = useWithdrawFiat();
   const { data: savedAddresses } = useSavedWithdrawalAddresses();
+  const { data: savedBanks } = useSavedBanks();
 
   const handleClose = useCallback(() => {
     setScSuccess(false);
@@ -462,7 +657,7 @@ function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }
         amount: Number(scAmount),
         network: scNetwork,
         token: scToken,
-        externalId: scExternalId,
+        externalId: generateUUID(),
       });
       setScSuccess(true);
     } catch {
@@ -532,7 +727,36 @@ function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }
               </button>
             </div>
           ) : (
-            <form onSubmit={handleStablecoinSubmit} className="flex flex-col gap-3">
+            <form
+              onSubmit={handleStablecoinSubmit}
+              className="flex flex-col gap-3"
+            >
+              {savedAddresses && savedAddresses.length > 0 && (
+                <div>
+                  <Label>Saved Address</Label>
+                  <Select
+                    value={scAddress}
+                    onChange={(e) => {
+                      const sa = (savedAddresses as WithdrawalAddress[]).find(
+                        (a) => a.address === e.target.value,
+                      );
+                      if (sa) {
+                        setScAddress(sa.address);
+                        setScNetwork(sa.network);
+                        setScToken(sa.token);
+                      }
+                    }}
+                  >
+                    <option value="">Select saved address…</option>
+                    {(savedAddresses as WithdrawalAddress[]).map((sa) => (
+                      <option key={sa.id} value={sa.address}>
+                        {sa.label} — {sa.address.slice(0, 12)}… ({sa.network}/
+                        {sa.token})
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              )}
               <div>
                 <Label>Destination Address</Label>
                 <Input
@@ -557,41 +781,15 @@ function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Network</Label>
-                  <Select
-                    value={scNetwork}
-                    onChange={(e) => setScNetwork(e.target.value)}
-                  >
-                    {["ERC20", "TRC20", "SOL", "BSC", "TON"].map((n) => (
-                      <option key={n} value={n}>{n}</option>
-                    ))}
-                  </Select>
+                  <div className="flex h-9 items-center rounded-lg border border-[#1C1C1F] bg-[#18181B] px-3 text-sm text-[#A1A1AA]">
+                    {scNetwork || "—"}
+                  </div>
                 </div>
                 <div>
                   <Label>Token</Label>
-                  <Select
-                    value={scToken}
-                    onChange={(e) => setScToken(e.target.value)}
-                  >
-                    {["USDT", "USDC"].map((t) => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <Label>External ID</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={scExternalId}
-                    onChange={(e) => setScExternalId(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setScExternalId(generateUUID())}
-                    className="shrink-0 text-xs text-[#52525B] hover:text-[#A1A1AA] transition-colors"
-                  >
-                    Refresh
-                  </button>
+                  <div className="flex h-9 items-center rounded-lg border border-[#1C1C1F] bg-[#18181B] px-3 text-sm text-[#A1A1AA]">
+                    {scToken || "—"}
+                  </div>
                 </div>
               </div>
               <ErrorMsg message={scError} />
@@ -629,23 +827,25 @@ function WithdrawModal({ open, onClose }: { open: boolean; onClose: () => void }
           ) : (
             <form onSubmit={handleFiatSubmit} className="flex flex-col gap-3">
               <div>
-                <Label>Bank ID / Recipient</Label>
-                {savedAddresses && savedAddresses.length > 0 ? (
+                <Label>Bank Recipient</Label>
+                {savedBanks && savedBanks.length > 0 ? (
                   <Select
+                    required
                     value={fiatBankId}
                     onChange={(e) => setFiatBankId(e.target.value)}
                   >
-                    <option value="">Select saved recipient…</option>
-                    {savedAddresses.map((sa: WithdrawalAddress) => (
-                      <option key={sa.id} value={sa.id}>
-                        {sa.label} — {sa.address} ({sa.network}/{sa.token})
+                    <option value="">Select saved bank…</option>
+                    {(savedBanks as SavedBank[]).map((bank) => (
+                      <option key={bank.id} value={bank.provider_recipient_id}>
+                        {bank.bank_name} — {bank.account_number} (
+                        {bank.account_name})
                       </option>
                     ))}
                   </Select>
                 ) : (
                   <Input
                     required
-                    placeholder="Bank ID"
+                    placeholder="Recipient ID"
                     value={fiatBankId}
                     onChange={(e) => setFiatBankId(e.target.value)}
                   />
@@ -738,7 +938,11 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
   const handleGetQuote = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const q = await createQuotation.mutateAsync({ fromCurrency, toCurrency, amount });
+      const q = await createQuotation.mutateAsync({
+        fromCurrency,
+        toCurrency,
+        amount,
+      });
       setQuotation(q);
       setStep("quotation");
     } catch {
@@ -768,7 +972,9 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
       <div className="flex flex-col items-center gap-3 py-6">
         <CheckCircle2 size={40} className="text-[#4ade80]" />
         <p className="text-sm font-semibold text-[#FAFAFA]">Swap Executed!</p>
-        <p className="text-xs text-[#71717A]">Your swap has been successfully executed.</p>
+        <p className="text-xs text-[#71717A]">
+          Your swap has been successfully executed.
+        </p>
         <button
           type="button"
           onClick={onDone}
@@ -808,8 +1014,8 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
                 timerExpired
                   ? "text-[#f87171]"
                   : countdown <= 5
-                  ? "text-[#F59E0B]"
-                  : "text-[#FAFAFA]",
+                    ? "text-[#F59E0B]"
+                    : "text-[#FAFAFA]",
               )}
             >
               {timerExpired ? "Expired" : `${countdown}s`}
@@ -852,7 +1058,9 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
             onChange={(e) => setFromCurrency(e.target.value)}
           >
             {SWAP_QUOTATION_CURRENCIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </Select>
         </div>
@@ -862,9 +1070,13 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
             value={toCurrency}
             onChange={(e) => setToCurrency(e.target.value)}
           >
-            {SWAP_QUOTATION_CURRENCIES.filter((c) => c !== fromCurrency).map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+            {SWAP_QUOTATION_CURRENCIES.filter((c) => c !== fromCurrency).map(
+              (c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ),
+            )}
           </Select>
         </div>
       </div>
@@ -899,7 +1111,11 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
       )}
 
       <ErrorMsg message={quotationError} />
-      <PrimaryButton type="submit" loading={createQuotation.isPending} className="mt-1">
+      <PrimaryButton
+        type="submit"
+        loading={createQuotation.isPending}
+        className="mt-1"
+      >
         Get Quote
       </PrimaryButton>
     </form>
@@ -907,24 +1123,20 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
 }
 
 function OfframpFlow({ onDone }: { onDone: () => void }) {
-  const [walletId, setWalletId] = useState("");
   const [cryptoAsset, setCryptoAsset] = useState<WalletAsset>("USDT");
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [recipientId, setRecipientId] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const { data: walletsData, isLoading: walletsLoading } = useWallets();
-  const { data: savedAddresses, isLoading: addressesLoading } = useSavedWithdrawalAddresses();
+  const { data: savedBanks, isLoading: banksLoading } = useSavedBanks();
   const createOfframp = useCreateOfframp();
 
-  const wallets = walletsData?.data ?? [];
-  const withdrawalAddresses: WithdrawalAddress[] = (savedAddresses as WithdrawalAddress[] | undefined) ?? [];
+  const bankList: SavedBank[] = (savedBanks as SavedBank[] | undefined) ?? [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await createOfframp.mutateAsync({
-        wallet_id: walletId,
         crypto_asset: cryptoAsset,
         crypto_amount: Number(cryptoAmount),
         recipient_id: recipientId,
@@ -942,8 +1154,12 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
         <CheckCircle2 size={40} className="text-[#4ade80]" />
-        <p className="text-sm font-semibold text-[#FAFAFA]">Offramp Submitted</p>
-        <p className="text-xs text-[#71717A]">Your offramp has been successfully submitted.</p>
+        <p className="text-sm font-semibold text-[#FAFAFA]">
+          Offramp Submitted
+        </p>
+        <p className="text-xs text-[#71717A]">
+          Your offramp has been successfully submitted.
+        </p>
         <button
           type="button"
           onClick={onDone}
@@ -957,25 +1173,6 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <div>
-        <Label>Source Wallet</Label>
-        {walletsLoading ? (
-          <div className="h-9 animate-pulse rounded-lg bg-[#1C1C1F]" />
-        ) : (
-          <Select
-            value={walletId}
-            onChange={(e) => setWalletId(e.target.value)}
-            required
-          >
-            <option value="">Select wallet…</option>
-            {wallets.map((w) => (
-              <option key={w.id} value={w.id}>
-                {w.label} ({w.asset_symbol ?? w.asset_id})
-              </option>
-            ))}
-          </Select>
-        )}
-      </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label>Crypto Asset</Label>
@@ -983,8 +1180,10 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
             value={cryptoAsset}
             onChange={(e) => setCryptoAsset(e.target.value as WalletAsset)}
           >
-            {WALLET_ASSET_OPTIONS.map((a) => (
-              <option key={a} value={a}>{a}</option>
+            {SWAP_QUOTATION_CURRENCIES.filter((c) => c !== "NGN").map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
             ))}
           </Select>
         </div>
@@ -1003,21 +1202,18 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
       </div>
       <div>
         <Label>Recipient</Label>
-        {addressesLoading ? (
+        {banksLoading ? (
           <div className="h-9 animate-pulse rounded-lg bg-[#1C1C1F]" />
-        ) : withdrawalAddresses.length > 0 ? (
+        ) : bankList.length > 0 ? (
           <Select
             value={recipientId}
             onChange={(e) => setRecipientId(e.target.value)}
             required
           >
-            <option value="">Select recipient…</option>
-            {withdrawalAddresses.map((wa) => (
-              <option
-                key={wa.id}
-                value={(wa as WithdrawalAddress & { recipient_id?: string }).recipient_id ?? wa.id}
-              >
-                {wa.label} — {wa.address.slice(0, 10)}… ({wa.network}/{wa.token})
+            <option value="">Select bank recipient…</option>
+            {bankList.map((bank) => (
+              <option key={bank.id} value={bank.provider_recipient_id}>
+                {bank.bank_name} — {bank.account_number} ({bank.account_name})
               </option>
             ))}
           </Select>
@@ -1031,7 +1227,11 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
         )}
       </div>
       <ErrorMsg message={offrampError} />
-      <PrimaryButton type="submit" loading={createOfframp.isPending} className="mt-1">
+      <PrimaryButton
+        type="submit"
+        loading={createOfframp.isPending}
+        className="mt-1"
+      >
         Execute Offramp
       </PrimaryButton>
     </form>
@@ -1047,7 +1247,12 @@ function SwapModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <ModalShell open={open} onClose={onClose} title="Swap / Offramp" maxWidth="max-w-lg">
+    <ModalShell
+      open={open}
+      onClose={onClose}
+      title="Swap / Offramp"
+      maxWidth="max-w-lg"
+    >
       {/* Sub-tabs */}
       <div className="flex gap-1 rounded-lg border border-[#1C1C1F] bg-[#09090B] p-1 mb-5">
         {(["crypto", "offramp"] as SwapModalTab[]).map((t) => (
@@ -1080,7 +1285,7 @@ function HistoryTab({
   txRef,
 }: {
   currency: Currency;
-  txRef: React.MutableRefObject<LedgerTransaction[]>;
+  txRef: React.RefObject<LedgerTransaction[]>;
 }) {
   const { data, isLoading, isError } = useLedgerTransactions({ limit: 20 });
   const txList: LedgerTransaction[] = data?.data ?? [];
@@ -1111,7 +1316,9 @@ function HistoryTab({
   return (
     <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
       <div className="border-b border-[#1C1C1F] px-5 py-4">
-        <p className="text-sm font-semibold text-[#FAFAFA]">Transaction History</p>
+        <p className="text-sm font-semibold text-[#FAFAFA]">
+          Transaction History
+        </p>
       </div>
 
       {isLoading && (
@@ -1138,8 +1345,14 @@ function HistoryTab({
 
       {!isLoading && !isError && txList.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-          <ArrowLeftRight size={28} className="text-[#3F3F46]" strokeWidth={1.5} />
-          <p className="text-sm font-semibold text-[#FAFAFA]">No transactions yet.</p>
+          <ArrowLeftRight
+            size={28}
+            className="text-[#3F3F46]"
+            strokeWidth={1.5}
+          />
+          <p className="text-sm font-semibold text-[#FAFAFA]">
+            No transactions yet.
+          </p>
         </div>
       )}
 
@@ -1148,7 +1361,14 @@ function HistoryTab({
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#1C1C1F]">
-                {["Type", "Asset", `Amount (${currency})`, "Status", "Reference", "Date"].map((h) => (
+                {[
+                  "Type",
+                  "Asset",
+                  `Amount (${currency})`,
+                  "Status",
+                  "Reference",
+                  "Date",
+                ].map((h) => (
                   <th
                     key={h}
                     className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
@@ -1221,7 +1441,8 @@ function HistoryTab({
 function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
   const { data, isLoading } = useSwapList();
 
-  const rawList = (data as unknown as { data?: unknown[] })?.data ??
+  const rawList =
+    (data as unknown as { data?: unknown[] })?.data ??
     (Array.isArray(data) ? (data as unknown[]) : []);
 
   return (
@@ -1250,7 +1471,11 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
 
       {!isLoading && rawList.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-          <ArrowLeftRight size={28} className="text-[#3F3F46]" strokeWidth={1.5} />
+          <ArrowLeftRight
+            size={28}
+            className="text-[#3F3F46]"
+            strokeWidth={1.5}
+          />
           <p className="text-sm font-semibold text-[#FAFAFA]">No swaps yet.</p>
           <button
             type="button"
@@ -1294,11 +1519,15 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
                   >
                     <td className="px-5 py-3.5 text-[#FAFAFA]">
                       {fromAmt != null ? fmt(Number(fromAmt)) : "—"}{" "}
-                      <span className="text-[#71717A]">{String(fromCur ?? "")}</span>
+                      <span className="text-[#71717A]">
+                        {String(fromCur ?? "")}
+                      </span>
                     </td>
                     <td className="px-5 py-3.5 text-[#4ade80]">
                       {toAmt != null ? fmt(Number(toAmt)) : "—"}{" "}
-                      <span className="text-[#71717A]">{String(toCur ?? "")}</span>
+                      <span className="text-[#71717A]">
+                        {String(toCur ?? "")}
+                      </span>
                     </td>
                     <td className="px-5 py-3.5 font-mono text-xs text-[#A1A1AA]">
                       {rate != null ? String(rate) : "—"}
@@ -1334,7 +1563,14 @@ export default function BalancePage() {
 
   const { data: balance, isLoading: balanceLoading } = useLedgerBalance();
 
-  const currencyData = currency === "NGN" ? balance?.ngn : balance?.usd;
+  const currencyData =
+    currency === "NGN"
+      ? balance?.ngn
+      : currency === "USD"
+        ? balance?.usd
+        : currency === "USDT"
+          ? balance?.usdt
+          : balance?.usdc;
   const symbol = currency === "NGN" ? "₦" : "$";
 
   // CSV export
@@ -1352,6 +1588,10 @@ export default function BalancePage() {
       "credit_ngn",
       "debit_usd",
       "credit_usd",
+      "debit_usdt",
+      "credit_usdt",
+      "debit_usdc",
+      "credit_usdc",
       "status",
       "reference_id",
       "description",
@@ -1376,6 +1616,10 @@ export default function BalancePage() {
           tx.credit_ngn,
           tx.debit_usd,
           tx.credit_usd,
+          tx.debit_usdt,
+          tx.credit_usdt,
+          tx.debit_usdc,
+          tx.credit_usdc,
           tx.status,
           tx.reference_id,
           tx.description ?? "",
@@ -1386,7 +1630,9 @@ export default function BalancePage() {
       ),
     ];
 
-    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([lines.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -1418,6 +1664,8 @@ export default function BalancePage() {
                 >
                   <option value="NGN">NGN</option>
                   <option value="USD">USD</option>
+                  <option value="USDT">USDT</option>
+                  <option value="USDC">USDC</option>
                 </select>
                 <ChevronDown
                   size={13}
@@ -1461,19 +1709,25 @@ export default function BalancePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
             label="Available Balance"
-            value={balanceLoading ? "—" : `${symbol}${fmt(currencyData?.balance)}`}
+            value={
+              balanceLoading ? "—" : `${symbol}${fmt(currencyData?.balance)}`
+            }
             icon={<Wallet size={15} />}
             loading={balanceLoading}
           />
           <StatCard
             label="Total Credits"
-            value={balanceLoading ? "—" : `${symbol}${fmt(currencyData?.credits)}`}
+            value={
+              balanceLoading ? "—" : `${symbol}${fmt(currencyData?.credits)}`
+            }
             icon={<TrendingUp size={15} />}
             loading={balanceLoading}
           />
           <StatCard
             label="Total Debits"
-            value={balanceLoading ? "—" : `${symbol}${fmt(currencyData?.debits)}`}
+            value={
+              balanceLoading ? "—" : `${symbol}${fmt(currencyData?.debits)}`
+            }
             icon={<TrendingDown size={15} />}
             loading={balanceLoading}
           />
@@ -1513,7 +1767,10 @@ export default function BalancePage() {
       {/* Modals */}
       <DepositModal open={depositOpen} onClose={() => setDepositOpen(false)} />
       <SwapModal open={swapOpen} onClose={() => setSwapOpen(false)} />
-      <WithdrawModal open={withdrawOpen} onClose={() => setWithdrawOpen(false)} />
+      <WithdrawModal
+        open={withdrawOpen}
+        onClose={() => setWithdrawOpen(false)}
+      />
     </>
   );
 }

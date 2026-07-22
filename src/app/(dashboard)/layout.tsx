@@ -56,7 +56,7 @@ export default function DashboardLayout({
   if (isError) return null;
 
   return (
-    <div className="flex min-h-screen bg-[#09090B]">
+    <div className="flex h-screen overflow-hidden bg-[#09090B]">
       <Sidebar
         user={user}
         collapsed={collapsed}

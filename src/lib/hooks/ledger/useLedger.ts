@@ -37,8 +37,8 @@ export function useLedgerBalance() {
   return useQuery({
     queryKey: ledgerKeys.balance(),
     queryFn: ledgerApi.getBalance,
-    staleTime: 20_000,
-    refetchInterval: 60_000,
+    staleTime: 120_000,
+    refetchInterval: 300_000,
   });
 }
 

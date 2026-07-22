@@ -4,9 +4,9 @@ import type {
   Wallet,
   WalletDetails,
   WalletAddress,
-  WalletBalance,
   WalletTransaction,
   CreateWalletDto,
+  IssueDepositIdentityDto,
   UpdateWalletBankDetailsDto,
   UpdateWalletAutoSettlementDto,
   WalletListFilters,
@@ -15,16 +15,17 @@ import type {
   AddWithdrawalAddressDto,
   InitiateStableCoinWithdrawalDto,
   InitiateFiatWithdrawalDto,
-WithdrawalResult,
+  WithdrawalResult,
   MockTradeDto,
 } from "@/lib/types/wallet";
 
 export const walletsApi = {
-  // POST /wallets/balance — retrieve current balance for a user
-  getBalance: () => post<WalletBalance>("/wallets/balance"),
-
   // POST /wallets — create a new wallet
-  create: (payload: CreateWalletDto) => post<Wallet>("/wallets", payload),
+  create: (payload: CreateWalletDto) => post<any>("/wallets", payload),
+
+  // POST /wallets/:wallet_id/identities — issue a crypto address or NGN virtual account
+  issueIdentity: (walletId: string, payload: IssueDepositIdentityDto) =>
+    post<any>(`/wallets/${walletId}/identities`, payload),
 
   // GET /wallets — list wallets
   getAll: (filters: WalletListFilters = {}) =>
@@ -71,13 +72,10 @@ export const walletsApi = {
     walletId: string,
     filters: WalletTransactionFilters = {},
   ) =>
-    get<WalletTransaction[]>(
-      `/wallets/${walletId}/transactions`,
-      {
-        page: filters.page ?? 1,
-        limit: filters.limit ?? 100,
-      },
-    ),
+    get<WalletTransaction[]>(`/wallets/${walletId}/transactions`, {
+      page: filters.page ?? 1,
+      limit: filters.limit ?? 100,
+    }),
 
   // ── Withdrawal addresses ───────────────────────────────────────────────────
 
