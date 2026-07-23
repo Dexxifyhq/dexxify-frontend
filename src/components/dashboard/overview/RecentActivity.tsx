@@ -60,7 +60,7 @@ export default function RecentActivity({ items, loading }: RecentActivityProps) 
                   {TYPE_LABELS[item.type][0]}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-[#FAFAFA]">{item.description}</p>
+                  <p className="truncate text-sm text-[#FAFAFA]">{item.description ?? item.type}</p>
                   <p className="text-xs text-[#52525B]">
                     {new Date(item.created_at).toLocaleDateString("en", {
                       month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
@@ -69,8 +69,8 @@ export default function RecentActivity({ items, loading }: RecentActivityProps) 
                 </div>
               </div>
               <div className="shrink-0 flex flex-col items-end gap-1">
-                <p className="text-sm font-medium text-[#FAFAFA]">
-                  {item.amount > 0 ? "+" : ""}{item.amount.toLocaleString()} {item.currency}
+                <p className={`text-sm font-medium ${item.direction === "credit" ? "text-[#4ade80]" : item.direction === "debit" ? "text-[#f87171]" : "text-[#FAFAFA]"}`}>
+                  {item.direction === "credit" ? "+" : item.direction === "debit" ? "-" : ""}{item.amount.toLocaleString()} {item.currency}
                 </p>
                 <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", STATUS_STYLES[item.status])}>
                   {item.status}
