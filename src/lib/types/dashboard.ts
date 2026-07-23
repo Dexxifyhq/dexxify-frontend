@@ -1,6 +1,6 @@
 import type { DateRange, FiatCurrency } from "./common";
 
-// ── Stats ──────────────────────────────────────────────────────────────────
+// ── Stat change ────────────────────────────────────────────────────────────
 
 export interface StatChange {
   value: number;
@@ -8,44 +8,74 @@ export interface StatChange {
   direction: "up" | "down" | "flat";
 }
 
-/**
- * Raw shape of GET /dashboard/overview (after envelope unwrap). The backend
- * returns nested objects with counts + NGN volumes; all kept optional so a
- * partial/changed payload degrades to zeros instead of throwing.
- */
+// ── Overview response (matches GET /dashboard/overview) ───────────────────
+
+export interface SessionBreakdown {
+  count: number;
+  volume: number;
+}
+
+export interface InvoiceBreakdown {
+  count: number;
+  volume?: number;
+}
+
 export interface DashboardOverviewResponse {
-  wallets?: { total?: number };
-  payouts?: { total?: number; volume_ngn?: number };
-  offramps?: { total?: number; volume_ngn?: number };
-  kyc_verifications?: { total?: number };
-  total_volume_ngn?: number;
+  balances: { ngn: number; usdt: number; usdc: number };
+  total_received: { ngn: number; usdt: number; usdc: number };
+  payment_sessions: {
+    total: number;
+    completed?: SessionBreakdown;
+    pending?: SessionBreakdown;
+    expired?: SessionBreakdown;
+    failed?: SessionBreakdown;
+  };
+  invoices: {
+    total: number;
+    paid?: InvoiceBreakdown;
+    pending?: InvoiceBreakdown;
+    overdue?: InvoiceBreakdown;
+  };
+  customers: { total: number; new_this_month: number };
+  deposit_accounts: number;
+  pending_payouts: { count: number; total_amount: number };
 }
 
-/**
- * UI-facing stats mapped from DashboardOverviewResponse. The four cards reflect
- * the real crypto-infra metrics this backend exposes (volume / wallets /
- * payouts / KYC verifications) — not generic payments-SaaS metrics.
- */
+// ── UI-facing stats (4 cards) ─────────────────────────────────────────────
+
 export interface DashboardStats {
-  total_volume: { value: number; change: StatChange; currency: string };
-  wallets: { value: number; change: StatChange };
-  payouts: { value: number; change: StatChange };
-  kyc_verifications: { value: number; change: StatChange };
+  ngn_balance: { value: number; change: StatChange };
+  total_received_ngn: { value: number; change: StatChange };
+  payment_sessions: {
+    total: number;
+    completed: number;
+    change: StatChange;
+  };
+  customers: {
+    total: number;
+    new_this_month: number;
+    change: StatChange;
+  };
 }
 
-// ── Revenue chart ──────────────────────────────────────────────────────────
+// ── Revenue chart (matches GET /dashboard/revenue-chart) ──────────────────
 
 export interface RevenueDataPoint {
   date: string;
-  revenue: number;
+  revenue: number; // mapped from ngn for chart bar height
+  ngn: number;
+  usdt: number;
+  usdc: number;
+  tx_count: number;
 }
 
 export interface RevenueChartData {
   range: DateRange;
+  period_days?: number;
   data: RevenueDataPoint[];
 }
 
-// ── Asset distribution ─────────────────────────────────────────────────────
+// ── Asset distribution (matches GET /dashboard/asset-distribution) ────────
 
 export interface AssetSlice {
   symbol: string;
@@ -53,6 +83,8 @@ export interface AssetSlice {
   value_usd: number;
   percentage: number;
   color: string;
+  total_sessions?: number;
+  completed?: number;
 }
 
 export interface AssetDistributionData {
@@ -60,19 +92,21 @@ export interface AssetDistributionData {
   assets: AssetSlice[];
 }
 
-// ── Recent activity ────────────────────────────────────────────────────────
+// ── Recent activity (matches GET /dashboard/recent-activity) ──────────────
 
 export interface ActivityItem {
   id: string;
   type: "payment" | "withdrawal" | "swap" | "deposit" | "refund";
-  description: string;
+  direction?: "credit" | "debit";
+  description: string | null;
   amount: number;
   currency: string;
+  asset?: string | null;
   status: "completed" | "pending" | "failed";
   created_at: string;
 }
 
-// ── Dashboard query params ──────────────────────────────────────────────────
+// ── Dashboard query params ────────────────────────────────────────────────
 
 export interface DashboardParams {
   range: DateRange;

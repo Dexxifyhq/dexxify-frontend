@@ -3,11 +3,10 @@
 import { useState } from "react";
 import {
   Banknote,
-  Wallet,
-  Send,
-  ShieldCheck,
+  ArrowDownToLine,
+  CreditCard,
+  Users,
   SlidersHorizontal,
-  Plus,
   ChevronDown,
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
@@ -34,7 +33,7 @@ const DATE_RANGES: { label: string; value: DateRange }[] = [
   { label: "All Time", value: "all" },
 ];
 
-const CURRENCIES: FiatCurrency[] = ["NGN", "USD"];
+const CURRENCIES: FiatCurrency[] = ["NGN"];
 
 function SelectButton({
   value,
@@ -82,6 +81,9 @@ export default function DashboardPage() {
 
   const flat: StatChange = { value: 0, percent: 0, direction: "flat" };
 
+  const fmtNgn = (v: number) =>
+    `₦${v.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
@@ -103,10 +105,6 @@ export default function DashboardPage() {
               <SlidersHorizontal size={13} />
               Filters
             </button>
-            <button className="flex h-9 items-center gap-2 rounded-lg bg-[#2563EB] px-3 text-sm font-medium text-white hover:brightness-110 transition-all">
-              <Plus size={13} />
-              New Payment
-            </button>
           </>
         }
       />
@@ -114,31 +112,39 @@ export default function DashboardPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Total Volume"
-          value={stats ? `₦${stats.total_volume.value.toLocaleString()}` : "₦0"}
-          change={stats?.total_volume.change ?? flat}
+          label="NGN Balance"
+          value={stats ? fmtNgn(stats.ngn_balance.value) : "₦0.00"}
+          change={stats?.ngn_balance.change ?? flat}
           icon={<Banknote size={15} />}
           loading={statsLoading}
         />
         <StatCard
-          label="Wallets"
-          value={stats ? stats.wallets.value.toLocaleString() : "0"}
-          change={stats?.wallets.change ?? flat}
-          icon={<Wallet size={15} />}
+          label="Total Received (NGN)"
+          value={stats ? fmtNgn(stats.total_received_ngn.value) : "₦0.00"}
+          change={stats?.total_received_ngn.change ?? flat}
+          icon={<ArrowDownToLine size={15} />}
           loading={statsLoading}
         />
         <StatCard
-          label="Payouts"
-          value={stats ? stats.payouts.value.toLocaleString() : "0"}
-          change={stats?.payouts.change ?? flat}
-          icon={<Send size={15} />}
+          label="Payment Sessions"
+          value={stats ? stats.payment_sessions.total.toLocaleString() : "0"}
+          change={stats?.payment_sessions.change ?? flat}
+          description={
+            stats ? `${stats.payment_sessions.completed} completed` : undefined
+          }
+          icon={<CreditCard size={15} />}
           loading={statsLoading}
         />
         <StatCard
-          label="KYC Verifications"
-          value={stats ? stats.kyc_verifications.value.toLocaleString() : "0"}
-          change={stats?.kyc_verifications.change ?? flat}
-          icon={<ShieldCheck size={15} />}
+          label="Customers"
+          value={stats ? stats.customers.total.toLocaleString() : "0"}
+          change={stats?.customers.change ?? flat}
+          description={
+            stats && stats.customers.new_this_month > 0
+              ? `+${stats.customers.new_this_month} this month`
+              : undefined
+          }
+          icon={<Users size={15} />}
           loading={statsLoading}
         />
       </div>

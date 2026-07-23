@@ -6,6 +6,7 @@ interface StatCardProps {
   label: string;
   value: string;
   change?: StatChange;
+  description?: string;
   icon: React.ReactNode;
   loading?: boolean;
 }
@@ -35,7 +36,7 @@ function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded bg-[#1C1C1F]", className)} />;
 }
 
-export default function StatCard({ label, value, change, icon, loading }: StatCardProps) {
+export default function StatCard({ label, value, change, description, icon, loading }: StatCardProps) {
   return (
     <div className="relative flex flex-col gap-4 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
       {/* Label + icon */}
@@ -53,9 +54,11 @@ export default function StatCard({ label, value, change, icon, loading }: StatCa
         <p className="text-3xl font-bold tracking-tight text-[#FAFAFA]">{value}</p>
       )}
 
-      {/* Change */}
+      {/* Change / description */}
       {loading ? (
         <Skeleton className="h-5 w-16" />
+      ) : description ? (
+        <p className="text-xs text-[#52525B]">{description}</p>
       ) : change ? (
         <ChangeBadge change={change} />
       ) : null}
