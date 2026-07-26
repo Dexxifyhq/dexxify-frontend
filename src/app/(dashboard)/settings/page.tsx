@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import {
   Settings as SettingsIcon,
   FileText,
@@ -14,24 +14,44 @@ import {
   ChevronDown,
   HelpCircle,
   Info,
-  Send,
-  Users,
   Receipt,
-  ExternalLink,
-  Lock,
-  ShieldCheck,
-  Key,
-  IdCard,
-  Building2,
+  Users,
   ArrowRight,
   User,
   UserPlus,
   Clock,
   Zap,
+  Lock,
+  ShieldCheck,
+  Key,
+  IdCard,
+  Building2,
+  Plus,
+  Trash2,
+  X,
+  Loader2,
 } from "lucide-react";
 import Toggle from "@/components/dashboard/shared/Toggle";
 import InviteStaffModal from "@/components/dashboard/teams/InviteStaffModal";
 import { cn } from "@/utils/utils";
+import {
+  useMyBusiness,
+  useUpdateBusinessProfile,
+  useUpdateSettlements,
+  useUpdateNotifications,
+  useCreateBusiness,
+} from "@/lib/hooks/businesses/useBusinesses";
+import {
+  useMyDeveloperProfile,
+  useUpdateDeveloperProfile,
+  useChangePassword,
+} from "@/lib/hooks/developers/useDevelopers";
+import {
+  useTeamMembers,
+  useTeamInvitations,
+  useInviteTeamMember,
+  useRemoveTeamMember,
+} from "@/lib/hooks/teams/useTeams";
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
@@ -71,53 +91,53 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-2 py-4 sm:px-4">
       <div className="flex flex-col gap-10 lg:flex-row">
-        {/* Title + sub-navigation — pinned while the content scrolls */}
         <div className="w-full shrink-0 self-start lg:sticky lg:top-0 lg:w-60">
           <h1 className="text-3xl font-bold tracking-tight text-[#FAFAFA]">
             Settings
           </h1>
 
           <nav className="mt-8">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label} className="mb-6">
-              <p className="mb-2 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
-                {group.label}
-              </p>
-              <div className="flex flex-col gap-1">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const active = tab === item.key;
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => setTab(item.key)}
-                      className={cn(
-                        "relative flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
-                        active
-                          ? "bg-[#0F1626] text-[#FAFAFA]"
-                          : "text-[#A1A1AA] hover:bg-[#101013] hover:text-[#FAFAFA]",
-                      )}
-                    >
-                      {active && (
-                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[#2563EB]" />
-                      )}
-                      <Icon
-                        size={16}
-                        className={active ? "text-[#2563EB]" : "text-[#71717A]"}
-                      />
-                      {item.label}
-                    </button>
-                  );
-                })}
+            {NAV_GROUPS.map((group) => (
+              <div key={group.label} className="mb-6">
+                <p className="mb-2 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+                  {group.label}
+                </p>
+                <div className="flex flex-col gap-1">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const active = tab === item.key;
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setTab(item.key)}
+                        className={cn(
+                          "relative flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
+                          active
+                            ? "bg-[#0F1626] text-[#FAFAFA]"
+                            : "text-[#A1A1AA] hover:bg-[#101013] hover:text-[#FAFAFA]",
+                        )}
+                      >
+                        {active && (
+                          <span className="absolute left-0 top-1/2 h-5 w-0.75 -translate-y-1/2 rounded-full bg-[#2563EB]" />
+                        )}
+                        <Icon
+                          size={16}
+                          className={
+                            active ? "text-[#2563EB]" : "text-[#71717A]"
+                          }
+                        />
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </nav>
         </div>
 
-        {/* Content */}
-        <div className="min-w-0 flex-1 pb-16 lg:pt-[68px]">
+        <div className="min-w-0 flex-1 pb-16 lg:pt-17">
           {tab === "general" && <GeneralTab />}
           {tab === "settlements" && <SettlementsTab />}
           {tab === "notifications" && <NotificationsTab />}
@@ -133,14 +153,72 @@ export default function SettingsPage() {
 // ── General ──────────────────────────────────────────────────────────────────
 
 function GeneralTab() {
-  const [firstName, setFirstName] = useState("Samuel");
-  const [lastName, setLastName] = useState("Uzor");
-  const [email] = useState("samueluzor80@gmail.com");
-  const [phone, setPhone] = useState("2348110015132");
+  const { data: dev } = useMyDeveloperProfile();
+  const { data: biz } = useMyBusiness();
+  const updateDev = useUpdateDeveloperProfile();
+  const updateBiz = useUpdateBusinessProfile();
+  const createBiz = useCreateBusiness();
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [theme, setTheme] = useState("system");
+
   const [businessName, setBusinessName] = useState("");
   const [supportEmail, setSupportEmail] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [showBranding, setShowBranding] = useState(false);
-  const [theme, setTheme] = useState("system");
+
+  const [newBizName, setNewBizName] = useState("");
+  const [newBizType, setNewBizType] = useState("");
+
+  useEffect(() => {
+    if (dev) {
+      setFirstName(dev.first_name ?? "");
+      setLastName(dev.last_name ?? "");
+      setPhone(dev.phone ?? "");
+      setTheme(dev.theme_preference ?? "system");
+    }
+  }, [dev]);
+
+  useEffect(() => {
+    if (biz) {
+      setBusinessName(biz.name ?? "");
+      setSupportEmail(biz.support_email ?? "");
+      setWebsiteUrl(biz.website_url ?? "");
+      setShowBranding(biz.show_branding_on_checkout ?? false);
+    }
+  }, [biz]);
+
+  async function handleSave() {
+    await Promise.all([
+      updateDev.mutateAsync({
+        first_name: firstName,
+        last_name: lastName,
+        phone: phone || undefined,
+        theme_preference: theme,
+      }),
+      updateBiz.mutateAsync({
+        name: businessName,
+        support_email: supportEmail || undefined,
+        website_url: websiteUrl || undefined,
+        show_branding_on_checkout: showBranding,
+      }),
+    ]);
+  }
+
+  async function handleCreateBusiness(e: FormEvent) {
+    e.preventDefault();
+    if (!newBizName.trim()) return;
+    await createBiz.mutateAsync({
+      name: newBizName.trim(),
+      ...(newBizType ? { type: newBizType } : {}),
+    });
+    setNewBizName("");
+    setNewBizType("");
+  }
+
+  const saving = updateDev.isPending || updateBiz.isPending;
 
   return (
     <div>
@@ -157,10 +235,10 @@ function GeneralTab() {
           <Input value={lastName} onChange={setLastName} />
         </Field>
         <Field label="Email address" badge={<VerifiedBadge />}>
-          <Input value={email} readOnly />
+          <Input value={dev?.email ?? ""} readOnly />
         </Field>
-        <Field label="Phone number" badge={<VerifiedBadge />}>
-          <Input value={phone} onChange={setPhone} />
+        <Field label="Phone number">
+          <Input value={phone} onChange={setPhone} placeholder="+234 800 000 0000" />
         </Field>
       </div>
 
@@ -184,6 +262,13 @@ function GeneralTab() {
             onChange={setSupportEmail}
             placeholder="support@yourbusiness.com"
             type="email"
+          />
+        </Field>
+        <Field label="Website URL">
+          <Input
+            value={websiteUrl}
+            onChange={setWebsiteUrl}
+            placeholder="https://yourbusiness.com"
           />
         </Field>
       </div>
@@ -213,7 +298,11 @@ function GeneralTab() {
             Display your business name and logo on the checkout page header.
           </p>
         </div>
-        <Toggle checked={showBranding} onChange={setShowBranding} color="blue" />
+        <Toggle
+          checked={showBranding}
+          onChange={setShowBranding}
+          color="blue"
+        />
       </div>
 
       <Divider />
@@ -237,7 +326,80 @@ function GeneralTab() {
         </Field>
       </div>
 
-      <SaveBar label="Save Changes" />
+      <div className="mt-12 flex justify-end">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+        >
+          {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          {saving ? "Saving…" : "Save Changes"}
+        </button>
+      </div>
+
+      <Divider />
+
+      <SectionHeading
+        title="Create New Business"
+        description="Add another business workspace to your account."
+      />
+
+      <form onSubmit={handleCreateBusiness} className="mt-8 space-y-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            value={newBizName}
+            onChange={(e) => setNewBizName(e.target.value)}
+            placeholder="Business name"
+            className="h-11 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+          />
+          <div className="relative">
+            <select
+              value={newBizType}
+              onChange={(e) => setNewBizType(e.target.value)}
+              className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 pr-10 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+            >
+              <option value="">Business type (optional)</option>
+              <option value="ecommerce">E-commerce</option>
+              <option value="saas">SaaS</option>
+              <option value="marketplace">Marketplace</option>
+              <option value="fintech">Fintech</option>
+              <option value="freelance">Freelance / Agency</option>
+              <option value="retail">Retail</option>
+              <option value="logistics">Logistics</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="education">Education</option>
+              <option value="gaming">Gaming</option>
+              <option value="travel">Travel</option>
+              <option value="food_and_beverage">Food & Beverage</option>
+              <option value="media_and_entertainment">Media & Entertainment</option>
+              <option value="real_estate">Real Estate</option>
+              <option value="professional_services">Professional Services</option>
+              <option value="nonprofit">Nonprofit</option>
+              <option value="other">Other</option>
+            </select>
+            <ChevronDown
+              size={15}
+              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={!newBizName.trim() || createBiz.isPending}
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {createBiz.isPending ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Plus size={14} />
+            )}
+            {createBiz.isPending ? "Creating…" : "Create Business"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -265,23 +427,28 @@ const NETWORKS = [
 ];
 
 function SettlementsTab() {
-  const [currency, setCurrency] = useState("usdt");
-  const [payout, setPayout] = useState("crypto");
-  const [networkFees, setNetworkFees] = useState("customer");
-  const [instantPayouts, setInstantPayouts] = useState(false);
-  const [partialPayments, setPartialPayments] = useState(true);
-  const [underpayment, setUnderpayment] = useState("0");
-  const [assets, setAssets] = useState<string[]>([]);
-  const [networks, setNetworks] = useState<string[]>([]);
+  const { data: biz } = useMyBusiness();
+  const updateSettlements = useUpdateSettlements();
 
-  const toggle = (
-    list: string[],
-    setList: (v: string[]) => void,
-    value: string,
-  ) =>
-    setList(
-      list.includes(value) ? list.filter((v) => v !== value) : [...list, value],
-    );
+  const [currency, setCurrency] = useState("USDT");
+  const [payout, setPayout] = useState("crypto");
+  const [instantPayouts, setInstantPayouts] = useState(false);
+
+  useEffect(() => {
+    if (biz) {
+      setCurrency(biz.settlement_currency ?? "USDT");
+      setPayout(biz.default_payout_method ?? "crypto");
+      setInstantPayouts(biz.instant_payouts_enabled ?? false);
+    }
+  }, [biz]);
+
+  async function handleSave() {
+    await updateSettlements.mutateAsync({
+      settlement_currency: currency as "NGN" | "USDT" | "USDC",
+      default_payout_method: payout as "crypto" | "bank",
+      instant_payouts_enabled: instantPayouts,
+    });
+  }
 
   return (
     <div>
@@ -300,10 +467,9 @@ function SettlementsTab() {
             value={currency}
             onChange={setCurrency}
             options={[
-              { label: "USDT (Tether)", value: "usdt" },
-              { label: "USDC (Circle)", value: "usdc" },
-              { label: "NGN (Nigerian Naira)", value: "ngn" },
-              { label: "USD (US Dollar)", value: "usd" },
+              { label: "USDT (Tether)", value: "USDT" },
+              { label: "USDC (Circle)", value: "USDC" },
+              { label: "NGN (Nigerian Naira)", value: "NGN" },
             ]}
           />
         </Field>
@@ -314,16 +480,6 @@ function SettlementsTab() {
             options={[
               { label: "Crypto Wallet", value: "crypto" },
               { label: "Bank Account", value: "bank" },
-            ]}
-          />
-        </Field>
-        <Field label="Network Fee Responsibility">
-          <Select
-            value={networkFees}
-            onChange={setNetworkFees}
-            options={[
-              { label: "Customer Pays Fees", value: "customer" },
-              { label: "Merchant Pays Fees", value: "merchant" },
             ]}
           />
         </Field>
@@ -340,40 +496,11 @@ function SettlementsTab() {
           checked={instantPayouts}
           onChange={setInstantPayouts}
         />
-        <ToggleRow
-          title="Enable Partial Payments"
-          description="Allow customers to make multiple payments to complete a single session."
-          checked={partialPayments}
-          onChange={setPartialPayments}
-        />
-        <div className="flex items-center justify-between gap-6 py-6">
-          <div>
-            <p className="text-[15px] font-semibold text-[#FAFAFA]">
-              Underpayment Tolerance
-            </p>
-            <p className="mt-1 text-sm text-[#71717A]">
-              Auto-complete sessions if paid at least{" "}
-              {100 - (Number(underpayment) || 0)}%
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <input
-              type="number"
-              value={underpayment}
-              onChange={(e) => setUnderpayment(e.target.value)}
-              className="h-11 w-20 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-2 text-center text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
-            />
-            <span className="text-sm text-[#71717A]">%</span>
-          </div>
-        </div>
       </div>
 
       <Divider />
 
-      <SectionHeading
-        title="Accepted Assets"
-        description="Tap to toggle. When none are selected, all options are accepted."
-      />
+      <SectionHeading title="Accepted Assets" />
 
       <div className="mt-8">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
@@ -381,13 +508,7 @@ function SettlementsTab() {
         </p>
         <div className="flex flex-wrap gap-2">
           {CRYPTOS.map((c) => (
-            <Chip
-              key={c.label}
-              label={c.label}
-              color={c.color}
-              active={assets.includes(c.label)}
-              onClick={() => toggle(assets, setAssets, c.label)}
-            />
+            <Chip key={c.label} label={c.label} color={c.color} />
           ))}
         </div>
       </div>
@@ -398,18 +519,26 @@ function SettlementsTab() {
         </p>
         <div className="flex flex-wrap gap-2">
           {NETWORKS.map((n) => (
-            <Chip
-              key={n.label}
-              label={n.label}
-              color={n.color}
-              active={networks.includes(n.label)}
-              onClick={() => toggle(networks, setNetworks, n.label)}
-            />
+            <Chip key={n.label} label={n.label} color={n.color} />
           ))}
         </div>
       </div>
 
-      <SaveBar label="Save Preferences" />
+      <div className="mt-12 flex justify-end">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={updateSettlements.isPending}
+          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+        >
+          {updateSettlements.isPending ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Save size={14} />
+          )}
+          {updateSettlements.isPending ? "Saving…" : "Save Preferences"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -417,12 +546,34 @@ function SettlementsTab() {
 // ── Notifications ────────────────────────────────────────────────────────────
 
 function NotificationsTab() {
+  const { data: biz } = useMyBusiness();
+  const updateNotifications = useUpdateNotifications();
+
   const [emailNotifs, setEmailNotifs] = useState(true);
-  const [telegramAlerts, setTelegramAlerts] = useState(false);
-  const [telegramGroup, setTelegramGroup] = useState(false);
   const [balanceAlerts, setBalanceAlerts] = useState(false);
   const [receipts, setReceipts] = useState(true);
   const [invoiceFollowups, setInvoiceFollowups] = useState(true);
+
+  useEffect(() => {
+    if (biz?.notification_preferences) {
+      const p = biz.notification_preferences;
+      setEmailNotifs(p.email_notifications ?? true);
+      setBalanceAlerts(p.low_balance_alerts ?? false);
+      setReceipts(p.automated_receipts ?? true);
+      setInvoiceFollowups(p.invoice_followups ?? true);
+    }
+  }, [biz]);
+
+  async function handleSave() {
+    await updateNotifications.mutateAsync({
+      preferences: {
+        email_notifications: emailNotifs,
+        low_balance_alerts: balanceAlerts,
+        automated_receipts: receipts,
+        invoice_followups: invoiceFollowups,
+      },
+    });
+  }
 
   return (
     <div>
@@ -442,24 +593,6 @@ function NotificationsTab() {
           description="Receive summary reports and critical alerts via email."
           checked={emailNotifs}
           onChange={setEmailNotifs}
-        />
-        <ToggleRow
-          icon={<Send size={17} className="text-[#2563EB]" />}
-          iconBg="rgba(37,99,235,0.10)"
-          title="Direct Telegram Alerts"
-          info
-          description="Instant transaction notifications via our Telegram bot."
-          checked={telegramAlerts}
-          onChange={setTelegramAlerts}
-        />
-        <ToggleRow
-          icon={<Users size={17} className="text-[#60A5FA]" />}
-          iconBg="rgba(96,165,250,0.10)"
-          title="Telegram Group Alerts"
-          info
-          description="Keep your whole team informed in a shared group."
-          checked={telegramGroup}
-          onChange={setTelegramGroup}
         />
         <ToggleRow
           icon={<Bell size={17} className="text-[#2563EB]" />}
@@ -492,6 +625,22 @@ function NotificationsTab() {
           onChange={setInvoiceFollowups}
         />
       </div>
+
+      <div className="mt-12 flex justify-end">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={updateNotifications.isPending}
+          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+        >
+          {updateNotifications.isPending ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Save size={14} />
+          )}
+          {updateNotifications.isPending ? "Saving…" : "Save Preferences"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -507,7 +656,6 @@ function VerificationTab() {
       />
 
       <div className="mt-10 flex flex-col gap-10">
-        {/* Identity */}
         <div className="flex items-start gap-5">
           <IconTile>
             <IdCard size={20} className="text-[#22C55E]" />
@@ -528,7 +676,6 @@ function VerificationTab() {
           </div>
         </div>
 
-        {/* Business */}
         <div className="flex items-start gap-5">
           <IconTile>
             <Building2 size={20} className="text-[#2563EB]" />
@@ -557,6 +704,8 @@ function VerificationTab() {
 // ── Security ─────────────────────────────────────────────────────────────────
 
 function SecurityTab() {
+  const [pwModalOpen, setPwModalOpen] = useState(false);
+
   return (
     <div>
       <SectionHeading
@@ -565,39 +714,6 @@ function SecurityTab() {
       />
 
       <div className="mt-6 divide-y divide-[#17171A]">
-        {/* Telegram */}
-        <div className="flex flex-wrap items-center justify-between gap-4 py-6">
-          <div className="flex min-w-0 items-start gap-5">
-            <IconTile>
-              <Send size={19} className="text-[#2563EB]" />
-            </IconTile>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="text-[15px] font-semibold text-[#FAFAFA]">
-                  Telegram
-                </p>
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
-                >
-                  <ExternalLink size={11} /> Open Bot
-                </a>
-              </div>
-              <p className="mt-1.5 text-sm text-[#71717A]">
-                Not connected. Link your account to receive notifications and
-                use the bot.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-[#2563EB] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8]"
-          >
-            <Send size={14} /> Connect
-          </button>
-        </div>
-
-        {/* Password */}
         <div className="flex flex-wrap items-center justify-between gap-4 py-6">
           <div className="flex min-w-0 items-start gap-5">
             <IconTile>
@@ -614,13 +730,13 @@ function SecurityTab() {
           </div>
           <button
             type="button"
+            onClick={() => setPwModalOpen(true)}
             className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#15151A]"
           >
             <Key size={14} /> Change password
           </button>
         </div>
 
-        {/* 2FA */}
         <div className="flex flex-wrap items-center justify-between gap-4 py-6">
           <div className="flex min-w-0 items-start gap-5">
             <IconTile>
@@ -650,6 +766,122 @@ function SecurityTab() {
           </button>
         </div>
       </div>
+
+      {pwModalOpen && (
+        <ChangePasswordModal onClose={() => setPwModalOpen(false)} />
+      )}
+    </div>
+  );
+}
+
+function ChangePasswordModal({ onClose }: { onClose: () => void }) {
+  const changePassword = useChangePassword();
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [mismatch, setMismatch] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (newPw !== confirmPw) {
+      setMismatch(true);
+      return;
+    }
+    setMismatch(false);
+    await changePassword.mutateAsync({
+      current_password: currentPw,
+      new_password: newPw,
+    });
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1F1F23] bg-[#111113] shadow-2xl">
+        <div className="flex items-center justify-between px-7 py-6">
+          <div className="flex items-center gap-3">
+            <Key size={17} className="text-[#2563EB]" />
+            <h2 className="text-lg font-bold text-[#FAFAFA]">Change Password</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="px-7 pb-7">
+          <div className="space-y-4">
+            <Field label="Current password">
+              <input
+                type="password"
+                value={currentPw}
+                onChange={(e) => setCurrentPw(e.target.value)}
+                required
+                className="h-12 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+              />
+            </Field>
+            <Field label="New password">
+              <input
+                type="password"
+                value={newPw}
+                onChange={(e) => { setNewPw(e.target.value); setMismatch(false); }}
+                required
+                minLength={8}
+                placeholder="Min. 8 characters"
+                className="h-12 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+              />
+            </Field>
+            <Field label="Confirm new password">
+              <input
+                type="password"
+                value={confirmPw}
+                onChange={(e) => { setConfirmPw(e.target.value); setMismatch(false); }}
+                required
+                className={cn(
+                  "h-12 w-full rounded-lg border bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors focus:outline-none",
+                  mismatch
+                    ? "border-[#EF4444] focus:border-[#EF4444]"
+                    : "border-[#1C1C1F] focus:border-[#2563EB]",
+                )}
+              />
+              {mismatch && (
+                <p className="mt-1.5 text-xs text-[#EF4444]">
+                  Passwords do not match.
+                </p>
+              )}
+            </Field>
+          </div>
+
+          <div className="mt-7 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-10 rounded-lg border border-[#26262B] px-5 text-sm font-medium text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={changePassword.isPending}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+            >
+              {changePassword.isPending ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Key size={14} />
+              )}
+              {changePassword.isPending ? "Updating…" : "Update Password"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -659,6 +891,23 @@ function SecurityTab() {
 function TeamTab() {
   const [view, setView] = useState<"members" | "pending">("members");
   const [inviteOpen, setInviteOpen] = useState(false);
+
+  const { data: members = [], isLoading: membersLoading } = useTeamMembers();
+  const { data: invitations = [], isLoading: invitationsLoading } = useTeamInvitations();
+  const invite = useInviteTeamMember();
+  const remove = useRemoveTeamMember();
+
+  async function handleInvite(payload: {
+    email: string;
+    role: string;
+    permissions: string[];
+  }) {
+    await invite.mutateAsync({
+      email: payload.email,
+      role: payload.role as "admin" | "staff",
+      permissions: payload.permissions,
+    });
+  }
 
   return (
     <div>
@@ -676,7 +925,6 @@ function TeamTab() {
         </button>
       </div>
 
-      {/* Sub-tabs */}
       <div className="mt-8 flex gap-8 border-b border-[#1C1C1F]">
         <TeamViewTab
           icon={<Users size={15} />}
@@ -686,41 +934,128 @@ function TeamTab() {
         />
         <TeamViewTab
           icon={<Clock size={15} />}
-          label="Pending Invitations"
+          label={`Pending Invitations${invitations.length > 0 ? ` (${invitations.length})` : ""}`}
           active={view === "pending"}
           onClick={() => setView("pending")}
         />
       </div>
 
-      {/* Empty states */}
       {view === "members" ? (
-        <div className="flex flex-col items-center justify-center gap-5 py-24">
-          <User size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
-          <p className="text-sm text-[#A1A1AA]">No team members yet.</p>
-          <button
-            type="button"
-            onClick={() => setInviteOpen(true)}
-            className="inline-flex h-11 items-center rounded-lg bg-[#FAFAFA] px-5 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white"
-          >
-            Invite your first member
-          </button>
+        membersLoading ? (
+          <div className="flex justify-center py-24">
+            <Loader2 size={24} className="animate-spin text-[#52525B]" />
+          </div>
+        ) : members.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-5 py-24">
+            <User size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
+            <p className="text-sm text-[#A1A1AA]">No team members yet.</p>
+            <button
+              type="button"
+              onClick={() => setInviteOpen(true)}
+              className="inline-flex h-11 items-center rounded-lg bg-[#FAFAFA] px-5 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white"
+            >
+              Invite your first member
+            </button>
+          </div>
+        ) : (
+          <div className="mt-4 divide-y divide-[#17171A]">
+            {members.map((m) => {
+              const name = [m.first_name, m.last_name].filter(Boolean).join(" ") || m.email;
+              const initials = [m.first_name?.at(0), m.last_name?.at(0)]
+                .filter(Boolean)
+                .join("")
+                .toUpperCase() || m.email.at(0)?.toUpperCase() || "?";
+              return (
+                <div
+                  key={m.id}
+                  className="flex items-center justify-between gap-4 py-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#162038] text-xs font-semibold text-[#3B82F6]">
+                      {initials}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                        {name}
+                      </p>
+                      <p className="truncate text-xs text-[#52525B]">{m.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <RoleBadge role={m.role} />
+                    {m.role !== "owner" && (
+                      <button
+                        type="button"
+                        onClick={() => remove.mutate(m.id)}
+                        disabled={remove.isPending}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#EF4444] disabled:opacity-40"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+      ) : invitationsLoading ? (
+        <div className="flex justify-center py-24">
+          <Loader2 size={24} className="animate-spin text-[#52525B]" />
         </div>
-      ) : (
+      ) : invitations.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-5 py-24">
           <Clock size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
           <p className="text-sm text-[#A1A1AA]">No pending invitations.</p>
+        </div>
+      ) : (
+        <div className="mt-4 divide-y divide-[#17171A]">
+          {invitations.map((inv) => (
+            <div
+              key={inv.id}
+              className="flex items-center justify-between gap-4 py-4"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                  {inv.email}
+                </p>
+                <p className="mt-0.5 text-xs text-[#52525B]">
+                  Invited ·{" "}
+                  {inv.invite_expires_at
+                    ? `Expires ${new Date(inv.invite_expires_at).toLocaleDateString()}`
+                    : "No expiry"}
+                </p>
+              </div>
+              <RoleBadge role={inv.role} />
+            </div>
+          ))}
         </div>
       )}
 
       <InviteStaffModal
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
-        onSubmit={(payload) => {
-          // TODO: POST /teams/invite
-          console.log("invite staff", payload);
-        }}
+        onSubmit={handleInvite}
       />
     </div>
+  );
+}
+
+function RoleBadge({ role }: { role: string }) {
+  const styles: Record<string, string> = {
+    owner: "bg-[#2D1654] text-[#A855F7]",
+    admin: "bg-[#0F2640] text-[#3B82F6]",
+    staff: "bg-[#1A1A1D] text-[#A1A1AA]",
+  };
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize",
+        styles[role] ?? styles.staff,
+      )}
+    >
+      {role}
+    </span>
   );
 }
 
@@ -917,40 +1252,11 @@ function IconTile({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SaveBar({ label }: { label: string }) {
-  return (
-    <div className="mt-12 flex justify-end">
-      <button
-        type="button"
-        className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8]"
-      >
-        <Save size={14} /> {label}
-      </button>
-    </div>
-  );
-}
-
-function Chip({
-  label,
-  color,
-  active,
-  onClick,
-}: {
-  label: string;
-  color: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+function Chip({ label, color }: { label: string; color: string }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-xs font-medium transition-colors",
-        active
-          ? "border-[#2563EB] bg-[#2563EB]/15 text-[#FAFAFA]"
-          : "border-[#1C1C1F] bg-[#0A0B0E] text-[#A1A1AA] hover:border-[#2563EB]/40",
-      )}
+      className="inline-flex h-9 items-center gap-2 rounded-full border border-[#1C1C1F] bg-[#0A0B0E] px-3.5 text-xs font-medium text-[#A1A1AA] transition-colors hover:border-[#2563EB]/40"
     >
       <span
         className="inline-block h-2 w-2 rounded-full"

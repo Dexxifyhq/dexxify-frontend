@@ -27,9 +27,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
-import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
-import type { Environment } from "@/lib/types/common";
 import { toast } from "sonner";
+import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
 
 // ── Nav config ───────────────────────────────────────────────────────────────
 
@@ -89,37 +88,13 @@ interface SidebarProps {
   };
   collapsed: boolean;
   onExpand: () => void;
-  mobileOpen?: boolean;
-  onMobileClose?: () => void;
-  environment?: Environment;
-  onEnvChange?: (env: Environment) => void;
 }
 
-export default function Sidebar({
-  user,
-  collapsed,
-  onExpand,
-  mobileOpen = false,
-  onMobileClose,
-  environment = "test",
-  onEnvChange,
-}: SidebarProps) {
+export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + "/");
-
-  // The collapse rail is a desktop-only affordance. On mobile the sidebar is a
-  // full-width drawer, so we never render the icons-only collapsed layout there.
-  const [isDesktop, setIsDesktop] = useState(true);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const update = () => setIsDesktop(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  const railCollapsed = isDesktop && collapsed;
 
   // Which collapsible group (if any) contains the current route.
   const activeGroup = [...NAV_TOP, ...NAV_BOTTOM].find(
@@ -136,9 +111,13 @@ export default function Sidebar({
     if (activeGroup) setOpen((o) => ({ ...o, [activeGroup]: true }));
   }, [activeGroup]);
 
-  const businessName = user.businessName || "Business";
+  const { data: business } = useMyBusiness();
+  const businessName = business?.name || user.businessName || "Business";
   const businessInitial = businessName.charAt(0).toUpperCase() || "B";
-  const shortId = user.businessId ? user.businessId.slice(0, 8) : "";
+  const businessId = business?.id || user.businessId;
+  const shortId = businessId ? businessId.slice(0, 8) : "";
+
+  const [bizMenuOpen, setBizMenuOpen] = useState(false);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -153,7 +132,7 @@ export default function Sidebar({
 
   function toggleGroup(label: string) {
     // When collapsed, opening a group expands the rail first.
-    if (railCollapsed) {
+    if (collapsed) {
       onExpand();
       setOpen((o) => ({ ...o, [label]: true }));
       return;
@@ -169,11 +148,10 @@ export default function Sidebar({
         <Link
           key={entry.href}
           href={entry.href}
-          onClick={onMobileClose}
-          title={railCollapsed ? entry.label : undefined}
+          title={collapsed ? entry.label : undefined}
           className={cn(
             "group relative flex items-center rounded-lg text-sm transition-colors",
-            railCollapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
+            collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
             active
               ? "bg-[#162038] font-medium text-[#FAFAFA]"
               : "text-[#71717A] hover:bg-[#111113] hover:text-[#FAFAFA]",
@@ -183,7 +161,7 @@ export default function Sidebar({
             <span
               className={cn(
                 "absolute top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#2563EB]",
-                railCollapsed ? "-left-2" : "-left-3",
+                collapsed ? "-left-2" : "-left-3",
               )}
             />
           )}
@@ -195,7 +173,7 @@ export default function Sidebar({
                 : "text-[#52525B] group-hover:text-[#FAFAFA]"
             }
           />
-          {!railCollapsed && entry.label}
+          {!collapsed && entry.label}
         </Link>
       );
     }
@@ -203,22 +181,22 @@ export default function Sidebar({
     // group
     const Icon = entry.icon;
     const groupActive = entry.children.some((c) => isActive(c.href));
-    const isOpen = !railCollapsed && !!open[entry.label];
+    const isOpen = !collapsed && !!open[entry.label];
     return (
       <div key={entry.label}>
         <button
           type="button"
           onClick={() => toggleGroup(entry.label)}
-          title={railCollapsed ? entry.label : undefined}
+          title={collapsed ? entry.label : undefined}
           className={cn(
             "group relative flex w-full items-center rounded-lg text-sm transition-colors",
-            railCollapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
+            collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
             groupActive
               ? "font-medium text-[#FAFAFA]"
               : "text-[#71717A] hover:bg-[#111113] hover:text-[#FAFAFA]",
           )}
         >
-          {groupActive && railCollapsed && (
+          {groupActive && collapsed && (
             <span className="absolute -left-2 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#2563EB]" />
           )}
           <Icon
@@ -229,7 +207,7 @@ export default function Sidebar({
                 : "text-[#52525B] group-hover:text-[#FAFAFA]"
             }
           />
-          {!railCollapsed && (
+          {!collapsed && (
             <>
               <span className="flex-1 text-left">{entry.label}</span>
               <ChevronDown
@@ -252,7 +230,6 @@ export default function Sidebar({
                 <Link
                   key={child.href}
                   href={child.href}
-                  onClick={onMobileClose}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg py-2 pl-9 pr-3 text-sm transition-colors",
                     active
@@ -275,59 +252,91 @@ export default function Sidebar({
   }
 
   return (
-    <>
-      {/* Mobile backdrop */}
-      <div
-        aria-hidden
-        onClick={onMobileClose}
-        className={cn(
-          "fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm transition-opacity duration-200 lg:hidden",
-          mobileOpen
-            ? "opacity-100"
-            : "pointer-events-none opacity-0",
-        )}
-      />
-
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-[60] flex w-60 flex-col border-r border-[#1C1C1F] bg-[#09090B]",
-          "transition-transform duration-200 lg:z-40 lg:transition-[width,transform]",
-          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          railCollapsed ? "lg:w-16" : "lg:w-60",
-        )}
-      >
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-[#1C1C1F] bg-[#09090B] transition-[width] duration-200",
+        collapsed ? "w-16" : "w-60",
+      )}
+    >
       {/* Workspace block */}
-      <div
-        className={cn(
-          "flex items-center border-b border-[#1C1C1F] py-4",
-          railCollapsed ? "justify-center px-0" : "gap-2.5 px-4",
-        )}
-      >
-        <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-gradient-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
-          {businessInitial}
-        </div>
-        {!railCollapsed && (
+      <div className="relative border-b border-[#1C1C1F]">
+        {bizMenuOpen && !collapsed && (
           <>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-[#FAFAFA]">
-                {businessName}
-              </p>
-              {shortId && (
-                <p className="truncate text-[11px] text-[#52525B]">
-                  ID {shortId}
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setBizMenuOpen(false)}
+            />
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
+              <div className="px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-[#52525B]">
+                  Active workspace
                 </p>
-              )}
+                <div className="mt-2 flex items-center gap-2.5">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-xs font-bold text-white">
+                    {businessInitial}
+                  </div>
+                  <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                    {businessName}
+                  </p>
+                </div>
+              </div>
+              <div className="my-1 border-t border-[#1C1C1F]" />
+              <button
+                type="button"
+                onClick={() => {
+                  router.push("/settings");
+                  setBizMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+              >
+                <Settings size={14} />
+                Manage business
+              </button>
             </div>
-            <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
           </>
         )}
+
+        <button
+          type="button"
+          onClick={() => {
+            if (collapsed) {
+              onExpand();
+              return;
+            }
+            setBizMenuOpen((v) => !v);
+          }}
+          title={collapsed ? businessName : undefined}
+          className={cn(
+            "flex w-full items-center py-4 transition-colors",
+            collapsed ? "justify-center px-0" : "gap-2.5 px-4 hover:bg-[#111113]",
+          )}
+        >
+          <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
+            {businessInitial}
+          </div>
+          {!collapsed && (
+            <>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+                  {businessName}
+                </p>
+                {shortId && (
+                  <p className="truncate text-[11px] text-[#52525B]">
+                    ID {shortId}
+                  </p>
+                )}
+              </div>
+              <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
+            </>
+          )}
+        </button>
       </div>
 
       {/* Nav */}
       <nav
         className={cn(
           "flex-1 overflow-y-auto py-4",
-          railCollapsed ? "px-2" : "px-3",
+          collapsed ? "px-2" : "px-3",
         )}
       >
         <div className="space-y-0.5">{NAV_TOP.map(renderEntry)}</div>
@@ -335,16 +344,9 @@ export default function Sidebar({
         <div className="space-y-0.5">{NAV_BOTTOM.map(renderEntry)}</div>
       </nav>
 
-      {/* Environment toggle — mobile only (desktop has it in the topbar) */}
-      {!railCollapsed && (
-        <div className="border-t border-[#1C1C1F] px-4 py-3 lg:hidden">
-          <EnvToggle environment={environment} onEnvChange={onEnvChange} />
-        </div>
-      )}
-
       {/* Profile footer */}
       <div className="relative border-t border-[#1C1C1F] p-3">
-        {menuOpen && !railCollapsed && (
+        {menuOpen && !collapsed && (
           <>
             <div
               className="fixed inset-0 z-40"
@@ -394,22 +396,22 @@ export default function Sidebar({
         <button
           type="button"
           onClick={() => {
-            if (railCollapsed) {
+            if (collapsed) {
               onExpand();
               return;
             }
             setMenuOpen((v) => !v);
           }}
-          title={railCollapsed ? user.name || "Account" : undefined}
+          title={collapsed ? user.name || "Account" : undefined}
           className={cn(
             "group flex w-full items-center rounded-lg transition-colors hover:bg-[#111113]",
-            railCollapsed ? "justify-center px-0 py-2" : "gap-2.5 px-2 py-2",
+            collapsed ? "justify-center px-0 py-2" : "gap-2.5 px-2 py-2",
           )}
         >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-xs font-semibold text-white">
             {user.initials || "U"}
           </div>
-          {!railCollapsed && (
+          {!collapsed && (
             <>
               <div className="min-w-0 flex-1 text-left">
                 <p className="truncate text-sm font-medium text-[#FAFAFA]">
@@ -426,56 +428,6 @@ export default function Sidebar({
           )}
         </button>
       </div>
-      </aside>
-    </>
-  );
-}
-
-// ── Environment toggle (mobile drawer) ───────────────────────────────────────
-
-function EnvToggle({
-  environment,
-  onEnvChange,
-}: {
-  environment: Environment;
-  onEnvChange?: (env: Environment) => void;
-}) {
-  const switchMode = useSwitchMode();
-  const isLive = environment === "live";
-
-  function handleToggle() {
-    const next: Environment = isLive ? "test" : "live";
-    switchMode.mutate(next, { onSuccess: () => onEnvChange?.(next) });
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      disabled={switchMode.isPending}
-      className="flex w-full items-center gap-2.5 rounded-lg px-1 py-1 disabled:opacity-60"
-    >
-      <span
-        className={cn(
-          "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
-          isLive ? "bg-[#22C55E]" : "bg-[#3F3F46]",
-        )}
-      >
-        <span
-          className={cn(
-            "absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-white transition-all",
-            isLive ? "right-[3px]" : "left-[3px]",
-          )}
-        />
-      </span>
-      <span
-        className={cn(
-          "text-xs font-semibold tracking-wide",
-          isLive ? "text-[#22C55E]" : "text-[#F59E0B]",
-        )}
-      >
-        {switchMode.isPending ? "Switching…" : isLive ? "LIVE" : "TEST"}
-      </span>
-    </button>
+    </aside>
   );
 }
