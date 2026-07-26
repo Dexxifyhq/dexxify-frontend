@@ -21,6 +21,8 @@ export default function DashboardLayout({
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem(SIDEBAR_KEY) === "1";
   });
+  // Mobile drawer open state (independent of the desktop collapse rail).
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   function setCollapsedPersisted(value: boolean) {
     setCollapsed(value);
@@ -61,12 +63,16 @@ export default function DashboardLayout({
         user={user}
         collapsed={collapsed}
         onExpand={() => setCollapsedPersisted(false)}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+        environment={environment}
+        onEnvChange={setEnvironment}
       />
 
       <div
         className={cn(
-          "flex flex-1 flex-col transition-[padding] duration-200",
-          collapsed ? "pl-16" : "pl-60",
+          "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
+          collapsed ? "lg:pl-16" : "lg:pl-60",
         )}
       >
         <Topbar
@@ -75,8 +81,9 @@ export default function DashboardLayout({
             setEnvironment((e) => (e === "test" ? "live" : "test"))
           }
           onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
+          onOpenMobile={() => setMobileOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
