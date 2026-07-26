@@ -28,6 +28,7 @@ import {
 import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
 import { toast } from "sonner";
+import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
 
 // ── Nav config ───────────────────────────────────────────────────────────────
 
@@ -110,9 +111,13 @@ export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
     if (activeGroup) setOpen((o) => ({ ...o, [activeGroup]: true }));
   }, [activeGroup]);
 
-  const businessName = user.businessName || "Business";
+  const { data: business } = useMyBusiness();
+  const businessName = business?.name || user.businessName || "Business";
   const businessInitial = businessName.charAt(0).toUpperCase() || "B";
-  const shortId = user.businessId ? user.businessId.slice(0, 8) : "";
+  const businessId = business?.id || user.businessId;
+  const shortId = businessId ? businessId.slice(0, 8) : "";
+
+  const [bizMenuOpen, setBizMenuOpen] = useState(false);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -254,30 +259,77 @@ export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
       )}
     >
       {/* Workspace block */}
-      <div
-        className={cn(
-          "flex items-center border-b border-[#1C1C1F] py-4",
-          collapsed ? "justify-center px-0" : "gap-2.5 px-4",
-        )}
-      >
-        <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-gradient-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
-          {businessInitial}
-        </div>
-        {!collapsed && (
+      <div className="relative border-b border-[#1C1C1F]">
+        {bizMenuOpen && !collapsed && (
           <>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-[#FAFAFA]">
-                {businessName}
-              </p>
-              {shortId && (
-                <p className="truncate text-[11px] text-[#52525B]">
-                  ID {shortId}
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setBizMenuOpen(false)}
+            />
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
+              <div className="px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-[#52525B]">
+                  Active workspace
                 </p>
-              )}
+                <div className="mt-2 flex items-center gap-2.5">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-xs font-bold text-white">
+                    {businessInitial}
+                  </div>
+                  <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                    {businessName}
+                  </p>
+                </div>
+              </div>
+              <div className="my-1 border-t border-[#1C1C1F]" />
+              <button
+                type="button"
+                onClick={() => {
+                  router.push("/settings");
+                  setBizMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+              >
+                <Settings size={14} />
+                Manage business
+              </button>
             </div>
-            <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
           </>
         )}
+
+        <button
+          type="button"
+          onClick={() => {
+            if (collapsed) {
+              onExpand();
+              return;
+            }
+            setBizMenuOpen((v) => !v);
+          }}
+          title={collapsed ? businessName : undefined}
+          className={cn(
+            "flex w-full items-center py-4 transition-colors",
+            collapsed ? "justify-center px-0" : "gap-2.5 px-4 hover:bg-[#111113]",
+          )}
+        >
+          <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
+            {businessInitial}
+          </div>
+          {!collapsed && (
+            <>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+                  {businessName}
+                </p>
+                {shortId && (
+                  <p className="truncate text-[11px] text-[#52525B]">
+                    ID {shortId}
+                  </p>
+                )}
+              </div>
+              <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
+            </>
+          )}
+        </button>
       </div>
 
       {/* Nav */}
