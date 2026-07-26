@@ -8,9 +8,11 @@ export interface RegisterPayload {
   password: string;
   first_name: string;
   last_name: string;
-  business_name: string;
-  business_type?: string;
   phone?: string;
+}
+
+export interface SelectBusinessPayload {
+  business_id: string;
 }
 
 export interface LoginPayload {
@@ -103,4 +105,10 @@ export const authApi = {
 
   switchMode: (mode: "live" | "test") =>
     post<{ message: string }>("/auth/mode", { mode }),
+
+  selectBusiness: (payload: SelectBusinessPayload) =>
+    post<{ business: { id: string; name: string; logo_url: string | null } }>(
+      "/auth/select-business",
+      payload,
+    ),
 };
