@@ -7,6 +7,7 @@ import {
   X,
   Sparkles,
   PanelLeft,
+  Menu,
   Loader2,
 } from "lucide-react";
 import { cn } from "@/utils/utils";
@@ -17,7 +18,7 @@ import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
 
 function PendingActionsPanel({ onClose }: { onClose: () => void }) {
   return (
-    <div className="absolute right-16 top-12 z-50 w-72 rounded-xl border border-[#1C1C1F] bg-[#111113] p-4 shadow-xl">
+    <div className="absolute right-2 top-12 z-50 w-72 max-w-[calc(100vw-1rem)] rounded-xl border border-[#1C1C1F] bg-[#111113] p-4 shadow-xl sm:right-16">
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className="text-sm font-medium text-[#FAFAFA]">Pending Actions</p>
@@ -37,6 +38,7 @@ interface TopbarProps {
   environment: Environment;
   onEnvToggle: () => void;
   onToggleSidebar: () => void;
+  onOpenMobile?: () => void;
   showVerificationBanner?: boolean;
 }
 
@@ -44,6 +46,7 @@ export default function Topbar({
   environment,
   onEnvToggle,
   onToggleSidebar,
+  onOpenMobile,
   showVerificationBanner = true,
 }: TopbarProps) {
   const [bannerVisible, setBannerVisible] = useState(showVerificationBanner);
@@ -68,18 +71,31 @@ export default function Topbar({
         <div className="fixed inset-0 z-40" onClick={closeAll} />
       )}
 
-      <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-6">
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-4 sm:px-6">
         {/* Left: sidebar toggle + verification banner */}
         <div className="flex items-center gap-3">
+          {/* Mobile: open drawer */}
+          <button
+            onClick={onOpenMobile}
+            aria-label="Open menu"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors lg:hidden"
+          >
+            <Menu size={18} />
+          </button>
+          {/* Desktop: collapse rail */}
           <button
             onClick={onToggleSidebar}
             aria-label="Toggle sidebar"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="hidden h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors lg:flex"
           >
             <PanelLeft size={16} />
           </button>
+          {/* Mobile brand */}
+          <span className="text-base font-bold tracking-tight text-[#FAFAFA] lg:hidden">
+            Dexxify
+          </span>
           {bannerVisible && (
-            <div className="flex items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5">
+            <div className="hidden items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5 md:flex">
               <AlertTriangle size={13} className="text-[#F59E0B] shrink-0" />
               <span className="text-xs font-medium text-[#F59E0B]">
                 Complete verification
@@ -104,12 +120,12 @@ export default function Topbar({
             <Bell size={15} />
           </button>
 
-          {/* Live / Test toggle */}
+          {/* Live / Test toggle — desktop (mobile has it in the drawer) */}
           <button
             onClick={handleEnvToggle}
             disabled={switchMode.isPending}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs cursor-pointer font-semibold transition-colors border disabled:opacity-60 disabled:cursor-not-allowed",
+              "hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs cursor-pointer font-semibold transition-colors border disabled:opacity-60 disabled:cursor-not-allowed lg:flex",
               isLive
                 ? "bg-[#052E16]/60 border-[#14532D]/50 text-[#22C55E]"
                 : "bg-[#451A03]/60 border-[#78350F]/50 text-[#F59E0B]",
