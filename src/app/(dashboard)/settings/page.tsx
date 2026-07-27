@@ -52,6 +52,18 @@ import {
   useInviteTeamMember,
   useRemoveTeamMember,
 } from "@/lib/hooks/teams/useTeams";
+import {
+  useIndividualKycStatus,
+  useBusinessKycStatus,
+  useVerifyBvn,
+  useVerifyNin,
+  useVerifyVnin,
+  useVerifyCac,
+} from "@/lib/hooks/kyc/useKyc";
+import {
+  REGISTRATION_TYPES,
+  type RegistrationType,
+} from "@/lib/api/kyc";
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
@@ -647,7 +659,129 @@ function NotificationsTab() {
 
 // ── Verification ─────────────────────────────────────────────────────────────
 
+type IdType = "bvn" | "nin" | "vnin";
+
+const ID_TYPES: {
+  value: IdType;
+  label: string;
+  description: string;
+  placeholder: string;
+}[] = [
+  {
+    value: "bvn",
+    label: "BVN",
+    description: "11-digit Bank Verification Number",
+    placeholder: "12345678901",
+  },
+  {
+    value: "nin",
+    label: "NIN",
+    description: "11-digit National Identification Number",
+    placeholder: "12345678901",
+  },
+  {
+    value: "vnin",
+    label: "vNIN",
+    description: "16-character Virtual NIN",
+    placeholder: "AB1234567890CDEF",
+  },
+];
+
+function KycStatusBadge({ status }: { status: string }) {
+  const cfg: Record<
+    string,
+    { label: string; cls: string; icon: React.ElementType }
+  > = {
+    verified: {
+      label: "Verified",
+      cls: "bg-[#052E16] text-[#22C55E]",
+      icon: CheckCircle2,
+    },
+    failed: { label: "Failed", cls: "bg-[#2D0A0A] text-[#EF4444]", icon: X },
+    pending: {
+      label: "Pending",
+      cls: "bg-[#231A05] text-[#F59E0B]",
+      icon: Clock,
+    },
+    incomplete: {
+      label: "Not Started",
+      cls: "bg-[#1A1A1D] text-[#71717A]",
+      icon: Info,
+    },
+  };
+  const c = cfg[status] ?? cfg.incomplete;
+  const Icon = c.icon;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        c.cls,
+      )}
+    >
+      <Icon size={11} />
+      {c.label}
+    </span>
+  );
+}
+
 function VerificationTab() {
+  const { data: individualStatus, isLoading: loadingIndividual } =
+    useIndividualKycStatus();
+  const { data: businessStatus, isLoading: loadingBusiness } =
+    useBusinessKycStatus();
+
+  const verifyBvn = useVerifyBvn();
+  const verifyNin = useVerifyNin();
+  const verifyVnin = useVerifyVnin();
+  const verifyCac = useVerifyCac();
+
+  const [idType, setIdType] = useState<IdType>("bvn");
+  const [idNumber, setIdNumber] = useState("");
+  const [rcNumber, setRcNumber] = useState("");
+  const [regType, setRegType] = useState<RegistrationType>("RC");
+  const [regName, setRegName] = useState("");
+
+  const overallStatus = individualStatus?.overall_status ?? "incomplete";
+  const individualVerified = overallStatus === "verified";
+  const businessVerified = businessStatus?.verified ?? false;
+
+  const submittedTypes = new Set(
+    individualStatus?.verifications.map((v) => v.type) ?? [],
+  );
+
+  const identityPending =
+    verifyBvn.isPending || verifyNin.isPending || verifyVnin.isPending;
+
+  async function handleIdentitySubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!idNumber.trim() || submittedTypes.has(idType)) return;
+    if (idType === "bvn") await verifyBvn.mutateAsync({ bvn: idNumber.trim() });
+    else if (idType === "nin")
+      await verifyNin.mutateAsync({ nin: idNumber.trim() });
+    else await verifyVnin.mutateAsync({ vnin: idNumber.trim() });
+    setIdNumber("");
+  }
+
+  async function handleCacSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!rcNumber.trim()) return;
+    await verifyCac.mutateAsync({
+      rc_number: rcNumber.trim(),
+      registration_type: regType,
+      ...(regName.trim() ? { registration_name: regName.trim() } : {}),
+    });
+    setRcNumber("");
+    setRegName("");
+  }
+
+  const selectedTypeId = ID_TYPES.find((t) => t.value === idType);
+
+  const bizVerificationStatus = businessVerified
+    ? "verified"
+    : businessStatus?.verification
+      ? businessStatus.verification.status
+      : "incomplete";
+
   return (
     <div>
       <SectionHeading
@@ -655,45 +789,270 @@ function VerificationTab() {
         description="Complete verification to unlock all features and start accepting payments."
       />
 
-      <div className="mt-10 flex flex-col gap-10">
-        <div className="flex items-start gap-5">
-          <IconTile>
-            <IdCard size={20} className="text-[#22C55E]" />
-          </IconTile>
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h3 className="text-[15px] font-semibold text-[#FAFAFA]">
-                Identity Verification
-              </h3>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#052E16] px-2.5 py-0.5 text-xs font-medium text-[#22C55E]">
-                <CheckCircle2 size={11} /> Verified
-              </span>
+      <div className="mt-8 flex flex-col gap-5">
+        {/* ── Identity card ──────────────────────────────── */}
+        <div className="rounded-xl border border-[#1C1C1F] bg-[#0A0B0E]">
+          <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0F2640]">
+                <IdCard size={17} className="text-[#3B82F6]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#FAFAFA]">
+                  Identity Verification
+                </p>
+                <p className="text-xs text-[#52525B]">BVN · NIN · Virtual NIN</p>
+              </div>
             </div>
-            <p className="mt-1.5 text-sm text-[#71717A]">
-              Your identity has been verified. You can start processing live
-              transactions.
-            </p>
+            {loadingIndividual ? (
+              <Loader2 size={14} className="animate-spin text-[#52525B]" />
+            ) : (
+              <KycStatusBadge status={overallStatus} />
+            )}
+          </div>
+
+          <div className="p-5">
+            {individualVerified ? (
+              <div className="flex items-center gap-2 text-sm text-[#22C55E]">
+                <CheckCircle2 size={15} />
+                Your identity has been verified. You can process live
+                transactions.
+              </div>
+            ) : (
+              <>
+                {/* Previous attempts */}
+                {(individualStatus?.verifications.length ?? 0) > 0 && (
+                  <div className="mb-5">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+                      Previous attempts
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {individualStatus!.verifications.map((v) => (
+                        <div
+                          key={v.id}
+                          className="flex items-center justify-between rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5"
+                        >
+                          <span className="text-sm font-medium uppercase text-[#A1A1AA]">
+                            {v.type}
+                          </span>
+                          <KycStatusBadge status={v.status} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <form
+                  onSubmit={handleIdentitySubmit}
+                  className="flex flex-col gap-4"
+                >
+                  {loadingIndividual ? null : (
+                    <p className="text-sm text-[#71717A]">
+                      Submit a government-issued ID to verify your identity.
+                    </p>
+                  )}
+
+                  {/* Type selector */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                      Verification type
+                    </label>
+                    <div className="flex gap-2">
+                      {ID_TYPES.map((t) => {
+                        const used = submittedTypes.has(t.value);
+                        return (
+                          <button
+                            key={t.value}
+                            type="button"
+                            disabled={used}
+                            onClick={() => {
+                              setIdType(t.value);
+                              setIdNumber("");
+                            }}
+                            className={cn(
+                              "flex-1 rounded-lg border px-3 py-2 text-center text-sm font-medium transition-colors",
+                              used
+                                ? "cursor-not-allowed border-[#1C1C1F] text-[#3F3F46]"
+                                : idType === t.value
+                                  ? "border-[#2563EB] bg-[#0F2640] text-[#3B82F6]"
+                                  : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:border-[#2563EB]/40 hover:text-[#A1A1AA]",
+                            )}
+                          >
+                            {t.label}
+                            {used && (
+                              <span className="ml-1 text-[10px]">(used)</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* ID number input */}
+                  {!submittedTypes.has(idType) && (
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                        {selectedTypeId?.description ?? "ID Number"}
+                      </label>
+                      <input
+                        type="text"
+                        value={idNumber}
+                        onChange={(e) => setIdNumber(e.target.value)}
+                        placeholder={selectedTypeId?.placeholder}
+                        required
+                        className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] transition-colors focus:border-[#2563EB] focus:outline-none"
+                      />
+                    </div>
+                  )}
+
+                  {submittedTypes.has(idType) ? (
+                    <p className="text-xs text-[#52525B]">
+                      Select an unused verification type above.
+                    </p>
+                  ) : (
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={!idNumber.trim() || identityPending}
+                        className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {identityPending ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <ShieldCheck size={14} />
+                        )}
+                        {identityPending ? "Verifying…" : "Verify Identity"}
+                      </button>
+                    </div>
+                  )}
+                </form>
+              </>
+            )}
           </div>
         </div>
 
-        <div className="flex items-start gap-5">
-          <IconTile>
-            <Building2 size={20} className="text-[#2563EB]" />
-          </IconTile>
-          <div className="min-w-0">
-            <h3 className="text-[15px] font-semibold text-[#FAFAFA]">
-              Business Verification
-            </h3>
-            <p className="mt-1.5 text-sm text-[#71717A]">
-              Verify your registered business to unlock higher transaction
-              limits and business features.
-            </p>
-            <a
-              href="#"
-              className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2563EB] transition-colors hover:text-[#1D4ED8]"
-            >
-              Verify Business <ArrowRight size={14} />
-            </a>
+        {/* ── Business / CAC card ────────────────────────── */}
+        <div className="rounded-xl border border-[#1C1C1F] bg-[#0A0B0E]">
+          <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0F2640]">
+                <Building2 size={17} className="text-[#3B82F6]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#FAFAFA]">
+                  Business Verification
+                </p>
+                <p className="text-xs text-[#52525B]">
+                  CAC Registration Number
+                </p>
+              </div>
+            </div>
+            {loadingBusiness ? (
+              <Loader2 size={14} className="animate-spin text-[#52525B]" />
+            ) : (
+              <KycStatusBadge status={bizVerificationStatus} />
+            )}
+          </div>
+
+          <div className="p-5">
+            {businessVerified ? (
+              <div className="flex flex-wrap items-center gap-2 text-sm text-[#22C55E]">
+                <CheckCircle2 size={15} />
+                Your business is verified.
+                {businessStatus?.verification?.validation_input?.registration_name && (
+                  <span className="text-[#52525B]">
+                    ({businessStatus.verification.validation_input.registration_name})
+                  </span>
+                )}
+              </div>
+            ) : businessStatus?.verification ? (
+              <div className="flex items-center gap-2 text-sm text-[#71717A]">
+                <Info size={15} className="shrink-0" />
+                Your CAC verification is{" "}
+                <span className="font-medium capitalize">
+                  {businessStatus.verification.status}
+                </span>
+                . Contact support if you need assistance.
+              </div>
+            ) : (
+              <form
+                onSubmit={handleCacSubmit}
+                className="flex flex-col gap-4"
+              >
+                <p className="text-sm text-[#71717A]">
+                  Submit your CAC Registration Number to verify your business
+                  and unlock higher transaction limits.
+                </p>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                    Registration Type *
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={regType}
+                      onChange={(e) =>
+                        setRegType(e.target.value as RegistrationType)
+                      }
+                      className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-9 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+                    >
+                      {REGISTRATION_TYPES.map((t) => (
+                        <option key={t.value} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={14}
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                    CAC Registration Number *
+                  </label>
+                  <input
+                    type="text"
+                    value={rcNumber}
+                    onChange={(e) => setRcNumber(e.target.value)}
+                    placeholder="RC123456"
+                    required
+                    className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] transition-colors focus:border-[#2563EB] focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                    Registered Business Name{" "}
+                    <span className="text-[#52525B]">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={regName}
+                    onChange={(e) => setRegName(e.target.value)}
+                    placeholder="Acme Corp Ltd"
+                    className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] transition-colors focus:border-[#2563EB] focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={!rcNumber.trim() || verifyCac.isPending}
+                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {verifyCac.isPending ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Building2 size={14} />
+                    )}
+                    {verifyCac.isPending ? "Verifying…" : "Verify Business"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </div>

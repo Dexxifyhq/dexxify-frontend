@@ -6,11 +6,38 @@ import {
   type UpdateSettlementsDto,
   type UpdateNotificationsDto,
 } from "@/lib/api/businesses";
+import { authApi } from "@/lib/auth-api";
+import { useRouter } from "next/navigation";
 
 export const businessKeys = {
   all: ["businesses"] as const,
+  list: () => [...businessKeys.all, "list"] as const,
   me: () => [...businessKeys.all, "me"] as const,
 };
+
+export function useMyBusinesses() {
+  return useQuery({
+    queryKey: businessKeys.list(),
+    queryFn: businessesApi.getAll,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useSelectBusiness() {
+  const qc = useQueryClient();
+  const router = useRouter();
+  return useMutation({
+    mutationFn: (businessId: string) =>
+      authApi.selectBusiness({ business_id: businessId }),
+    onSuccess: () => {
+      // Cookie now contains the new business_id — wipe all cached data so
+      // every active query refetches against the newly selected workspace.
+      qc.clear();
+      router.refresh();
+    },
+    onError: (e: any) => toast.error(e.message ?? "Failed to switch business."),
+  });
+}
 
 export function useMyBusiness() {
   return useQuery({

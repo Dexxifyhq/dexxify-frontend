@@ -36,7 +36,14 @@ export interface UpdateNotificationsDto {
   preferences?: Record<string, boolean>;
 }
 
+export interface BusinessSummary {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
+
 export const businessesApi = {
+  getAll: () => get<BusinessSummary[]>("/businesses"),
   getMe: () => get<Business>("/businesses/me"),
   updateProfile: (dto: UpdateBusinessProfileDto) =>
     patch<Business>("/businesses/me", dto),

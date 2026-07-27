@@ -28,7 +28,11 @@ import {
 import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
 import { toast } from "sonner";
-import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
+import {
+  useMyBusiness,
+  useMyBusinesses,
+  useSelectBusiness,
+} from "@/lib/hooks/businesses/useBusinesses";
 import type { Environment } from "@/lib/types/common";
 import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
 
@@ -126,12 +130,18 @@ export default function Sidebar({
   }, [activeGroup]);
 
   const { data: business } = useMyBusiness();
+  const { data: allBusinesses = [] } = useMyBusinesses();
+  const selectBusiness = useSelectBusiness();
+
   const businessName = business?.name || user.businessName || "Business";
   const businessInitial = businessName.charAt(0).toUpperCase() || "B";
   const businessId = business?.id || user.businessId;
   const shortId = businessId ? businessId.slice(0, 8) : "";
 
   const [bizMenuOpen, setBizMenuOpen] = useState(false);
+
+  // True whenever the sidebar shows full content — desktop expanded OR mobile drawer open.
+  const isExpanded = !collapsed || mobileOpen;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -282,215 +292,249 @@ export default function Sidebar({
         />
       )}
 
-    <aside
-      className={cn(
-        "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#1C1C1F] bg-[#09090B] transition-[width,transform] duration-200",
-        // Desktop: collapse rail
-        "lg:translate-x-0",
-        collapsed ? "lg:w-16" : "lg:w-60",
-        // Mobile: full-width drawer, hidden unless open
-        "w-72",
-        mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-      )}
-    >
-      {/* Workspace block */}
-      <div className="relative border-b border-[#1C1C1F]">
-        {bizMenuOpen && !collapsed && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setBizMenuOpen(false)}
-            />
-            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
-              <div className="px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-[#52525B]">
-                  Active workspace
-                </p>
-                <div className="mt-2 flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-xs font-bold text-white">
-                    {businessInitial}
-                  </div>
-                  <p className="truncate text-sm font-medium text-[#FAFAFA]">
-                    {businessName}
-                  </p>
-                </div>
-              </div>
-              <div className="my-1 border-t border-[#1C1C1F]" />
-              <button
-                type="button"
-                onClick={() => {
-                  router.push("/settings");
-                  setBizMenuOpen(false);
-                }}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
-              >
-                <Settings size={14} />
-                Manage business
-              </button>
-            </div>
-          </>
-        )}
-
-        <button
-          type="button"
-          onClick={() => {
-            if (collapsed) {
-              onExpand();
-              return;
-            }
-            setBizMenuOpen((v) => !v);
-          }}
-          title={collapsed ? businessName : undefined}
-          className={cn(
-            "flex w-full items-center py-4 transition-colors",
-            collapsed ? "justify-center px-0" : "gap-2.5 px-4 hover:bg-[#111113]",
-          )}
-        >
-          <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
-            {businessInitial}
-          </div>
-          {!collapsed && (
-            <>
-              <div className="min-w-0 flex-1 text-left">
-                <p className="truncate text-sm font-semibold text-[#FAFAFA]">
-                  {businessName}
-                </p>
-                {shortId && (
-                  <p className="truncate text-[11px] text-[#52525B]">
-                    ID {shortId}
-                  </p>
-                )}
-              </div>
-              <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Nav */}
-      <nav
+      <aside
         className={cn(
-          "flex-1 overflow-y-auto py-4",
-          collapsed ? "px-2" : "px-3",
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#1C1C1F] bg-[#09090B] transition-[width,transform] duration-200",
+          // Desktop: collapse rail
+          "lg:translate-x-0",
+          collapsed ? "lg:w-16" : "lg:w-60",
+          // Mobile: full-width drawer, hidden unless open
+          "w-72",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        <div className="space-y-0.5">{NAV_TOP.map(renderEntry)}</div>
-        <div className="my-3 border-t border-[#1C1C1F]" />
-        <div className="space-y-0.5">{NAV_BOTTOM.map(renderEntry)}</div>
-      </nav>
-
-      {/* Profile footer */}
-      <div className="relative border-t border-[#1C1C1F] p-3">
-        {menuOpen && !collapsed && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setMenuOpen(false)}
-            />
-            <div className="absolute bottom-full left-3 right-3 z-50 mb-2 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
-              <button
-                type="button"
-                onClick={() => {
-                  router.push("/settings");
-                  setMenuOpen(false);
-                }}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
-              >
-                <User size={14} />
-                Profile
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  router.push("/settings");
-                  setMenuOpen(false);
-                }}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
-              >
-                <Settings size={14} />
-                Settings
-              </button>
-              <div className="my-1 border-t border-[#1C1C1F]" />
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#EF4444] transition-colors hover:bg-[#1C1C1F] disabled:opacity-50"
-              >
-                {loggingOut ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <LogOut size={14} />
-                )}
-                {loggingOut ? "Signing out…" : "Logout"}
-              </button>
-            </div>
-          </>
-        )}
-
-        <button
-          type="button"
-          onClick={() => {
-            if (collapsed) {
-              onExpand();
-              return;
-            }
-            setMenuOpen((v) => !v);
-          }}
-          title={collapsed ? user.name || "Account" : undefined}
-          className={cn(
-            "group flex w-full items-center rounded-lg transition-colors hover:bg-[#111113]",
-            collapsed ? "justify-center px-0 py-2" : "gap-2.5 px-2 py-2",
-          )}
-        >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-xs font-semibold text-white">
-            {user.initials || "U"}
-          </div>
-          {!collapsed && (
+        {/* Workspace block */}
+        <div className="relative border-b border-[#1C1C1F]">
+          {bizMenuOpen && isExpanded && (
             <>
-              <div className="min-w-0 flex-1 text-left">
-                <p className="truncate text-sm font-medium text-[#FAFAFA]">
-                  {user.name || "Account"}
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setBizMenuOpen(false)}
+              />
+              <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
+                <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-widest text-[#52525B]">
+                  Workspaces
                 </p>
-                {user.role && (
-                  <p className="truncate text-[11px] capitalize text-[#52525B]">
-                    {user.role.toLowerCase()}
-                  </p>
-                )}
+
+                {allBusinesses.map((biz) => {
+                  const isActive = biz.id === businessId;
+                  const initial = biz.name.charAt(0).toUpperCase();
+                  return (
+                    <button
+                      key={biz.id}
+                      type="button"
+                      disabled={isActive || selectBusiness.isPending}
+                      onClick={async () => {
+                        if (isActive) return;
+                        await selectBusiness.mutateAsync(biz.id);
+                        setBizMenuOpen(false);
+                      }}
+                      className={cn(
+                        "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors disabled:cursor-default",
+                        isActive
+                          ? "text-[#FAFAFA]"
+                          : "text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA]",
+                      )}
+                    >
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-[10px] font-bold text-white">
+                        {initial}
+                      </div>
+                      <span className="flex-1 truncate text-left">
+                        {biz.name}
+                      </span>
+                      {isActive && (
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#22C55E]" />
+                      )}
+                      {!isActive &&
+                        selectBusiness.isPending &&
+                        selectBusiness.variables === biz.id && (
+                          <Loader2
+                            size={12}
+                            className="animate-spin text-[#52525B]"
+                          />
+                        )}
+                    </button>
+                  );
+                })}
+
+                <div className="my-1 border-t border-[#1C1C1F]" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    router.push("/settings");
+                    setBizMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                >
+                  <Settings size={14} />
+                  Manage businesses
+                </button>
               </div>
-              <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
             </>
           )}
-        </button>
-      </div>
 
-      {/* Mobile-only: env toggle */}
-      <div className="border-t border-[#1C1C1F] p-3 lg:hidden">
-        <button
-          type="button"
-          onClick={handleEnvToggle}
-          disabled={switchMode.isPending}
+          <button
+            type="button"
+            onClick={() => {
+              if (!isExpanded) {
+                onExpand();
+                return;
+              }
+              setBizMenuOpen((v) => !v);
+            }}
+            title={!isExpanded ? businessName : undefined}
+            className={cn(
+              "flex w-full items-center py-4 transition-colors",
+              !isExpanded
+                ? "justify-center px-0"
+                : "gap-2.5 px-4 hover:bg-[#111113]",
+            )}
+          >
+            <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
+              {businessInitial}
+            </div>
+            {isExpanded && (
+              <>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+                    {businessName}
+                  </p>
+                  {shortId && (
+                    <p className="truncate text-[11px] text-[#52525B]">
+                      ID {shortId}
+                    </p>
+                  )}
+                </div>
+                <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav
           className={cn(
-            "flex w-full items-center justify-center gap-2 rounded-full border py-2 text-xs font-semibold transition-colors disabled:opacity-60",
-            isLive
-              ? "border-[#14532D]/50 bg-[#052E16]/60 text-[#22C55E]"
-              : "border-[#78350F]/50 bg-[#451A03]/60 text-[#F59E0B]",
+            "flex-1 overflow-y-auto py-4",
+            collapsed ? "px-2" : "px-3",
           )}
         >
-          {switchMode.isPending ? (
-            <Loader2 size={11} className="animate-spin" />
-          ) : (
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full",
-                isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
-              )}
-            />
+          <div className="space-y-0.5">{NAV_TOP.map(renderEntry)}</div>
+          <div className="my-3 border-t border-[#1C1C1F]" />
+          <div className="space-y-0.5">{NAV_BOTTOM.map(renderEntry)}</div>
+        </nav>
+
+        {/* Profile footer */}
+        <div className="relative border-t border-[#1C1C1F] p-3">
+          {menuOpen && !collapsed && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setMenuOpen(false)}
+              />
+              <div className="absolute bottom-full left-3 right-3 z-50 mb-2 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
+                <button
+                  type="button"
+                  onClick={() => {
+                    router.push("/settings");
+                    setMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                >
+                  <User size={14} />
+                  Profile
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    router.push("/settings");
+                    setMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                >
+                  <Settings size={14} />
+                  Settings
+                </button>
+                <div className="my-1 border-t border-[#1C1C1F]" />
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#EF4444] transition-colors hover:bg-[#1C1C1F] disabled:opacity-50"
+                >
+                  {loggingOut ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <LogOut size={14} />
+                  )}
+                  {loggingOut ? "Signing out…" : "Logout"}
+                </button>
+              </div>
+            </>
           )}
-          {isLive ? "LIVE MODE" : "TEST MODE"}
-        </button>
-      </div>
-    </aside>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (collapsed) {
+                onExpand();
+                return;
+              }
+              setMenuOpen((v) => !v);
+            }}
+            title={collapsed ? user.name || "Account" : undefined}
+            className={cn(
+              "group flex w-full items-center rounded-lg transition-colors hover:bg-[#111113]",
+              collapsed ? "justify-center px-0 py-2" : "gap-2.5 px-2 py-2",
+            )}
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-xs font-semibold text-white">
+              {user.initials || "U"}
+            </div>
+            {!collapsed && (
+              <>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                    {user.name || "Account"}
+                  </p>
+                  {user.role && (
+                    <p className="truncate text-[11px] capitalize text-[#52525B]">
+                      {user.role.toLowerCase()}
+                    </p>
+                  )}
+                </div>
+                <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Mobile-only: env toggle */}
+        <div className="border-t border-[#1C1C1F] p-3 lg:hidden">
+          <button
+            type="button"
+            onClick={handleEnvToggle}
+            disabled={switchMode.isPending}
+            className={cn(
+              "flex w-full items-center justify-center gap-2 rounded-full border py-2 text-xs font-semibold transition-colors disabled:opacity-60",
+              isLive
+                ? "border-[#14532D]/50 bg-[#052E16]/60 text-[#22C55E]"
+                : "border-[#78350F]/50 bg-[#451A03]/60 text-[#F59E0B]",
+            )}
+          >
+            {switchMode.isPending ? (
+              <Loader2 size={11} className="animate-spin" />
+            ) : (
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full",
+                  isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
+                )}
+              />
+            )}
+            {isLive ? "LIVE MODE" : "TEST MODE"}
+          </button>
+        </div>
+      </aside>
     </>
   );
 }

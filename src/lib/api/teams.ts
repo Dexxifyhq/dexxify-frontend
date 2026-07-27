@@ -34,6 +34,13 @@ export interface UpdateMemberDto {
   permissions?: string[];
 }
 
+export interface AcceptInviteDto {
+  token: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+}
+
 export const teamsApi = {
   getMembers: (): Promise<TeamMember[]> =>
     get<{ data: TeamMember[] }>("/teams/members").then((r) => r.data ?? []),
@@ -44,4 +51,6 @@ export const teamsApi = {
     patch<any>(`/teams/members/${id}`, dto),
   removeMember: (id: string) =>
     del<{ removed: boolean; id: string }>(`/teams/members/${id}`),
+  acceptInvite: (dto: AcceptInviteDto) =>
+    post<{ message: string }>("/teams/accept", dto),
 };

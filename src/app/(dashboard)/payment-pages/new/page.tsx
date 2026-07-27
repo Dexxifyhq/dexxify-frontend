@@ -6,15 +6,17 @@ import { useState } from "react";
 import {
   ArrowLeft,
   Building2,
-  Save,
   ChevronDown,
   Copy,
   Check,
   ExternalLink,
   Loader2,
-  X,
+  Zap,
+  FileText,
+  DollarSign,
 } from "lucide-react";
 import { useCreatePaymentPage } from "@/lib/hooks/payment-pages/usePaymentPages";
+import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
 import { toast } from "sonner";
 
 const STATUSES = [
@@ -23,26 +25,22 @@ const STATUSES = [
   { label: "Inactive", value: "inactive" },
 ];
 
-interface PricingOption {
-  id: string;
-  label: string;
-  amount: string;
-}
+const CURRENCIES = [
+  { label: "USD", value: "USD" },
+  { label: "NGN", value: "NGN" },
+];
 
 export default function CreatePaymentPageForm() {
   const router = useRouter();
   const createPage = useCreatePaymentPage();
+  const { data: business } = useMyBusiness();
 
-  // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [currency] = useState("USD");
+  const [currency, setCurrency] = useState<"NGN" | "USD">("USD");
   const [status, setStatus] = useState("active");
   const [amount, setAmount] = useState("");
-  const [autoSettlement, setAutoSettlement] = useState(false);
-  const [previewAmount, setPreviewAmount] = useState("");
 
-  // Success state
   const [createdPage, setCreatedPage] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -57,15 +55,11 @@ export default function CreatePaymentPageForm() {
         currency,
         status,
         amount: Number(amount),
-        auto_settlement: autoSettlement,
       },
       {
-        onSuccess: (res: any) => {
-          setCreatedPage(res);
-        },
-        onError: (err: any) => {
-          toast.error(err?.message ?? "Failed to create payment page.");
-        },
+        onSuccess: (res: any) => setCreatedPage(res),
+        onError: (err: any) =>
+          toast.error(err?.message ?? "Failed to create payment page."),
       },
     );
   };
@@ -101,7 +95,7 @@ export default function CreatePaymentPageForm() {
             </span>
             <button
               onClick={handleCopy}
-              className="shrink-0 text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+              className="shrink-0 text-[#71717A] transition-colors hover:text-[#FAFAFA]"
             >
               {copied ? (
                 <Check size={14} className="text-[#22C55E]" />
@@ -115,7 +109,7 @@ export default function CreatePaymentPageForm() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/payment-pages")}
-            className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
           >
             View all pages
           </button>
@@ -123,7 +117,7 @@ export default function CreatePaymentPageForm() {
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] transition-colors hover:bg-white"
           >
             <ExternalLink size={13} />
             Preview page
@@ -141,39 +135,45 @@ export default function CreatePaymentPageForm() {
         <div className="flex items-center gap-3">
           <Link
             href="/payment-pages"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
             aria-label="Back"
           >
             <ArrowLeft size={15} />
           </Link>
-          <h1 className="text-xl font-bold tracking-tight text-[#FAFAFA]">
-            Create Payment Page
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-[#FAFAFA]">
+              New Payment Page
+            </h1>
+            <p className="text-xs text-[#52525B]">
+              Configure your page then share the link to collect payments.
+            </p>
+          </div>
         </div>
         <button
           type="button"
           onClick={handleCreate}
           disabled={!canCreate || createPage.isPending}
-          className="inline-flex h-9 cursor-pointer hover:opacity-70 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+          className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           {createPage.isPending ? (
             <Loader2 size={14} className="animate-spin" />
           ) : (
-            <Save size={14} />
+            <Zap size={14} />
           )}
           {createPage.isPending ? "Creating…" : "Create Page"}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Left column */}
-        <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
+        {/* ── Left: form fields ────────────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
           {/* General */}
-          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
-            <h2 className="mb-4 text-sm font-semibold text-[#FAFAFA]">
-              General Information
-            </h2>
-            <div className="flex flex-col gap-4">
+          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
+            <div className="flex items-center gap-2.5 border-b border-[#1C1C1F] px-5 py-3.5">
+              <FileText size={14} className="text-[#52525B]" />
+              <h2 className="text-sm font-semibold text-[#FAFAFA]">General</h2>
+            </div>
+            <div className="flex flex-col gap-4 p-5">
               <Field label="Page Title *">
                 <input
                   type="text"
@@ -205,115 +205,124 @@ export default function CreatePaymentPageForm() {
           </section>
 
           {/* Pricing */}
-          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
-            <h2 className="mb-4 text-sm font-semibold text-[#FAFAFA]">
-              Pricing
-            </h2>
-            <div className="flex flex-col gap-4">
-              <Field label="Amount (USD) *">
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className={inputCls}
-                />
-              </Field>
+          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
+            <div className="flex items-center gap-2.5 border-b border-[#1C1C1F] px-5 py-3.5">
+              <DollarSign size={14} className="text-[#52525B]" />
+              <h2 className="text-sm font-semibold text-[#FAFAFA]">Pricing</h2>
             </div>
-          </section>
-
-          {/* Settlement */}
-          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-sm font-semibold text-[#FAFAFA]">
-                  Auto Settlement
-                </h2>
-                <p className="mt-0.5 text-xs text-[#71717A]">
-                  Automatically settle received payments to your linked bank
-                  account after each confirmed transaction.
-                </p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={autoSettlement}
-                onClick={() => setAutoSettlement((v) => !v)}
-                className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none ${
-                  autoSettlement
-                    ? "border-[#14532D]/60 bg-[#22C55E]"
-                    : "border-[#2a2a2e] bg-[#1C1C1F]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                    autoSettlement ? "translate-x-0.5" : "-translate-x-5"
-                  }`}
-                />
-              </button>
+            <div className="p-5">
+              <Field label="Amount & Currency *">
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    className={`${inputCls} min-w-0 flex-1`}
+                  />
+                  <div className="relative w-28 shrink-0">
+                    <select
+                      value={currency}
+                      onChange={(e) =>
+                        setCurrency(e.target.value as typeof currency)
+                      }
+                      className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-8 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+                    >
+                      {CURRENCIES.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={14}
+                      className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                    />
+                  </div>
+                </div>
+              </Field>
             </div>
           </section>
         </div>
 
-        {/* Preview (right column) */}
+        {/* ── Right: live preview ──────────────────────────────────────── */}
         <aside className="h-fit">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
             Live Preview
           </p>
-          <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-5">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1C1C1F] text-[#A1A1AA]">
-                <Building2 size={18} />
+
+          {/* Mirrors the actual /p/[slug] checkout card */}
+          <div className="w-full rounded-2xl border border-white/10 bg-[#0D0D0F] shadow-2xl">
+            {/* Page header */}
+            <div className="border-b border-white/10 px-5 py-5 text-center">
+              <div className="mb-3 flex flex-col items-center gap-1.5">
+                {business?.logo_url ? (
+                  <img
+                    src={business.logo_url}
+                    alt={business.name}
+                    className="h-10 w-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-white/25">
+                    <Building2 size={18} />
+                  </div>
+                )}
+                {business?.name && (
+                  <p className="text-[11px] font-medium text-white/40">
+                    {business.name}
+                  </p>
+                )}
               </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-[#FAFAFA]">
-                  {title || "Page Title"}
-                </p>
-                <p className="truncate text-xs text-[#71717A]">
-                  {description || "Description"}
+              <p className="text-sm font-semibold text-white">
+                {title || "Page Title"}
+              </p>
+              <p className="mt-0.5 text-xs text-white/40">
+                {description || "Your description will appear here"}
+              </p>
+              <div className="mt-3">
+                <p className="text-2xl font-bold text-white">
+                  {Number(amount || 0).toFixed(2)}
+                  <span className="ml-1.5 text-sm font-normal text-white/40">
+                    {currency}
+                  </span>
                 </p>
               </div>
             </div>
 
-            {/* Preset options */}
-            {/* {options.filter((o) => o.label && o.amount).length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2">
-                {options
-                  .filter((o) => o.label && o.amount)
-                  .map((o) => (
-                    <button
-                      key={o.id}
-                      type="button"
-                      className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-1.5 text-xs font-medium text-[#A1A1AA]"
-                    >
-                      {o.label} — ${o.amount}
-                    </button>
-                  ))}
+            {/* Mock form — mirrors p/[slug] step="form" */}
+            <div className="flex flex-col gap-3 px-5 py-5">
+              <div className="grid grid-cols-2 gap-2.5">
+                <MockField label="First Name" placeholder="James" />
+                <MockField label="Last Name" placeholder="Wilson" />
               </div>
-            )} */}
+              <MockField label="Email" placeholder="you@example.com" />
 
-            <div className="mb-4 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5 text-center">
-              <p className="text-xs text-[#71717A]">You pay</p>
-              <p className="text-xl font-bold text-[#FAFAFA]">
-                ${amount || "0.00"}{" "}
-                <span className="text-sm font-normal text-[#71717A]">USD</span>
-              </p>
+              {/* Pay With picker mock */}
+              <div>
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/30">
+                  Pay With
+                </p>
+                <div className="flex h-9 items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3">
+                  <span className="text-xs text-white/20">Choose token…</span>
+                  <ChevronDown size={12} className="text-white/20" />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                disabled
+                className="mt-1 h-9 w-full cursor-not-allowed rounded-lg bg-white/10 text-xs font-semibold text-white/25"
+              >
+                Continue to Pay
+              </button>
             </div>
 
-            <button
-              type="button"
-              className="h-9 w-full opacity-50 cursor-not-allowed rounded-lg bg-[#FAFAFA] text-sm font-medium text-[#09090B]"
-            >
-              Continue to Pay
-            </button>
-
-            {autoSettlement && (
-              <p className="mt-3 text-center text-[11px] text-[#22C55E]">
-                Auto-settlement enabled
-              </p>
-            )}
+            <p className="pb-3.5 text-center text-[10px] text-white/15">
+              Powered by{" "}
+              <span className="font-semibold text-white/20">Dexxify</span>
+            </p>
           </div>
         </aside>
       </div>
@@ -369,6 +378,25 @@ function SelectField({
         size={14}
         className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
       />
+    </div>
+  );
+}
+
+function MockField({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder: string;
+}) {
+  return (
+    <div>
+      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/30">
+        {label}
+      </p>
+      <div className="flex h-9 items-center rounded-lg border border-white/10 bg-white/5 px-3">
+        <span className="text-xs text-white/20">{placeholder}</span>
+      </div>
     </div>
   );
 }

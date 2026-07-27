@@ -10,13 +10,15 @@ import {
   Menu,
   Loader2,
 } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/utils/utils";
 import type { Environment } from "@/lib/types/common";
 import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
+import { useIndividualKycStatus } from "@/lib/hooks/kyc/useKyc";
 
 // ── Pending actions panel ──────────────────────────────────────────────────
 
-function PendingActionsPanel({ onClose }: { onClose: () => void }) {
+function PendingActionsPanel({ onClose: _onClose }: { onClose: () => void }) {
   return (
     <div className="absolute right-2 top-12 z-50 w-72 max-w-[calc(100vw-1rem)] rounded-xl border border-[#1C1C1F] bg-[#111113] p-4 shadow-xl sm:right-16">
       <div className="flex items-start justify-between mb-3">
@@ -39,7 +41,6 @@ interface TopbarProps {
   onEnvToggle: () => void;
   onToggleSidebar: () => void;
   onOpenMobile?: () => void;
-  showVerificationBanner?: boolean;
 }
 
 export default function Topbar({
@@ -47,11 +48,13 @@ export default function Topbar({
   onEnvToggle,
   onToggleSidebar,
   onOpenMobile,
-  showVerificationBanner = true,
 }: TopbarProps) {
-  const [bannerVisible, setBannerVisible] = useState(showVerificationBanner);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const switchMode = useSwitchMode();
+  const { data: kycStatus, isLoading: kycLoading } = useIndividualKycStatus();
+  const isKycVerified = kycStatus?.overall_status === "verified";
+  const showBanner = !bannerDismissed && !kycLoading && !isKycVerified;
 
   const isLive = environment === "live";
 
@@ -71,7 +74,7 @@ export default function Topbar({
         <div className="fixed inset-0 z-40" onClick={closeAll} />
       )}
 
-      <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-4 sm:px-6">
+      <header className="sticky top-0 z-30 flex h-18 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-4 sm:px-6">
         {/* Left: sidebar toggle + verification banner */}
         <div className="flex items-center gap-3">
           {/* Mobile: open drawer */}
@@ -94,15 +97,18 @@ export default function Topbar({
           <span className="text-base font-bold tracking-tight text-[#FAFAFA] lg:hidden">
             Dexxify
           </span>
-          {bannerVisible && (
+          {showBanner && (
             <div className="hidden items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5 md:flex">
-              <AlertTriangle size={13} className="text-[#F59E0B] shrink-0" />
-              <span className="text-xs font-medium text-[#F59E0B]">
+              <AlertTriangle size={13} className="shrink-0 text-[#F59E0B]" />
+              <Link
+                href="/settings"
+                className="text-xs font-medium text-[#F59E0B] transition-colors hover:text-[#FCD34D]"
+              >
                 Complete verification
-              </span>
+              </Link>
               <button
-                onClick={() => setBannerVisible(false)}
-                className="ml-1 text-[#F59E0B]/60 hover:text-[#F59E0B] transition-colors"
+                onClick={() => setBannerDismissed(true)}
+                className="ml-1 text-[#F59E0B]/60 transition-colors hover:text-[#F59E0B]"
               >
                 <X size={12} />
               </button>
