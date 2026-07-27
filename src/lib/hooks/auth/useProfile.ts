@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/lib/auth-api";
 import type { Environment } from "@/lib/types/common";
 
@@ -36,8 +36,14 @@ function toApiMode(env: Environment): "live" | "test" {
 }
 
 export function useSwitchMode() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (env: Environment) => authApi.switchMode(toApiMode(env)),
+    onSuccess: () => {
+      // All cached data is environment-specific — wipe everything so active
+      // queries refetch against the new mode immediately.
+      qc.clear();
+    },
   });
 }
 
