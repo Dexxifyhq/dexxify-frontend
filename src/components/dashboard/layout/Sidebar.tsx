@@ -29,6 +29,8 @@ import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
 import { toast } from "sonner";
 import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
+import type { Environment } from "@/lib/types/common";
+import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
 
 // ── Nav config ───────────────────────────────────────────────────────────────
 
@@ -88,9 +90,21 @@ interface SidebarProps {
   };
   collapsed: boolean;
   onExpand: () => void;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
+  environment: Environment;
+  onEnvChange: (env: Environment) => void;
 }
 
-export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
+export default function Sidebar({
+  user,
+  collapsed,
+  onExpand,
+  mobileOpen,
+  onMobileClose,
+  environment,
+  onEnvChange,
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isActive = (href: string) =>
@@ -121,6 +135,13 @@ export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const switchMode = useSwitchMode();
+  const isLive = environment === "live";
+  function handleEnvToggle() {
+    const next: Environment = isLive ? "test" : "live";
+    switchMode.mutate(next, { onSuccess: () => onEnvChange(next) });
+  }
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -252,10 +273,24 @@ export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
   }
 
   return (
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-[#1C1C1F] bg-[#09090B] transition-[width] duration-200",
-        collapsed ? "w-16" : "w-60",
+        "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#1C1C1F] bg-[#09090B] transition-[width,transform] duration-200",
+        // Desktop: collapse rail
+        "lg:translate-x-0",
+        collapsed ? "lg:w-16" : "lg:w-60",
+        // Mobile: full-width drawer, hidden unless open
+        "w-72",
+        mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}
     >
       {/* Workspace block */}
@@ -428,6 +463,34 @@ export default function Sidebar({ user, collapsed, onExpand }: SidebarProps) {
           )}
         </button>
       </div>
+
+      {/* Mobile-only: env toggle */}
+      <div className="border-t border-[#1C1C1F] p-3 lg:hidden">
+        <button
+          type="button"
+          onClick={handleEnvToggle}
+          disabled={switchMode.isPending}
+          className={cn(
+            "flex w-full items-center justify-center gap-2 rounded-full border py-2 text-xs font-semibold transition-colors disabled:opacity-60",
+            isLive
+              ? "border-[#14532D]/50 bg-[#052E16]/60 text-[#22C55E]"
+              : "border-[#78350F]/50 bg-[#451A03]/60 text-[#F59E0B]",
+          )}
+        >
+          {switchMode.isPending ? (
+            <Loader2 size={11} className="animate-spin" />
+          ) : (
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
+              )}
+            />
+          )}
+          {isLive ? "LIVE MODE" : "TEST MODE"}
+        </button>
+      </div>
     </aside>
+    </>
   );
 }
