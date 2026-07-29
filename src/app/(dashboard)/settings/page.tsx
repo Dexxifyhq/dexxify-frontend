@@ -60,10 +60,7 @@ import {
   useVerifyVnin,
   useVerifyCac,
 } from "@/lib/hooks/kyc/useKyc";
-import {
-  REGISTRATION_TYPES,
-  type RegistrationType,
-} from "@/lib/api/kyc";
+import { REGISTRATION_TYPES, type RegistrationType } from "@/lib/api/kyc";
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
@@ -183,6 +180,7 @@ function GeneralTab() {
 
   const [newBizName, setNewBizName] = useState("");
   const [newBizType, setNewBizType] = useState("");
+  const [newBizEmail, setNewBizEmail] = useState("");
 
   useEffect(() => {
     if (dev) {
@@ -224,10 +222,12 @@ function GeneralTab() {
     if (!newBizName.trim()) return;
     await createBiz.mutateAsync({
       name: newBizName.trim(),
-      ...(newBizType ? { type: newBizType } : {}),
+      type: newBizType,
+      email: newBizEmail,
     });
     setNewBizName("");
     setNewBizType("");
+    setNewBizEmail("");
   }
 
   const saving = updateDev.isPending || updateBiz.isPending;
@@ -250,7 +250,11 @@ function GeneralTab() {
           <Input value={dev?.email ?? ""} readOnly />
         </Field>
         <Field label="Phone number">
-          <Input value={phone} onChange={setPhone} placeholder="+234 800 000 0000" />
+          <Input
+            value={phone}
+            onChange={setPhone}
+            placeholder="+234 800 000 0000"
+          />
         </Field>
       </div>
 
@@ -345,7 +349,11 @@ function GeneralTab() {
           disabled={saving}
           className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
         >
-          {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          {saving ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Save size={14} />
+          )}
           {saving ? "Saving…" : "Save Changes"}
         </button>
       </div>
@@ -364,6 +372,13 @@ function GeneralTab() {
             value={newBizName}
             onChange={(e) => setNewBizName(e.target.value)}
             placeholder="Business name"
+            className="h-11 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+          />
+          <input
+            type="email"
+            value={newBizEmail}
+            onChange={(e) => setNewBizEmail(e.target.value)}
+            placeholder="Business Email"
             className="h-11 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
           />
           <div className="relative">
@@ -385,9 +400,13 @@ function GeneralTab() {
               <option value="gaming">Gaming</option>
               <option value="travel">Travel</option>
               <option value="food_and_beverage">Food & Beverage</option>
-              <option value="media_and_entertainment">Media & Entertainment</option>
+              <option value="media_and_entertainment">
+                Media & Entertainment
+              </option>
               <option value="real_estate">Real Estate</option>
-              <option value="professional_services">Professional Services</option>
+              <option value="professional_services">
+                Professional Services
+              </option>
               <option value="nonprofit">Nonprofit</option>
               <option value="other">Other</option>
             </select>
@@ -801,7 +820,9 @@ function VerificationTab() {
                 <p className="text-sm font-semibold text-[#FAFAFA]">
                   Identity Verification
                 </p>
-                <p className="text-xs text-[#52525B]">BVN · NIN · Virtual NIN</p>
+                <p className="text-xs text-[#52525B]">
+                  BVN · NIN · Virtual NIN
+                </p>
               </div>
             </div>
             {loadingIndividual ? (
@@ -959,9 +980,15 @@ function VerificationTab() {
               <div className="flex flex-wrap items-center gap-2 text-sm text-[#22C55E]">
                 <CheckCircle2 size={15} />
                 Your business is verified.
-                {businessStatus?.verification?.validation_input?.registration_name && (
+                {businessStatus?.verification?.validation_input
+                  ?.registration_name && (
                   <span className="text-[#52525B]">
-                    ({businessStatus.verification.validation_input.registration_name})
+                    (
+                    {
+                      businessStatus.verification.validation_input
+                        .registration_name
+                    }
+                    )
                   </span>
                 )}
               </div>
@@ -975,10 +1002,7 @@ function VerificationTab() {
                 . Contact support if you need assistance.
               </div>
             ) : (
-              <form
-                onSubmit={handleCacSubmit}
-                className="flex flex-col gap-4"
-              >
+              <form onSubmit={handleCacSubmit} className="flex flex-col gap-4">
                 <p className="text-sm text-[#71717A]">
                   Submit your CAC Registration Number to verify your business
                   and unlock higher transaction limits.
@@ -1164,7 +1188,9 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between px-7 py-6">
           <div className="flex items-center gap-3">
             <Key size={17} className="text-[#2563EB]" />
-            <h2 className="text-lg font-bold text-[#FAFAFA]">Change Password</h2>
+            <h2 className="text-lg font-bold text-[#FAFAFA]">
+              Change Password
+            </h2>
           </div>
           <button
             type="button"
@@ -1190,7 +1216,10 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
               <input
                 type="password"
                 value={newPw}
-                onChange={(e) => { setNewPw(e.target.value); setMismatch(false); }}
+                onChange={(e) => {
+                  setNewPw(e.target.value);
+                  setMismatch(false);
+                }}
                 required
                 minLength={8}
                 placeholder="Min. 8 characters"
@@ -1201,7 +1230,10 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
               <input
                 type="password"
                 value={confirmPw}
-                onChange={(e) => { setConfirmPw(e.target.value); setMismatch(false); }}
+                onChange={(e) => {
+                  setConfirmPw(e.target.value);
+                  setMismatch(false);
+                }}
                 required
                 className={cn(
                   "h-12 w-full rounded-lg border bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors focus:outline-none",
@@ -1252,7 +1284,8 @@ function TeamTab() {
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const { data: members = [], isLoading: membersLoading } = useTeamMembers();
-  const { data: invitations = [], isLoading: invitationsLoading } = useTeamInvitations();
+  const { data: invitations = [], isLoading: invitationsLoading } =
+    useTeamInvitations();
   const invite = useInviteTeamMember();
   const remove = useRemoveTeamMember();
 
@@ -1319,11 +1352,16 @@ function TeamTab() {
         ) : (
           <div className="mt-4 divide-y divide-[#17171A]">
             {members.map((m) => {
-              const name = [m.first_name, m.last_name].filter(Boolean).join(" ") || m.email;
-              const initials = [m.first_name?.at(0), m.last_name?.at(0)]
-                .filter(Boolean)
-                .join("")
-                .toUpperCase() || m.email.at(0)?.toUpperCase() || "?";
+              const name =
+                [m.first_name, m.last_name].filter(Boolean).join(" ") ||
+                m.email;
+              const initials =
+                [m.first_name?.at(0), m.last_name?.at(0)]
+                  .filter(Boolean)
+                  .join("")
+                  .toUpperCase() ||
+                m.email.at(0)?.toUpperCase() ||
+                "?";
               return (
                 <div
                   key={m.id}
@@ -1337,7 +1375,9 @@ function TeamTab() {
                       <p className="truncate text-sm font-medium text-[#FAFAFA]">
                         {name}
                       </p>
-                      <p className="truncate text-xs text-[#52525B]">{m.email}</p>
+                      <p className="truncate text-xs text-[#52525B]">
+                        {m.email}
+                      </p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-3">

@@ -38,14 +38,12 @@ function PendingActionsPanel({ onClose: _onClose }: { onClose: () => void }) {
 
 interface TopbarProps {
   environment: Environment;
-  onEnvToggle: () => void;
   onToggleSidebar: () => void;
   onOpenMobile?: () => void;
 }
 
 export default function Topbar({
   environment,
-  onEnvToggle,
   onToggleSidebar,
   onOpenMobile,
 }: TopbarProps) {
@@ -60,7 +58,7 @@ export default function Topbar({
 
   function handleEnvToggle() {
     const next: Environment = isLive ? "test" : "live";
-    switchMode.mutate(next, { onSuccess: onEnvToggle });
+    switchMode.mutate(next);
   }
 
   function closeAll() {
@@ -93,10 +91,6 @@ export default function Topbar({
           >
             <PanelLeft size={16} />
           </button>
-          {/* Mobile brand */}
-          <span className="text-base font-bold tracking-tight text-[#FAFAFA] lg:hidden">
-            Dexxify
-          </span>
           {showBanner && (
             <div className="hidden items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5 md:flex">
               <AlertTriangle size={13} className="shrink-0 text-[#F59E0B]" />

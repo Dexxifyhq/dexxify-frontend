@@ -97,7 +97,6 @@ interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
   environment: Environment;
-  onEnvChange: (env: Environment) => void;
 }
 
 export default function Sidebar({
@@ -107,7 +106,6 @@ export default function Sidebar({
   mobileOpen,
   onMobileClose,
   environment,
-  onEnvChange,
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -150,7 +148,7 @@ export default function Sidebar({
   const isLive = environment === "live";
   function handleEnvToggle() {
     const next: Environment = isLive ? "test" : "live";
-    switchMode.mutate(next, { onSuccess: () => onEnvChange(next) });
+    switchMode.mutate(next);
   }
 
   async function handleLogout() {
