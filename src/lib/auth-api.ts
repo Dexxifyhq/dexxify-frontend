@@ -50,8 +50,6 @@ export interface UserProfile {
   status: "active" | "inactive" | "suspended";
   mode: "live" | "test";
   plan: string;
-  api_call_count: number;
-  monthly_api_limit: number;
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
@@ -98,7 +96,7 @@ export const authApi = {
    * Full logout:
    */
   logout: async () => {
-    await post<{ message: string }>("/auth/logout")
+    await post<{ message: string }>("/auth/logout");
   },
 
   getProfile: () => get<UserProfile>("/auth/profile"),

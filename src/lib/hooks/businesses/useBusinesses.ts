@@ -7,7 +7,6 @@ import {
   type UpdateNotificationsDto,
 } from "@/lib/api/businesses";
 import { authApi } from "@/lib/auth-api";
-import { useRouter } from "next/navigation";
 
 export const businessKeys = {
   all: ["businesses"] as const,
@@ -25,15 +24,36 @@ export function useMyBusinesses() {
 
 export function useSelectBusiness() {
   const qc = useQueryClient();
-  const router = useRouter();
   return useMutation({
     mutationFn: (businessId: string) =>
       authApi.selectBusiness({ business_id: businessId }),
-    onSuccess: () => {
-      // Cookie now contains the new business_id — wipe all cached data so
-      // every active query refetches against the newly selected workspace.
-      qc.clear();
-      router.refresh();
+    onSuccess: (data) => {
+      const biz = data?.business;
+
+      // Immediately seed the "me" cache with the returned business so the
+      // sidebar shows the new name/logo without waiting for a refetch.
+      if (biz) {
+        qc.setQueryData(businessKeys.me(), (old: any) =>
+          old
+            ? { ...old, id: biz.id, name: biz.name, logo_url: biz.logo_url }
+            : biz,
+        );
+      }
+
+      // Refetch the profile so business_name + business_id reflect the new workspace.
+      qc.invalidateQueries({ queryKey: ["profile"] });
+
+      // Invalidate the business list so the switcher shows the correct active marker.
+      qc.invalidateQueries({ queryKey: businessKeys.list() });
+
+      // Clear all workspace-scoped data (transactions, payment-pages, etc.)
+      // so active queries refetch against the newly selected business.
+      qc.removeQueries({
+        predicate: (q) =>
+          q.queryKey[0] !== "businesses" && q.queryKey[0] !== "profile",
+      });
+
+      toast.success(biz ? `Switched to ${biz.name}.` : "Workspace switched.");
     },
     onError: (e: any) => toast.error(e.message ?? "Failed to switch business."),
   });
@@ -92,7 +112,7 @@ export function useUpdateNotifications() {
 export function useCreateBusiness() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (dto: { name: string; type?: string }) =>
+    mutationFn: (dto: { name: string; type: string; email: string }) =>
       businessesApi.create(dto),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: businessKeys.all });

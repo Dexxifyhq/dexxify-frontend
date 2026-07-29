@@ -66,7 +66,6 @@ export default function DashboardLayout({
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
         environment={environment}
-        onEnvChange={setEnvironment}
       />
 
       <div
@@ -77,9 +76,6 @@ export default function DashboardLayout({
       >
         <Topbar
           environment={environment}
-          onEnvToggle={() =>
-            setEnvironment((e) => (e === "test" ? "live" : "test"))
-          }
           onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
           onOpenMobile={() => setMobileOpen(true)}
         />

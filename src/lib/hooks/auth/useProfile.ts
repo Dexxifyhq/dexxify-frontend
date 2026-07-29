@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/lib/auth-api";
+import type { UserProfile } from "@/lib/auth-api";
 import type { Environment } from "@/lib/types/common";
 
 export const profileKeys = {
@@ -39,10 +40,18 @@ export function useSwitchMode() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (env: Environment) => authApi.switchMode(toApiMode(env)),
-    onSuccess: () => {
-      // All cached data is environment-specific — wipe everything so active
-      // queries refetch against the new mode immediately.
-      qc.clear();
+    onSuccess: (_data, env) => {
+      const newMode = toApiMode(env);
+      // Write the confirmed mode directly into the profile cache so the
+      // layout's useEffect picks it up immediately — no refetch needed.
+      qc.setQueryData(profileKeys.detail(), (old: UserProfile | undefined) =>
+        old ? { ...old, mode: newMode } : old,
+      );
+      // Clear all env-scoped data (transactions, payment-pages, etc.) so
+      // active queries refetch against the new mode. Profile is kept above.
+      qc.removeQueries({
+        predicate: (query) => query.queryKey[0] !== "profile",
+      });
     },
   });
 }
