@@ -145,19 +145,17 @@ function getMainAmount(tx: LedgerTransaction): {
   value: string;
   positive: boolean;
 } {
-  // Crypto amount takes precedence
-  if (tx.amount_crypto != null && Number(tx.amount_crypto) > 0) {
-    const isCredit = Number(tx.credit_usd) > 0 || Number(tx.credit_ngn) > 0;
-    return {
-      value: `${fmtNum(Number(tx.amount_crypto), 6)} ${tx.asset ?? ""}`.trim(),
-      positive: isCredit,
-    };
+  if (Number(tx.credit_usdt) > 0) {
+    return { value: `$${fmtNum(Number(tx.credit_usdt))}`, positive: true };
   }
-  if (Number(tx.credit_usd) > 0) {
-    return { value: `$${fmtNum(Number(tx.credit_usd))}`, positive: true };
+  if (Number(tx.debit_usdt) > 0) {
+    return { value: `$${fmtNum(Number(tx.debit_usdt))}`, positive: false };
   }
-  if (Number(tx.debit_usd) > 0) {
-    return { value: `$${fmtNum(Number(tx.debit_usd))}`, positive: false };
+  if (Number(tx.credit_usdc) > 0) {
+    return { value: `$${fmtNum(Number(tx.credit_usdc))}`, positive: true };
+  }
+  if (Number(tx.debit_usdc) > 0) {
+    return { value: `$${fmtNum(Number(tx.debit_usdc))}`, positive: false };
   }
   if (Number(tx.credit_ngn) > 0) {
     return { value: `₦${fmtNum(Number(tx.credit_ngn))}`, positive: true };
@@ -292,11 +290,6 @@ function TransactionDrawer({
             {positive ? "+" : "−"}
             {amtValue}
           </p>
-          {tx.amount_usd != null && (
-            <p className="mt-0.5 text-sm text-[#71717A]">
-              ≈ ${fmtNum(Number(tx.amount_usd))} USD
-            </p>
-          )}
         </div>
 
         {/* Fields */}
@@ -328,12 +321,20 @@ function TransactionDrawer({
           <DetailRow label="Ledger (Debit / Credit)">
             <div className="mt-1 grid grid-cols-2 gap-2 text-xs">
               <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Debit USD</p>
-                <p className="font-mono">${fmtNum(Number(tx.debit_usd))}</p>
+                <p className="text-[#52525B]">Debit USDT</p>
+                <p className="font-mono">${fmtNum(Number(tx.debit_usdt))}</p>
               </div>
               <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Credit USD</p>
-                <p className="font-mono">${fmtNum(Number(tx.credit_usd))}</p>
+                <p className="text-[#52525B]">Credit USDT</p>
+                <p className="font-mono">${fmtNum(Number(tx.credit_usdt))}</p>
+              </div>
+              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
+                <p className="text-[#52525B]">Debit USDC</p>
+                <p className="font-mono">${fmtNum(Number(tx.debit_usdc))}</p>
+              </div>
+              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
+                <p className="text-[#52525B]">Credit USDC</p>
+                <p className="font-mono">${fmtNum(Number(tx.credit_usdc))}</p>
               </div>
               <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
                 <p className="text-[#52525B]">Debit NGN</p>

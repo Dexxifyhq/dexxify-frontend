@@ -59,7 +59,7 @@ import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
-type Currency = "NGN" | "USD" | "USDT" | "USDC";
+type Currency = "NGN" | "USDT" | "USDC";
 type ActiveTab = "history" | "swaps";
 
 const TX_TYPE_CFG: Record<LedgerTxType, { label: string; cls: string }> = {
@@ -430,7 +430,8 @@ function DepositModal({
         walletId,
         dto: {
           type: "static_deposit_address",
-          chain: selectedAsset.chainKey as import("@/lib/types/wallet").DepositIdentityChain,
+          chain:
+            selectedAsset.chainKey as import("@/lib/types/wallet").DepositIdentityChain,
         },
       });
 
@@ -1304,9 +1305,15 @@ function HistoryTab({
       if (credit > 0) return { value: `+₦${fmt(credit)}`, positive: true };
       if (debit > 0) return { value: `-₦${fmt(debit)}`, positive: false };
       return { value: "—", positive: false };
+    } else if (currency === "USDT") {
+      const credit = Number(tx.credit_usdt);
+      const debit = Number(tx.debit_usdt);
+      if (credit > 0) return { value: `+$${fmt(credit)}`, positive: true };
+      if (debit > 0) return { value: `-$${fmt(debit)}`, positive: false };
+      return { value: "—", positive: false };
     } else {
-      const credit = Number(tx.credit_usd);
-      const debit = Number(tx.debit_usd);
+      const credit = Number(tx.credit_usdc);
+      const debit = Number(tx.debit_usdc);
       if (credit > 0) return { value: `+$${fmt(credit)}`, positive: true };
       if (debit > 0) return { value: `-$${fmt(debit)}`, positive: false };
       return { value: "—", positive: false };
@@ -1566,11 +1573,9 @@ export default function BalancePage() {
   const currencyData =
     currency === "NGN"
       ? balance?.ngn
-      : currency === "USD"
-        ? balance?.usd
-        : currency === "USDT"
-          ? balance?.usdt
-          : balance?.usdc;
+      : currency === "USDT"
+        ? balance?.usdt
+        : balance?.usdc;
   const symbol = currency === "NGN" ? "₦" : "$";
 
   // CSV export
@@ -1582,12 +1587,8 @@ export default function BalancePage() {
       "id",
       "tx_type",
       "asset",
-      "amount_usd",
-      "amount_crypto",
       "debit_ngn",
       "credit_ngn",
-      "debit_usd",
-      "credit_usd",
       "debit_usdt",
       "credit_usdt",
       "debit_usdc",
@@ -1610,12 +1611,8 @@ export default function BalancePage() {
           tx.id,
           tx.tx_type,
           tx.asset ?? "",
-          tx.amount_usd ?? "",
-          tx.amount_crypto ?? "",
           tx.debit_ngn,
           tx.credit_ngn,
-          tx.debit_usd,
-          tx.credit_usd,
           tx.debit_usdt,
           tx.credit_usdt,
           tx.debit_usdc,
@@ -1663,7 +1660,6 @@ export default function BalancePage() {
                   className="h-9 appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-3 pr-8 text-sm font-medium text-[#A1A1AA] hover:border-[#2563EB] focus:border-[#2563EB] focus:outline-none transition-colors cursor-pointer"
                 >
                   <option value="NGN">NGN</option>
-                  <option value="USD">USD</option>
                   <option value="USDT">USDT</option>
                   <option value="USDC">USDC</option>
                 </select>

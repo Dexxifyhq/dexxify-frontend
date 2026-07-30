@@ -38,8 +38,6 @@ export interface LedgerTransaction {
   credit_usdc: number;
   asset: string | null;
   status: LedgerEntryStatus;
-  amount_usd: number | null;
-  amount_crypto: number | null;
   description: string | null;
   metadata: Record<string, unknown>;
   created_at: string;
