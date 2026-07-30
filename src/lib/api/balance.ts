@@ -64,14 +64,22 @@ function mapLedgerToHistory(tx: LedgerTransaction): BalanceHistoryItem {
       ? "debit"
       : (tx.tx_type as BalanceTxType);
 
-  const amount = Number(tx.amount_usd ?? tx.credit_usd ?? tx.debit_usd ?? tx.credit_ngn ?? tx.debit_ngn) || 0;
+  const amount =
+    Number(
+      tx.credit_usdt ??
+        tx.debit_usdt ??
+        tx.credit_usdc ??
+        tx.debit_usdc ??
+        tx.credit_ngn ??
+        tx.debit_ngn,
+    ) || 0;
   return {
     id: tx.id,
     reference: tx.reference_id,
     type: uiType,
     amount,
     currency: (tx.asset ?? "USD") as CryptoCurrency,
-    status: "pending" as TxStatus,
+    status: tx.status as unknown as TxStatus,
     description: tx.description ?? "",
     created_at: tx.created_at,
   };
@@ -80,7 +88,15 @@ function mapLedgerToHistory(tx: LedgerTransaction): BalanceHistoryItem {
 function mapLedgerToSwap(tx: LedgerTransaction): SwapItem {
   const meta = (tx.metadata ?? {}) as Record<string, unknown>;
   const asset = tx.asset ?? "USDT";
-  const amount = Number(tx.amount_usd ?? tx.amount_crypto ?? tx.debit_usd ?? tx.credit_usd) || 0;
+  const amount =
+    Number(
+      tx.credit_usdt ??
+        tx.debit_usdt ??
+        tx.credit_usdc ??
+        tx.debit_usdc ??
+        tx.credit_ngn ??
+        tx.debit_ngn,
+    ) || 0;
   return {
     id: tx.id,
     from_currency: (meta.from_currency ?? asset) as CryptoCurrency,
@@ -95,7 +111,15 @@ function mapLedgerToSwap(tx: LedgerTransaction): SwapItem {
 
 function mapLedgerToPayout(tx: LedgerTransaction): PayoutItem {
   const meta = (tx.metadata ?? {}) as Record<string, unknown>;
-  const amount = Number(tx.amount_usd ?? tx.debit_usd ?? tx.debit_ngn ?? 0);
+  const amount =
+    Number(
+      tx.credit_usdt ??
+        tx.debit_usdt ??
+        tx.credit_usdc ??
+        tx.debit_usdc ??
+        tx.credit_ngn ??
+        tx.debit_ngn,
+    ) || 0;
   return {
     id: tx.id,
     reference: tx.reference_id,
@@ -112,7 +136,14 @@ function mapLedgerToPayout(tx: LedgerTransaction): PayoutItem {
 function emptyPage<T>(): PaginatedResponse<T> {
   return {
     data: [],
-    meta: { total: 0, page: 1, limit: 20, total_pages: 0, has_next: false, has_prev: false },
+    meta: {
+      total: 0,
+      page: 1,
+      limit: 20,
+      total_pages: 0,
+      has_next: false,
+      has_prev: false,
+    },
   };
 }
 
