@@ -1387,7 +1387,11 @@ function HistoryTab({
             </thead>
             <tbody>
               {txList
-                .filter((tx) => currency === tx.asset || currency === "NGN")
+                .filter(
+                  (tx) =>
+                    (currency === tx.asset && tx.currency !== "NGN") ||
+                    currency === "NGN",
+                )
                 .map((tx) => {
                   const { value: amtValue, positive } = getAmount(tx);
                   return (
