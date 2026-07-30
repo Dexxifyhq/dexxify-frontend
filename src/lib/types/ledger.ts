@@ -25,7 +25,7 @@ export interface LedgerTransaction {
   id: string;
   developer_id: string;
   tx_type: LedgerTxType;
-  wallet_address: string | null;
+  // wallet_address: string | null;
   reference_type: string;
   reference_id: string;
   debit_ngn: number;
@@ -37,6 +37,7 @@ export interface LedgerTransaction {
   debit_usdc: number;
   credit_usdc: number;
   asset: string | null;
+  currency: string | null;
   status: LedgerEntryStatus;
   description: string | null;
   metadata: Record<string, unknown>;

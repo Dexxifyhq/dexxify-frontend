@@ -305,14 +305,6 @@ function TransactionDrawer({
           <DetailRow label="Reference Type">
             <span className="text-[#A1A1AA]">{tx.reference_type}</span>
           </DetailRow>
-          {tx.wallet_address && (
-            <DetailRow label="Wallet Address">
-              <span className="break-all font-mono text-xs">
-                {tx.wallet_address}
-              </span>
-              <CopyButton value={tx.wallet_address} />
-            </DetailRow>
-          )}
           {tx.asset && (
             <DetailRow label="Asset">
               <span className="text-[#A1A1AA]">{tx.asset}</span>
@@ -412,7 +404,6 @@ export default function TransactionsPage() {
       if (!q) return true;
       return (
         tx.reference_id.toLowerCase().includes(q) ||
-        (tx.wallet_address ?? "").toLowerCase().includes(q) ||
         (tx.asset ?? "").toLowerCase().includes(q) ||
         (tx.description ?? "").toLowerCase().includes(q) ||
         tx.id.toLowerCase().includes(q)
@@ -468,7 +459,7 @@ export default function TransactionsPage() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by reference, address, asset…"
+                  placeholder="Search by reference, asset, description…"
                   className="h-9 w-72 rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
                 />
               </div>

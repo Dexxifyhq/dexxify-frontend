@@ -1386,45 +1386,47 @@ function HistoryTab({
               </tr>
             </thead>
             <tbody>
-              {txList.map((tx) => {
-                const { value: amtValue, positive } = getAmount(tx);
-                return (
-                  <tr
-                    key={tx.id}
-                    className="border-b border-[#1C1C1F] last:border-0 hover:bg-[#111113] transition-colors"
-                  >
-                    <td className="px-5 py-3.5">
-                      <TxTypeBadge type={tx.tx_type} />
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="rounded-md border border-[#1C1C1F] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
-                        {tx.asset ?? "—"}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span
-                        className={cn(
-                          "font-mono text-sm font-medium",
-                          positive ? "text-[#4ade80]" : "text-[#FAFAFA]",
-                        )}
-                      >
-                        {amtValue}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <StatusBadge status={tx.status} />
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="font-mono text-xs text-[#71717A]">
-                        {truncate(tx.reference_id)}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-3.5 text-xs text-[#52525B]">
-                      {fmtDate(tx.created_at)}
-                    </td>
-                  </tr>
-                );
-              })}
+              {txList
+                .filter((tx) => currency === tx.asset || currency === "NGN")
+                .map((tx) => {
+                  const { value: amtValue, positive } = getAmount(tx);
+                  return (
+                    <tr
+                      key={tx.id}
+                      className="border-b border-[#1C1C1F] last:border-0 hover:bg-[#111113] transition-colors"
+                    >
+                      <td className="px-5 py-3.5">
+                        <TxTypeBadge type={tx.tx_type} />
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="rounded-md border border-[#1C1C1F] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
+                          {tx.asset ?? "—"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span
+                          className={cn(
+                            "font-mono text-sm font-medium",
+                            positive ? "text-[#4ade80]" : "text-[#FAFAFA]",
+                          )}
+                        >
+                          {amtValue}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <StatusBadge status={tx.status} />
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="font-mono text-xs text-[#71717A]">
+                          {truncate(tx.reference_id)}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-3.5 text-xs text-[#52525B]">
+                        {fmtDate(tx.created_at)}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
