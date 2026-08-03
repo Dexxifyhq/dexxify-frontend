@@ -17,43 +17,43 @@ interface NetworkOption {
 
 const NETWORK_OPTIONS: NetworkOption[] = [
   {
-    value: "ERC20",
+    value: "ethereum",
     label: "ERC-20",
     chain: "Ethereum",
     placeholder: "0x...",
   },
   {
-    value: "TRC20",
+    value: "tron",
     label: "TRC-20",
     chain: "Tron",
     placeholder: "T...",
   },
   {
-    value: "SOL",
+    value: "solana",
     label: "Solana",
     chain: "Solana",
     placeholder: "Base58 address…",
   },
   {
-    value: "BSC",
+    value: "bsc",
     label: "BEP-20",
     chain: "BSC",
     placeholder: "0x...",
   },
   {
-    value: "TON",
-    label: "TON",
-    chain: "TON",
-    placeholder: "UQ... or EQ...",
+    value: "base",
+    label: "Base",
+    chain: "Base",
+    placeholder: "0x2105...",
   },
 ];
 
 const TOKENS: WithdrawalToken[] = ["USDT", "USDC"];
 
 // USDC is not supported on TON
-function tokensFor(network: WithdrawalNetwork): WithdrawalToken[] {
-  return network === "TON" ? ["USDT"] : TOKENS;
-}
+// function tokensFor(network: WithdrawalNetwork): WithdrawalToken[] {
+//   return network === "TON" ? ["USDT"] : TOKENS;
+// }
 
 // ── Modal ──────────────────────────────────────────────────────────────────
 
@@ -70,7 +70,7 @@ export default function AddAddressModal({
 }: AddAddressModalProps) {
   const addAddress = useAddWithdrawalAddress();
 
-  const [network, setNetwork] = useState<WithdrawalNetwork>("ERC20");
+  const [network, setNetwork] = useState<WithdrawalNetwork>("ethereum");
   const [token, setToken] = useState<WithdrawalToken>("USDT");
   const [address, setAddress] = useState("");
   const [label, setLabel] = useState("");
@@ -78,16 +78,16 @@ export default function AddAddressModal({
   const [error, setError] = useState<string | null>(null);
 
   const selectedNet = NETWORK_OPTIONS.find((n) => n.value === network)!;
-  const availableTokens = tokensFor(network);
+  // const availableTokens = tokensFor(network);
 
   // If the selected token is not available on the new network, reset to USDT
-  useEffect(() => {
-    if (!availableTokens.includes(token)) setToken("USDT");
-  }, [network]);
+  // useEffect(() => {
+  //   if (!availableTokens.includes(token)) setToken("USDT");
+  // }, [network]);
 
   useEffect(() => {
     if (!open) return;
-    setNetwork("ERC20");
+    setNetwork("ethereum");
     setToken("USDT");
     setAddress("");
     setLabel("");
@@ -114,7 +114,13 @@ export default function AddAddressModal({
     if (!canSubmit || addAddress.isPending) return;
     setError(null);
     addAddress.mutate(
-      { address: address.trim(), network, token, label: label.trim(), isDefault },
+      {
+        address: address.trim(),
+        network,
+        token,
+        label: label.trim(),
+        isDefault,
+      },
       {
         onSuccess: () => {
           onSuccess?.();
@@ -194,28 +200,24 @@ export default function AddAddressModal({
               </label>
               <div className="flex flex-col gap-1.5">
                 {TOKENS.map((t) => {
-                  const unavailable = !availableTokens.includes(t);
+                  // const unavailable = !availableTokens.includes(t);
                   return (
                     <button
                       key={t}
                       type="button"
-                      disabled={unavailable}
-                      onClick={() => !unavailable && setToken(t)}
+                      // disabled={unavailable}
+                      onClick={() => setToken(t)}
                       className={cn(
                         "flex items-center justify-between rounded-lg border px-3 py-2 text-left text-xs transition-colors",
-                        unavailable
-                          ? "cursor-not-allowed border-[#1C1C1F] bg-[#09090B] opacity-30"
-                          : token === t
-                            ? "border-[#2563EB]/60 bg-[#1e3a5f]/40 text-[#FAFAFA]"
-                            : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:text-[#FAFAFA]",
+                        token === t
+                          ? "border-[#2563EB]/60 bg-[#1e3a5f]/40 text-[#FAFAFA]"
+                          : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:text-[#FAFAFA]",
                       )}
                     >
                       <span className="font-semibold">{t}</span>
-                      {unavailable && (
-                        <span className="text-[10px] text-[#3F3F46]">
-                          N/A
-                        </span>
-                      )}
+                      {/* {unavailable && (
+                        <span className="text-[10px] text-[#3F3F46]">N/A</span>
+                      )} */}
                     </button>
                   );
                 })}

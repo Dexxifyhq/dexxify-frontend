@@ -18,8 +18,8 @@ export type SwapQuotationCurrency = "NGN" | "USDT" | "USDC";
 export interface SwapEstimate {
   fromCurrency: string;
   toCurrency: string;
-  amount: number;
-  estimatedAmount: number;
+  sourceAmount: number;
+  targetAmount: number;
   rate: number;
   [key: string]: unknown;
 }
@@ -28,8 +28,8 @@ export interface SwapQuotation {
   id: string;
   fromCurrency: string;
   toCurrency: string;
-  amount: number;
-  quotedAmount: number;
+  sourceAmount: number;
+  targetAmount: number;
   rate: number;
   expiresAt: string;
   status: string;
@@ -70,8 +70,7 @@ export const swapsApi = {
     ),
 
   /** GET /swaps */
-  list: (page = 1, size = 20) =>
-    get<unknown>("/swaps", { page, size }),
+  list: (page = 1, size = 20) => get<unknown>("/swaps", { page, size }),
 
   /** GET /swaps/:id */
   findOne: (id: string) => get<unknown>(`/swaps/${id}`),

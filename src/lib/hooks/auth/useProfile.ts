@@ -47,10 +47,13 @@ export function useSwitchMode() {
       qc.setQueryData(profileKeys.detail(), (old: UserProfile | undefined) =>
         old ? { ...old, mode: newMode } : old,
       );
-      // Clear all env-scoped data (transactions, payment-pages, etc.) so
-      // active queries refetch against the new mode. Profile is kept above.
-      qc.removeQueries({
-        predicate: (query) => query.queryKey[0] !== "profile",
+      // Reset all env-scoped queries: clears stale data immediately so
+      // mounted components show their loading states, then refetches.
+      // Profile and businesses are excluded — profile was updated above,
+      // and the business list/name doesn't change between modes.
+      qc.resetQueries({
+        predicate: (q) =>
+          q.queryKey[0] !== "profile" && q.queryKey[0] !== "businesses",
       });
     },
   });
