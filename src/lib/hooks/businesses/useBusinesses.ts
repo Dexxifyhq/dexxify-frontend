@@ -46,9 +46,9 @@ export function useSelectBusiness() {
       // Invalidate the business list so the switcher shows the correct active marker.
       qc.invalidateQueries({ queryKey: businessKeys.list() });
 
-      // Clear all workspace-scoped data (transactions, payment-pages, etc.)
-      // so active queries refetch against the newly selected business.
-      qc.removeQueries({
+      // Reset all workspace-scoped data: clears stale data immediately so
+      // mounted components show their loading states, then refetches.
+      qc.resetQueries({
         predicate: (q) =>
           q.queryKey[0] !== "businesses" && q.queryKey[0] !== "profile",
       });

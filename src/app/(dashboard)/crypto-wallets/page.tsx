@@ -27,7 +27,7 @@ const NETWORK_LABEL: Record<string, string> = {
   TRC20: "TRC-20 · Tron",
   SOL: "Solana",
   BSC: "BEP-20 · BSC",
-  TON: "TON",
+  BASE: "BASE",
 };
 
 const NETWORK_COLOR: Record<string, string> = {
@@ -35,7 +35,7 @@ const NETWORK_COLOR: Record<string, string> = {
   TRC20: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50",
   SOL: "bg-[#0f2618]/60 text-[#4ade80] border-[#14532D]/50",
   BSC: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
-  TON: "bg-[#0c1a30]/60 text-[#38BDF8] border-[#1e3a5f]/50",
+  BASE: "bg-[#0c1a30]/60 text-[#38BDF8] border-[#1e3a5f]/50",
 };
 
 function NetworkBadge({ network }: { network: string }) {
@@ -86,7 +86,10 @@ function AddressCard({
                 {item.label}
               </p>
               {item.primary && (
-                <Star size={11} className="shrink-0 fill-[#F59E0B] text-[#F59E0B]" />
+                <Star
+                  size={11}
+                  className="shrink-0 fill-[#F59E0B] text-[#F59E0B]"
+                />
               )}
             </div>
             <p className="mt-0.5 font-mono text-xs text-[#52525B]">
@@ -140,11 +143,11 @@ function AddressCard({
 
 const NETWORK_FILTERS = [
   { label: "All Networks", value: "all" },
-  { label: "ERC-20", value: "ERC20" },
-  { label: "TRC-20", value: "TRC20" },
-  { label: "Solana", value: "SOL" },
-  { label: "BEP-20", value: "BSC" },
-  { label: "TON", value: "TON" },
+  { label: "ERC-20", value: "ethereum" },
+  { label: "TRC-20", value: "tron" },
+  { label: "Solana", value: "solana" },
+  { label: "BEP-20", value: "bsc" },
+  { label: "BASE", value: "base" },
 ];
 
 export default function CryptoWalletsPage() {

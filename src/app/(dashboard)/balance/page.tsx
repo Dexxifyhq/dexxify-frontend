@@ -626,8 +626,8 @@ function WithdrawModal({
   // Stablecoin state
   const [scAddress, setScAddress] = useState("");
   const [scAmount, setScAmount] = useState("");
-  const [scNetwork, setScNetwork] = useState("ERC20");
-  const [scToken, setScToken] = useState("USDT");
+  const [scNetwork, setScNetwork] = useState("");
+  const [scToken, setScToken] = useState("");
   // const [scExternalId, setScExternalId] = useState(() => generateUUID());
   const [scSuccess, setScSuccess] = useState(false);
 
@@ -899,9 +899,8 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
   const [toCurrency, setToCurrency] = useState("USDC");
   const [amount, setAmount] = useState("");
   const [quotation, setQuotation] = useState<SwapQuotation | null>(null);
-  const [countdown, setCountdown] = useState(15);
+  const [countdown, setCountdown] = useState(0);
   const [timerExpired, setTimerExpired] = useState(false);
-
   const createQuotation = useCreateSwapQuotation();
   const executeSwap = useExecuteSwap();
 
@@ -918,11 +917,16 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
     amount,
   );
 
-  // Countdown timer for quotation step
+  // Countdown timer for quotation step — driven by quotation.expiresAt
   useEffect(() => {
-    if (step !== "quotation") return;
-    setCountdown(15);
-    setTimerExpired(false);
+    if (step !== "quotation" || !quotation) return;
+    const secondsLeft = Math.max(
+      0,
+      Math.round((new Date(quotation.expiresAt).getTime() - Date.now()) / 1000),
+    );
+    setCountdown(secondsLeft);
+    setTimerExpired(secondsLeft <= 0);
+    if (secondsLeft <= 0) return;
     const interval = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
@@ -934,7 +938,7 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [step]);
+  }, [step, quotation]);
 
   const handleGetQuote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -994,13 +998,13 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
           <div className="flex justify-between text-sm">
             <span className="text-[#71717A]">From</span>
             <span className="font-semibold text-[#FAFAFA]">
-              {fmt(quotation.amount)} {quotation.fromCurrency}
+              {fmt(quotation.sourceAmount)} {quotation.fromCurrency}
             </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-[#71717A]">To</span>
             <span className="font-semibold text-[#4ade80]">
-              {fmt(quotation.quotedAmount)} {quotation.toCurrency}
+              {fmt(quotation.targetAmount)} {quotation.toCurrency}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -1103,7 +1107,7 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
             <div className="flex justify-between text-xs">
               <span className="text-[#71717A]">Estimated output</span>
               <span className="font-mono font-semibold text-[#FAFAFA]">
-                {fmt(estimate.estimatedAmount)} {estimate.toCurrency}
+                {fmt(estimate.targetAmount)} {estimate.toCurrency}
                 <span className="ml-2 text-[#52525B]">@ {estimate.rate}</span>
               </span>
             </div>
@@ -1390,7 +1394,8 @@ function HistoryTab({
                 .filter(
                   (tx) =>
                     tx.currency === "NGN" ||
-                    (currency === tx.asset && tx.currency !== "NGN"),
+                    ((currency === tx.asset || currency === tx.currency) &&
+                      tx.currency !== "NGN"),
                 )
                 .map((tx) => {
                   const { value: amtValue, positive } = getAmount(tx);
@@ -1518,10 +1523,10 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
             <tbody>
               {rawList.map((swap, idx) => {
                 const s = swap as Record<string, unknown>;
-                const fromAmt = s.amount ?? s.from_amount ?? s.fromAmount;
-                const fromCur = s.fromCurrency ?? s.from_currency;
-                const toAmt = s.quotedAmount ?? s.to_amount ?? s.toAmount;
-                const toCur = s.toCurrency ?? s.to_currency;
+                const fromAmt = s.sourceAmount;
+                const fromCur = s.fromCurrency;
+                const toAmt = s.targetAmount;
+                const toCur = s.toCurrency;
                 const rate = s.rate;
                 const status = String(s.status ?? "—");
                 const createdAt = String(s.created_at ?? s.createdAt ?? "");

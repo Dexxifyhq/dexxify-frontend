@@ -128,7 +128,7 @@ export interface WalletTransactionFilters {
 
 // ── Withdrawal addresses ─────────────────────────────────────────────────────
 
-export type WithdrawalNetwork = "ERC20" | "TRC20" | "SOL" | "BSC" | "TON";
+export type WithdrawalNetwork = "ethereum" | "tron" | "solana" | "bsc" | "base";
 export type WithdrawalToken = "USDT" | "USDC";
 
 export interface WithdrawalAddress {

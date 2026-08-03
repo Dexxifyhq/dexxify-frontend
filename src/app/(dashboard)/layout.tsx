@@ -6,7 +6,6 @@ import Sidebar from "@/components/dashboard/layout/Sidebar";
 import Topbar from "@/components/dashboard/layout/Topbar";
 import { useProfile, useProfileDisplay } from "@/lib/hooks/auth/useProfile";
 import { cn } from "@/utils/utils";
-import type { Environment } from "@/lib/types/common";
 
 const SIDEBAR_KEY = "dexxify:sidebar-collapsed";
 
@@ -16,12 +15,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [environment, setEnvironment] = useState<Environment>("test");
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem(SIDEBAR_KEY) === "1";
   });
-  // Mobile drawer open state (independent of the desktop collapse rail).
   const [mobileOpen, setMobileOpen] = useState(false);
 
   function setCollapsedPersisted(value: boolean) {
@@ -34,18 +31,15 @@ export default function DashboardLayout({
   const { data: profile, isLoading, isError } = useProfile();
   const { user } = useProfileDisplay();
 
+  // Derived directly from profile — no useState + useEffect needed.
+  // When useSwitchMode calls qc.setQueryData, profile updates in the same
+  // render pass and environment is correct immediately.
+  const environment = profile?.mode === "live" ? "live" : "test";
+
   useEffect(() => {
     if (isError) router.replace("/login");
   }, [isError, router]);
 
-  // Sync environment with what the backend has stored for this session.
-  useEffect(() => {
-    if (profile?.mode)
-      setEnvironment(profile.mode === "live" ? "live" : "test");
-  }, [profile?.mode]);
-
-  // First load (and the refresh-retry window): hold the dashboard behind a
-  // spinner so child queries don't flash against a half-authed shell.
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#09090B]">
@@ -54,7 +48,6 @@ export default function DashboardLayout({
     );
   }
 
-  // Logged out — the effect above is redirecting; render nothing meanwhile.
   if (isError) return null;
 
   return (
