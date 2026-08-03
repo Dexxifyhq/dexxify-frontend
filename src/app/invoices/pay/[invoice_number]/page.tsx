@@ -16,6 +16,7 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
+import WalletQRCode from "@/components/ui/WalletQRCode";
 
 type Step = "form" | "deposit" | "error";
 
@@ -427,10 +428,15 @@ export default function InvoicePayPage() {
               )}
 
               {/* Address */}
-              <div>
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/30">
+              <div className="flex flex-col gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/30">
                   Deposit Address
                 </p>
+                {depositAddress && (
+                  <div className="flex justify-center">
+                    <WalletQRCode address={depositAddress} size={160} />
+                  </div>
+                )}
                 <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                   <span className="flex-1 break-all font-mono text-xs text-white/70">
                     {depositAddress ?? "—"}

@@ -56,6 +56,7 @@ import type { SwapQuotation } from "@/lib/api/swaps";
 import { useQuery } from "@tanstack/react-query";
 import { payApi } from "@/lib/api/pay";
 import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
+import WalletQRCode from "@/components/ui/WalletQRCode";
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
@@ -547,15 +548,18 @@ function DepositModal({
 
           {/* Filtered deposit address */}
           {matchedAddress ? (
-            <div>
+            <div className="flex flex-col gap-2">
               <Label>Deposit Address</Label>
+              <div className="flex justify-center">
+                <WalletQRCode address={matchedAddress.address} size={160} />
+              </div>
               <div className="flex items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
                 <span className="flex-1 break-all font-mono text-xs text-[#A1A1AA]">
                   {matchedAddress.address}
                 </span>
                 <CopyButton value={matchedAddress.address} />
               </div>
-              <p className="mt-1.5 text-[10px] text-[#52525B]">
+              <p className="text-[10px] text-[#52525B]">
                 Only send {selectedAsset?.symbol} on the{" "}
                 {selectedAsset?.networkDisplay} network to this address.
               </p>
@@ -1018,12 +1022,14 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
                 "font-mono font-semibold",
                 timerExpired
                   ? "text-[#f87171]"
-                  : countdown <= 5
+                  : countdown <= 30
                     ? "text-[#F59E0B]"
                     : "text-[#FAFAFA]",
               )}
             >
-              {timerExpired ? "Expired" : `${countdown}s`}
+              {timerExpired
+                ? "Expired"
+                : `${String(Math.floor(countdown / 60)).padStart(2, "0")}:${String(countdown % 60).padStart(2, "0")}`}
             </span>
           </div>
         </div>
