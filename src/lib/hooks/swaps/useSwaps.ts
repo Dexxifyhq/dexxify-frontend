@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { swapsApi } from "@/lib/api/swaps";
 import { offrampApi } from "@/lib/api/offramp";
 import type { CreateOfframpDto } from "@/lib/api/offramp";
+import { ledgerKeys } from "@/lib/hooks/ledger/useLedger";
 
 // ── Query keys ────────────────────────────────────────────────────────────────
 
@@ -65,6 +66,7 @@ export function useExecuteSwap() {
       swapsApi.executeQuotation(quotationId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: swapKeys.all });
+      qc.invalidateQueries({ queryKey: ledgerKeys.all });
     },
   });
 }
