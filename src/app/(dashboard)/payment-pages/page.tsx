@@ -104,10 +104,7 @@ function InfoRow({
     <div className="flex items-center justify-between gap-4">
       <span className="text-xs text-[#52525B]">{label}</span>
       <span
-        className={cn(
-          "truncate text-xs text-[#A1A1AA]",
-          mono && "font-mono",
-        )}
+        className={cn("truncate text-xs text-[#A1A1AA]", mono && "font-mono")}
       >
         {value}
       </span>
@@ -135,9 +132,7 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
         payload: {
           title: title.trim(),
           description: description,
-          ...(amount && Number(amount) > 0
-            ? { amount: Number(amount) }
-            : {}),
+          ...(amount && Number(amount) > 0 ? { amount: Number(amount) } : {}),
           status: status as any,
         },
       },
@@ -216,7 +211,7 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
                   className={`${drawerInputCls} flex-1`}
                 />
                 <span className="shrink-0 text-sm font-semibold text-[#52525B]">
-                  {page.currency ?? "USD"}
+                  {page.currency}
                 </span>
               </div>
             </DrawerField>
@@ -296,7 +291,7 @@ export default function PaymentPagesPage() {
 
   const [editingPage, setEditingPage] = useState<any | null>(null);
 
-  const pages: any[] = Array.isArray(data) ? data : (data as any)?.data ?? [];
+  const pages: any[] = Array.isArray(data) ? data : ((data as any)?.data ?? []);
 
   function handleToggleStatus(page: any) {
     const next = page.status === "active" ? "inactive" : "active";
@@ -353,10 +348,7 @@ export default function PaymentPagesPage() {
             {pages.map((page: any) => {
               const publicUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/p/${page.slug}`;
               return (
-                <li
-                  key={page.id}
-                  className="flex items-center gap-4 px-5 py-4"
-                >
+                <li key={page.id} className="flex items-center gap-4 px-5 py-4">
                   {/* Icon */}
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1C1C1F] bg-[#111113]">
                     <Globe size={15} className="text-[#52525B]" />
@@ -393,9 +385,7 @@ export default function PaymentPagesPage() {
                         ? "Flexible"
                         : `$${Number(page.amount).toFixed(2)}`}
                     </p>
-                    <p className="text-xs text-[#52525B]">
-                      {page.currency ?? "USD"}
-                    </p>
+                    <p className="text-xs text-[#52525B]">{page.currency}</p>
                   </div>
 
                   {/* Actions */}

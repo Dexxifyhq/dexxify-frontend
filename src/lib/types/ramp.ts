@@ -2,6 +2,7 @@ import type { TxStatus } from "./common";
 
 export type RampCryptoAsset = "BTC" | "USDT" | "ETH" | "USDC";
 
+// (Former Ramp)
 // ── Off-Ramp ───────────────────────────────────────────────────────────────
 
 export interface OfframpTransaction {

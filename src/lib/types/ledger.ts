@@ -30,8 +30,6 @@ export interface LedgerTransaction {
   reference_id: string;
   debit_ngn: number;
   credit_ngn: number;
-  debit_usd: number;
-  credit_usd: number;
   debit_usdt: number;
   credit_usdt: number;
   debit_usdc: number;
@@ -50,7 +48,6 @@ export type LedgerTransactionList = PaginatedResponse<LedgerTransaction>;
 
 export interface LedgerBalance {
   ngn: { credits: number; debits: number; balance: number };
-  usd: { credits: number; debits: number; balance: number };
   usdt: { credits: number; debits: number; balance: number };
   usdc: { credits: number; debits: number; balance: number };
   synced_at: string;
@@ -64,8 +61,6 @@ export interface SettlementReport {
     total_entries: number;
     total_debits_ngn: number;
     total_credits_ngn: number;
-    total_debits_usd: number;
-    total_credits_usd: number;
     total_debits_usdt: number;
     total_credits_usdt: number;
     total_debits_usdc: number;
@@ -76,8 +71,6 @@ export interface SettlementReport {
         count: number;
         debit_ngn: number;
         credit_ngn: number;
-        debit_usd: number;
-        credit_usd: number;
         debit_usdt: number;
         credit_usdt: number;
         debit_usdc: number;
