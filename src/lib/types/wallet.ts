@@ -1,5 +1,6 @@
 import type { CryptoCurrency, TxStatus, PaginatedResponse } from "./common";
 
+// (Former Integration)
 // ── Wallet ─────────────────────────────────────────────────────────────────
 
 export interface Wallet {
