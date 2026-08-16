@@ -1,18 +1,8 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import QueryProvider from '@/providers/QueryProvider';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+import { ttInterphases, ttInterphasesMono } from '@/fonts';
 
 export const metadata: Metadata = {
   title: 'Dexxify - Crypto Infrastructure API for Africa',
@@ -32,17 +22,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-screen antialiased bg-[#09090B] text-[#FAFAFA]">
+    <html
+      lang="en"
+      className={`${ttInterphases.variable} ${ttInterphasesMono.variable}`}
+    >
+      <body className="min-h-screen antialiased bg-background text-foreground">
         <QueryProvider>{children}</QueryProvider>
         <Toaster
-          theme="dark"
+          theme="light"
           position="top-right"
           toastOptions={{
             style: {
-              background: '#111113',
-              border: '1px solid #1C1C1F',
-              color: '#FAFAFA',
+              background: 'var(--background)',
+              border: '1px solid var(--border)',
+              color: 'var(--foreground)',
             },
           }}
         />

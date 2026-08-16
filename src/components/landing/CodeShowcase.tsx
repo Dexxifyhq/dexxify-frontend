@@ -1,6 +1,5 @@
 "use client";
-import { useLayoutEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { useState } from "react";
 
 const GATEWAY_CODE = `import Dexxify from "@dexxify/node";
 
@@ -74,26 +73,6 @@ function highlight(code: string): React.ReactNode {
 }
 
 function WebhookLog() {
-  const logRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const rows = logRef.current?.querySelectorAll(".webhook-row");
-      if (!rows) return;
-
-      gsap.set(Array.from(rows), { opacity: 0, x: -10 });
-
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 2 });
-      Array.from(rows).forEach((row, i) => {
-        tl.to(row, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, `+=${i === 0 ? 0 : 0.5}`);
-      });
-      tl.to({}, { duration: 1.5 });
-      tl.to(Array.from(rows), { opacity: 0, x: -10, stagger: 0.05, duration: 0.2 });
-      tl.set(Array.from(rows), { x: -10, opacity: 0 });
-    });
-    return () => ctx.revert();
-  }, []);
-
   return (
     <div className="bg-deeper border border-border rounded-xl overflow-hidden h-full flex flex-col">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
@@ -109,7 +88,7 @@ function WebhookLog() {
         </div>
       </div>
 
-      <div ref={logRef} className="flex-1 p-4 font-mono text-xs space-y-2.5 overflow-hidden">
+      <div className="flex-1 p-4 font-mono text-xs space-y-2.5 overflow-hidden">
         {WEBHOOK_EVENTS.map((e) => (
           <div key={e.event} className="webhook-row flex items-center gap-3">
             <div className="w-5 h-5 rounded bg-success/10 border border-success/20 flex items-center justify-center shrink-0">

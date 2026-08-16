@@ -1,14 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090B;
-  --foreground: #FAFAFA;
-  --card: #111113;
-  --deeper: #0D0D0F;
-  --border: #1C1C1F;
-  --primary: #2563EB;
-  --muted: #71717A;
-  --nav-bg: #0C0C0E;
+  /* Base — light */
+  --background: #FFFFFF;
+  --foreground: #1A2B3B;
+  --card: #F7F9FA;
+  --deeper: #F1F4F6;
+  --border: #E3E8EC;
+  --muted: #657482;
+  --nav-bg: #FFFFFF;
+
+  /* Brand — navy primary action, blue + mint accents */
+  --primary: #1A2B3B;
+  --primary-hover: #1D2A36;
+  --slate: #334352;
+  --slate-light: #687887;
+  --accent: #34BCFF;
+  --accent-mint: #31F2BF;
+  --accent-lime: #E8FC4B;
+
   --success: #22C55E;
   --error: #EF4444;
   --code-blue: #93C5FD;
@@ -16,8 +26,10 @@
   --code-comment: #52525B;
   --code-yellow: #FCD34D;
   --code-purple: #C4B5FD;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Typography — TT Interphases Pro, loaded in layout.tsx via next/font/local */
+  --font-tt-sans: var(--font-tt-interphases), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-tt-mono: var(--font-tt-interphases-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @theme inline {
@@ -27,12 +39,18 @@
   --color-deeper: var(--deeper);
   --color-border: var(--border);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-slate: var(--slate);
+  --color-slate-light: var(--slate-light);
+  --color-accent: var(--accent);
+  --color-accent-mint: var(--accent-mint);
+  --color-accent-lime: var(--accent-lime);
   --color-muted: var(--muted);
   --color-nav: var(--nav-bg);
   --color-success: var(--success);
   --color-error: var(--error);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-tt-sans);
+  --font-mono: var(--font-tt-mono);
 }
 
 html {
@@ -42,7 +60,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-tt-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -68,10 +86,10 @@ body {
 
 /* Nav scrolled state — applied via JS class toggle */
 .nav-scrolled {
-  background-color: color-mix(in srgb, var(--background) 92%, transparent);
-  border-bottom-color: var(--border) !important;
+  background-color: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgb(26 43 59 / 0.06);
 }
 
 /* Code block syntax highlighting */

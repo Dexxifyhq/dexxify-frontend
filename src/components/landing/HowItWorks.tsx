@@ -1,10 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useState } from "react";
 
 const TABS = {
   gateway: {
@@ -59,35 +55,13 @@ const TABS = {
 
 export default function HowItWorks() {
   const [activeTab, setActiveTab] = useState<"gateway" | "offramp">("gateway");
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const stepsRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const ctx = gsap.context(() => {
-      if (prefersReducedMotion) {
-        gsap.set([headRef.current, stepsRef.current], { opacity: 1, y: 0 });
-        return;
-      }
-      gsap.fromTo(headRef.current, { opacity: 0, y: 50 }, {
-        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
-      });
-      gsap.fromTo(stepsRef.current, { opacity: 0, y: 50 }, {
-        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: stepsRef.current, start: "top 80%", once: true },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
 
   const tab = TABS[activeTab];
 
   return (
-    <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
+    <section className="py-28 px-6 border-t border-[#1C1C1F]">
       <div className="max-w-5xl mx-auto">
-        <div ref={headRef} className="mb-14">
+        <div className="mb-14">
           <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">How it works</p>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
             <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] leading-tight max-w-xs">
@@ -111,7 +85,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div ref={stepsRef} className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {tab.steps.map((step, i) => (
             <div key={`${activeTab}-${step.n}`} className="relative">
               {i < tab.steps.length - 1 && (

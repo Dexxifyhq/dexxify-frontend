@@ -1,9 +1,5 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
 const PROBLEMS = [
   {
     n: "01",
@@ -33,43 +29,11 @@ const PROBLEMS = [
 ];
 
 export default function Problem() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: headingRef.current, start: "top 80%", once: true },
-        }
-      );
-
-      const cards = cardsRef.current?.querySelectorAll(".problem-card");
-      if (cards) {
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.1,
-            scrollTrigger: { trigger: cardsRef.current, start: "top 80%", once: true },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
+    <section className="py-28 px-6 border-t border-[#1C1C1F]">
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
-        <div ref={headingRef} className="max-w-2xl mb-16">
+        <div className="max-w-2xl mb-16">
           <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">
             The Problem
           </p>
@@ -84,7 +48,7 @@ export default function Problem() {
         </div>
 
         {/* Problem cards */}
-        <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {PROBLEMS.map((p) => (
             <div
               key={p.n}

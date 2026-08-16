@@ -1,15 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ShoppingCart, Monitor, Trophy, Wrench, Palette,
   BarChart2, Briefcase, Plane, Gamepad2, Wallet,
   type LucideIcon,
 } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const GATEWAY_USERS: { icon: LucideIcon; title: string; desc: string }[] = [
   { icon: ShoppingCart, title: "E-commerce stores", desc: "Accept crypto from global customers without a crypto wallet." },
@@ -28,43 +23,17 @@ const OFFRAMP_USERS: { icon: LucideIcon; title: string; desc: string }[] = [
 ];
 
 export default function WhoItsFor() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const colsRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const ctx = gsap.context(() => {
-      if (prefersReducedMotion) {
-        gsap.set([headRef.current, colsRef.current], { opacity: 1, y: 0 });
-        return;
-      }
-      gsap.fromTo(headRef.current, { opacity: 0, y: 50 }, {
-        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
-      });
-      const cards = colsRef.current?.querySelectorAll(".user-card");
-      if (cards) {
-        gsap.fromTo(cards, { opacity: 0, y: 50 }, {
-          opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.07,
-          scrollTrigger: { trigger: colsRef.current, start: "top 80%", once: true },
-        });
-      }
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
+    <section className="py-28 px-6 border-t border-[#1C1C1F]">
       <div className="max-w-5xl mx-auto">
-        <div ref={headRef} className="text-center max-w-xl mx-auto mb-16">
+        <div className="text-center max-w-xl mx-auto mb-16">
           <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">Who it&apos;s for</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] leading-tight">
             Built for every Nigerian business
           </h2>
         </div>
 
-        <div ref={colsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Payment Gateway column */}
           <div>
             <div className="flex items-center gap-2 mb-6">

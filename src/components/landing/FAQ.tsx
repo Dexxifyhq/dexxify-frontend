@@ -1,6 +1,5 @@
 "use client";
-import { useRef, useState, useCallback } from "react";
-import gsap from "gsap";
+import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 
 const FAQ_ITEMS = [
@@ -36,53 +35,24 @@ const FAQ_ITEMS = [
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const iconRef = useRef<HTMLDivElement>(null);
-
-  const toggle = useCallback(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (open) {
-      if (prefersReducedMotion) {
-        if (bodyRef.current) bodyRef.current.style.height = "0px";
-        if (bodyRef.current) bodyRef.current.style.overflow = "hidden";
-      } else {
-        gsap.to(bodyRef.current, { height: 0, duration: 0.3, ease: "power2.inOut", onComplete: () => {
-          if (bodyRef.current) bodyRef.current.style.overflow = "hidden";
-        }});
-        gsap.to(iconRef.current, { rotation: 0, duration: 0.3, ease: "power2.out" });
-      }
-    } else {
-      if (bodyRef.current) bodyRef.current.style.overflow = "visible";
-      const targetHeight = innerRef.current?.offsetHeight ?? 0;
-      if (prefersReducedMotion) {
-        if (bodyRef.current) bodyRef.current.style.height = targetHeight + "px";
-      } else {
-        gsap.from(bodyRef.current, { height: 0 });
-        gsap.to(bodyRef.current, { height: targetHeight, duration: 0.35, ease: "power2.out" });
-        gsap.to(iconRef.current, { rotation: 180, duration: 0.3, ease: "power2.out" });
-      }
-    }
-    setOpen(o => !o);
-  }, [open]);
 
   return (
     <div className="border-b border-border last:border-0">
       <button
-        onClick={toggle}
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
         className="w-full flex items-center justify-between py-5 text-left gap-4 group"
       >
         <span className="text-foreground text-base font-medium group-hover:text-white transition-colors">{q}</span>
-        <div ref={iconRef} className="w-6 h-6 rounded-full border border-border flex items-center justify-center shrink-0 group-hover:border-primary/40 transition-colors duration-200">
+        <div className="w-6 h-6 rounded-full border border-border flex items-center justify-center shrink-0 group-hover:border-primary/40 transition-colors duration-200">
           {open ? <Minus size={12} className="text-muted" /> : <Plus size={12} className="text-muted" />}
         </div>
       </button>
-      <div ref={bodyRef} style={{ height: 0, overflow: "hidden" }}>
-        <div ref={innerRef} className="pb-5">
+      {open && (
+        <div className="pb-5">
           <p className="text-muted leading-relaxed">{a}</p>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,9 @@
+# Licensed font binaries are deliberately untracked — this repo is public, and
+# both Untitled Sans and Input Mono forbid redistribution. See README.md.
+*.woff2
+*.woff
+*.ttf
+*.otf
+
+!.gitignore
+!README.md

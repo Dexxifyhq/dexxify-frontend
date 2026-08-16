@@ -1,9 +1,5 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
 const FEATURES = [
   "Wallet creation per user",
   "Send & Receive crypto",
@@ -78,43 +74,11 @@ function Cell({ val, highlight }: { val: Status; highlight?: boolean }) {
 }
 
 export default function Comparison() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const tableRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
-        }
-      );
-
-      const rows = tableRef.current?.querySelectorAll("tbody tr");
-      if (rows) {
-        gsap.fromTo(
-          rows,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.05,
-            scrollTrigger: { trigger: tableRef.current, start: "top 80%", once: true },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
+    <section className="py-28 px-6 border-t border-[#1C1C1F]">
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
-        <div ref={headRef} className="text-center max-w-xl mx-auto mb-14">
+        <div className="text-center max-w-xl mx-auto mb-14">
           <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">
             Comparison
           </p>
@@ -127,7 +91,7 @@ export default function Comparison() {
         </div>
 
         {/* Table */}
-        <div ref={tableRef} className="overflow-x-auto rounded-xl border border-[#1C1C1F]">
+        <div className="overflow-x-auto rounded-xl border border-[#1C1C1F]">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b border-[#1C1C1F]">

@@ -11,7 +11,7 @@ import Footer from "@/components/layout/Footer";
 
 export default function Home() {
   return (
-    <main className="bg-[#09090B] text-[#FAFAFA] min-h-screen">
+    <main className="bg-background text-foreground min-h-screen">
       <Navbar />
       <Hero />
       <CheckoutFlow />

@@ -1,34 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
-
 export default function Pricing() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const ctx = gsap.context(() => {
-      if (prefersReducedMotion) {
-        gsap.set(innerRef.current, { opacity: 1, y: 0 });
-        return;
-      }
-      gsap.fromTo(innerRef.current, { opacity: 0, y: 50 }, {
-        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: innerRef.current, start: "top 80%", once: true },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="py-28 px-6 border-t border-[#1C1C1F]">
+    <section className="py-28 px-6 border-t border-[#1C1C1F]">
       <div className="max-w-2xl mx-auto">
-        <div ref={innerRef} className="text-center">
+        <div className="text-center">
           <p className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-4">Pricing</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] leading-tight mb-4">
             Simple, transparent pricing
