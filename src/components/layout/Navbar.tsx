@@ -24,7 +24,7 @@ export default function Navbar() {
       ref={navRef}
       className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border transition-[background-color,box-shadow] duration-300"
     >
-      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 h-18 flex items-center justify-between">
+      <div className="max-w-[1300px] mx-auto px-6 sm:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-12">
           <span className="text-foreground font-extrabold text-xl uppercase tracking-widest">
             Dexxify
