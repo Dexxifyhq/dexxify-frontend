@@ -31,66 +31,66 @@ import { cn } from "@/utils/utils";
 const TX_TYPE_CFG: Record<LedgerTxType, { label: string; cls: string }> = {
   deposit: {
     label: "Deposit",
-    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   onramp: {
     label: "Onramp",
-    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   refund: {
     label: "Refund",
-    cls: "bg-[#052e16]/60 text-[#86efac] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   withdrawal: {
     label: "Withdrawal",
-    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+    cls: "bg-dash-error-bg text-dash-error border-dash-error-border",
   },
   offramp: {
     label: "Offramp",
-    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+    cls: "bg-dash-error-bg text-dash-error border-dash-error-border",
   },
   payout: {
     label: "Payout",
-    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+    cls: "bg-dash-orange-bg text-dash-orange border-dash-orange-border",
   },
   fee: {
     label: "Fee",
-    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+    cls: "bg-dash-warning-bg text-dash-warning border-dash-warning-border",
   },
   transfer: {
     label: "Transfer",
-    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+    cls: "bg-dash-accent-soft text-dash-accent border-dash-accent-soft",
   },
   swap: {
     label: "Swap",
-    cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50",
+    cls: "bg-dash-purple-bg text-dash-purple border-dash-purple-border",
   },
 };
 
 const STATUS_CFG: Record<LedgerEntryStatus, { label: string; cls: string }> = {
   completed: {
     label: "Completed",
-    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   pending: {
     label: "Pending",
-    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+    cls: "bg-dash-warning-bg text-dash-warning border-dash-warning-border",
   },
   initiated: {
     label: "Initiated",
-    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+    cls: "bg-dash-hover text-dash-muted border-dash-border",
   },
   processing: {
     label: "Processing",
-    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+    cls: "bg-dash-accent-soft text-dash-accent border-dash-accent-soft",
   },
   rejected: {
     label: "Rejected",
-    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+    cls: "bg-dash-error-bg text-dash-error border-dash-error-border",
   },
   reversed: {
     label: "Reversed",
-    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+    cls: "bg-dash-orange-bg text-dash-orange border-dash-orange-border",
   },
 };
 
@@ -171,7 +171,7 @@ function getMainAmount(tx: LedgerTransaction): {
 function TxTypeBadge({ type }: { type: LedgerTxType }) {
   const cfg = TX_TYPE_CFG[type] ?? {
     label: type,
-    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+    cls: "bg-dash-hover text-dash-muted border-dash-border",
   };
   return (
     <span
@@ -188,7 +188,7 @@ function TxTypeBadge({ type }: { type: LedgerTxType }) {
 function StatusBadge({ status }: { status: LedgerEntryStatus }) {
   const cfg = STATUS_CFG[status] ?? {
     label: status,
-    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+    cls: "bg-dash-hover text-dash-muted border-dash-border",
   };
   return (
     <span
@@ -216,10 +216,10 @@ function CopyButton({ value }: { value: string }) {
     <button
       type="button"
       onClick={copy}
-      className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded text-[#52525B] hover:text-[#A1A1AA] transition-colors"
+      className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded text-dash-faint hover:text-dash-muted transition-colors"
     >
       {copied ? (
-        <Check size={11} className="text-[#4ade80]" />
+        <Check size={11} className="text-dash-success" />
       ) : (
         <Copy size={11} />
       )}
@@ -237,11 +237,11 @@ function DetailRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-0.5 py-3 border-b border-[#1C1C1F] last:border-0">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+    <div className="flex flex-col gap-0.5 py-3 border-b border-dash-border last:border-0">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
         {label}
       </span>
-      <div className="text-sm text-[#FAFAFA]">{children}</div>
+      <div className="text-sm text-dash-foreground">{children}</div>
     </div>
   );
 }
@@ -260,9 +260,9 @@ function TransactionDrawer({
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-[#1C1C1F] bg-[#09090B] shadow-2xl">
+      <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-dash-border bg-dash-bg shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
           <div className="flex items-center gap-2.5">
             <TxTypeBadge type={tx.tx_type} />
             <StatusBadge status={tx.status} />
@@ -270,21 +270,21 @@ function TransactionDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Amount hero */}
-        <div className="border-b border-[#1C1C1F] px-5 py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+        <div className="border-b border-dash-border px-5 py-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
             Amount
           </p>
           <p
             className={cn(
               "mt-1 text-3xl font-bold tracking-tight",
-              positive ? "text-[#4ade80]" : "text-[#FAFAFA]",
+              positive ? "text-dash-success" : "text-dash-foreground",
             )}
           >
             {positive ? "+" : "−"}
@@ -303,52 +303,52 @@ function TransactionDrawer({
             <CopyButton value={tx.reference_id} />
           </DetailRow>
           <DetailRow label="Reference Type">
-            <span className="text-[#A1A1AA]">{tx.reference_type}</span>
+            <span className="text-dash-muted">{tx.reference_type}</span>
           </DetailRow>
           {tx.asset && (
             <DetailRow label="Asset">
-              <span className="text-[#A1A1AA]">{tx.asset}</span>
+              <span className="text-dash-muted">{tx.asset}</span>
             </DetailRow>
           )}
           <DetailRow label="Ledger (Debit / Credit)">
             <div className="mt-1 grid grid-cols-2 gap-2 text-xs">
-              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Debit USDT</p>
+              <div className="rounded-lg border border-dash-border bg-dash-card p-2">
+                <p className="text-dash-faint">Debit USDT</p>
                 <p className="font-mono">${fmtNum(Number(tx.debit_usdt))}</p>
               </div>
-              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Credit USDT</p>
+              <div className="rounded-lg border border-dash-border bg-dash-card p-2">
+                <p className="text-dash-faint">Credit USDT</p>
                 <p className="font-mono">${fmtNum(Number(tx.credit_usdt))}</p>
               </div>
-              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Debit USDC</p>
+              <div className="rounded-lg border border-dash-border bg-dash-card p-2">
+                <p className="text-dash-faint">Debit USDC</p>
                 <p className="font-mono">${fmtNum(Number(tx.debit_usdc))}</p>
               </div>
-              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Credit USDC</p>
+              <div className="rounded-lg border border-dash-border bg-dash-card p-2">
+                <p className="text-dash-faint">Credit USDC</p>
                 <p className="font-mono">${fmtNum(Number(tx.credit_usdc))}</p>
               </div>
-              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Debit NGN</p>
+              <div className="rounded-lg border border-dash-border bg-dash-card p-2">
+                <p className="text-dash-faint">Debit NGN</p>
                 <p className="font-mono">₦{fmtNum(Number(tx.debit_ngn))}</p>
               </div>
-              <div className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2">
-                <p className="text-[#52525B]">Credit NGN</p>
+              <div className="rounded-lg border border-dash-border bg-dash-card p-2">
+                <p className="text-dash-faint">Credit NGN</p>
                 <p className="font-mono">₦{fmtNum(Number(tx.credit_ngn))}</p>
               </div>
             </div>
           </DetailRow>
           {tx.description && (
             <DetailRow label="Description">
-              <span className="text-[#A1A1AA]">{tx.description}</span>
+              <span className="text-dash-muted">{tx.description}</span>
             </DetailRow>
           )}
           <DetailRow label="Date">
-            <span className="text-[#A1A1AA]">{fmtDate(tx.created_at)}</span>
+            <span className="text-dash-muted">{fmtDate(tx.created_at)}</span>
           </DetailRow>
           {tx.metadata && Object.keys(tx.metadata).length > 0 && (
             <DetailRow label="Metadata">
-              <pre className="mt-1 max-h-36 overflow-auto rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2 font-mono text-[11px] text-[#A1A1AA]">
+              <pre className="mt-1 max-h-36 overflow-auto rounded-lg border border-dash-border bg-dash-card p-2 font-mono text-[11px] text-dash-muted">
                 {JSON.stringify(tx.metadata, null, 2)}
               </pre>
             </DetailRow>
@@ -444,23 +444,23 @@ export default function TransactionsPage() {
         </div>
 
         {/* Table */}
-        <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1C1C1F] px-5 py-4">
-            <h2 className="text-sm font-semibold text-[#FAFAFA]">
+        <section className="rounded-xl border border-dash-border bg-dash-card">
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-dash-border px-5 py-4">
+            <h2 className="text-sm font-semibold text-dash-foreground">
               All Transactions
             </h2>
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
                 <Search
                   size={13}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
                 />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by reference, asset, description…"
-                  className="h-9 w-72 rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                  className="h-9 w-72 rounded-lg border border-dash-border bg-dash-card pl-9 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 />
               </div>
               <FilterSelect
@@ -480,16 +480,16 @@ export default function TransactionsPage() {
 
           {isLoading ? (
             <div className="flex items-center justify-center py-24">
-              <Loader2 size={22} className="animate-spin text-[#3F3F46]" />
+              <Loader2 size={22} className="animate-spin text-dash-faint" />
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
               <AlertCircle
                 size={24}
-                className="text-[#3F3F46]"
+                className="text-dash-faint"
                 strokeWidth={1.5}
               />
-              <p className="text-sm text-[#71717A]">
+              <p className="text-sm text-dash-muted">
                 Failed to load transactions.
               </p>
             </div>
@@ -497,10 +497,10 @@ export default function TransactionsPage() {
             <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
               <ArrowLeftRight
                 size={28}
-                className="text-[#3F3F46]"
+                className="text-dash-faint"
                 strokeWidth={1.5}
               />
-              <p className="text-sm font-semibold text-[#FAFAFA]">
+              <p className="text-sm font-semibold text-dash-foreground">
                 {search || txTypeFilter !== "all" || statusFilter !== "all"
                   ? "No transactions match your filters."
                   : "No transactions yet."}
@@ -510,7 +510,7 @@ export default function TransactionsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#1C1C1F]">
+                  <tr className="border-b border-dash-border">
                     {[
                       "Type",
                       "Asset",
@@ -522,7 +522,7 @@ export default function TransactionsPage() {
                     ].map((h) => (
                       <th
                         key={h}
-                        className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
+                        className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint"
                       >
                         {h}
                       </th>
@@ -536,13 +536,13 @@ export default function TransactionsPage() {
                       <tr
                         key={tx.id}
                         onClick={() => setSelected(tx)}
-                        className="cursor-pointer border-b border-[#1C1C1F] last:border-0 hover:bg-[#111113] transition-colors"
+                        className="cursor-pointer border-b border-dash-border last:border-0 hover:bg-dash-hover transition-colors"
                       >
                         <td className="px-5 py-3.5">
                           <TxTypeBadge type={tx.tx_type} />
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className="rounded-md border border-[#1C1C1F] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#A1A1AA]">
+                          <span className="rounded-md border border-dash-border px-2 py-0.5 font-mono text-[11px] font-semibold text-dash-muted">
                             {tx.asset ?? "—"}
                           </span>
                         </td>
@@ -550,7 +550,7 @@ export default function TransactionsPage() {
                           <span
                             className={cn(
                               "font-mono text-sm font-medium",
-                              positive ? "text-[#4ade80]" : "text-[#FAFAFA]",
+                              positive ? "text-dash-success" : "text-dash-foreground",
                             )}
                           >
                             {amtValue !== "—" ? (positive ? "+" : "−") : ""}
@@ -561,15 +561,15 @@ export default function TransactionsPage() {
                           <StatusBadge status={tx.status} />
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className="font-mono text-xs text-[#71717A]">
+                          <span className="font-mono text-xs text-dash-muted">
                             {truncate(tx.reference_id)}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-5 py-3.5 text-xs text-[#52525B]">
+                        <td className="whitespace-nowrap px-5 py-3.5 text-xs text-dash-faint">
                           {fmtDate(tx.created_at)}
                         </td>
                         <td className="px-4 py-3.5">
-                          <ChevronRight size={14} className="text-[#3F3F46]" />
+                          <ChevronRight size={14} className="text-dash-faint" />
                         </td>
                       </tr>
                     );
@@ -581,8 +581,8 @@ export default function TransactionsPage() {
 
           {/* Pagination */}
           {meta && meta.total_pages > 1 && (
-            <div className="flex items-center justify-between border-t border-[#1C1C1F] px-5 py-3">
-              <p className="text-xs text-[#52525B]">
+            <div className="flex items-center justify-between border-t border-dash-border px-5 py-3">
+              <p className="text-xs text-dash-faint">
                 Page {meta.page} of {meta.total_pages} &middot; {meta.total}{" "}
                 total
               </p>
@@ -590,14 +590,14 @@ export default function TransactionsPage() {
                 <button
                   onClick={() => setPage((p) => p - 1)}
                   disabled={!meta.has_prev || isLoading}
-                  className="flex h-8 items-center gap-1 rounded-lg border border-[#1C1C1F] px-3 text-xs font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] disabled:pointer-events-none disabled:opacity-30 transition-colors"
+                  className="flex h-8 items-center gap-1 rounded-lg border border-dash-border px-3 text-xs font-medium text-dash-muted hover:bg-dash-hover disabled:pointer-events-none disabled:opacity-30 transition-colors"
                 >
                   <ChevronLeft size={13} /> Prev
                 </button>
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={!meta.has_next || isLoading}
-                  className="flex h-8 items-center gap-1 rounded-lg border border-[#1C1C1F] px-3 text-xs font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] disabled:pointer-events-none disabled:opacity-30 transition-colors"
+                  className="flex h-8 items-center gap-1 rounded-lg border border-dash-border px-3 text-xs font-medium text-dash-muted hover:bg-dash-hover disabled:pointer-events-none disabled:opacity-30 transition-colors"
                 >
                   Next <ChevronRight size={13} />
                 </button>

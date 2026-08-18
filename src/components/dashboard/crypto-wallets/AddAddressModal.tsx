@@ -143,21 +143,21 @@ export default function AddAddressModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between px-6 pb-2 pt-5">
           <div>
-            <h2 className="text-base font-semibold text-[#FAFAFA]">
+            <h2 className="text-base font-semibold text-dash-foreground">
               Add Withdrawal Address
             </h2>
-            <p className="mt-0.5 text-xs text-[#71717A]">
+            <p className="mt-0.5 text-xs text-dash-muted">
               Save a crypto address for stablecoin payouts.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={16} />
           </button>
@@ -168,7 +168,7 @@ export default function AddAddressModal({
           <div className="grid grid-cols-2 gap-3">
             {/* Network */}
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 Network
               </label>
               <div className="flex flex-col gap-1.5">
@@ -180,12 +180,12 @@ export default function AddAddressModal({
                     className={cn(
                       "flex items-center justify-between rounded-lg border px-3 py-2 text-left text-xs transition-colors",
                       network === opt.value
-                        ? "border-[#2563EB]/60 bg-[#1e3a5f]/40 text-[#FAFAFA]"
-                        : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:text-[#FAFAFA]",
+                        ? "border-dash-accent bg-dash-accent-soft text-dash-foreground"
+                        : "border-dash-border bg-dash-card text-dash-muted hover:text-dash-foreground",
                     )}
                   >
                     <span className="font-medium">{opt.label}</span>
-                    <span className="text-[10px] text-[#52525B]">
+                    <span className="text-[10px] text-dash-faint">
                       {opt.chain}
                     </span>
                   </button>
@@ -195,7 +195,7 @@ export default function AddAddressModal({
 
             {/* Token */}
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 Token
               </label>
               <div className="flex flex-col gap-1.5">
@@ -210,13 +210,13 @@ export default function AddAddressModal({
                       className={cn(
                         "flex items-center justify-between rounded-lg border px-3 py-2 text-left text-xs transition-colors",
                         token === t
-                          ? "border-[#2563EB]/60 bg-[#1e3a5f]/40 text-[#FAFAFA]"
-                          : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:text-[#FAFAFA]",
+                          ? "border-dash-accent bg-dash-accent-soft text-dash-foreground"
+                          : "border-dash-border bg-dash-card text-dash-muted hover:text-dash-foreground",
                       )}
                     >
                       <span className="font-semibold">{t}</span>
                       {/* {unavailable && (
-                        <span className="text-[10px] text-[#3F3F46]">N/A</span>
+                        <span className="text-[10px] text-dash-faint">N/A</span>
                       )} */}
                     </button>
                   );
@@ -227,24 +227,24 @@ export default function AddAddressModal({
 
           {/* Address */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Wallet Address
             </label>
             <div className="relative">
               <Wallet
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder={selectedNet.placeholder}
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 font-mono text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 font-mono text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 required
               />
             </div>
-            <p className="mt-1.5 text-[11px] text-[#52525B]">
+            <p className="mt-1.5 text-[11px] text-dash-faint">
               Double-check this address — payouts to wrong addresses cannot be
               recovered.
             </p>
@@ -252,20 +252,20 @@ export default function AddAddressModal({
 
           {/* Label */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Label
             </label>
             <div className="relative">
               <Tag
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="text"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. Treasury USDT Wallet"
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 required
               />
             </div>
@@ -278,21 +278,21 @@ export default function AddAddressModal({
             className={cn(
               "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
               isDefault
-                ? "border-[#14532D]/40 bg-[#052e16]/40"
-                : "border-[#1C1C1F] bg-[#09090B]",
+                ? "border-dash-success-border bg-dash-success-bg"
+                : "border-dash-border bg-dash-card",
             )}
           >
             <Star
               size={14}
               className={
-                isDefault ? "fill-[#22C55E] text-[#22C55E]" : "text-[#52525B]"
+                isDefault ? "fill-dash-success text-dash-success" : "text-dash-faint"
               }
             />
             <div className="flex-1">
-              <p className="text-xs font-medium text-[#FAFAFA]">
+              <p className="text-xs font-medium text-dash-foreground">
                 Set as default
               </p>
-              <p className="text-[11px] text-[#71717A]">
+              <p className="text-[11px] text-dash-muted">
                 Auto-selected for all payouts
               </p>
             </div>
@@ -300,8 +300,8 @@ export default function AddAddressModal({
               className={cn(
                 "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
                 isDefault
-                  ? "border-[#22C55E] bg-[#22C55E]"
-                  : "border-[#3F3F46] bg-transparent",
+                  ? "border-dash-success bg-dash-success"
+                  : "border-dash-border-strong bg-transparent",
               )}
             >
               {isDefault && (
@@ -320,28 +320,28 @@ export default function AddAddressModal({
 
           {/* Error */}
           {error && (
-            <div className="flex items-start gap-2 rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/60 px-3 py-2.5">
+            <div className="flex items-start gap-2 rounded-lg border border-dash-error-border bg-dash-error-bg px-3 py-2.5">
               <AlertCircle
                 size={13}
-                className="mt-0.5 shrink-0 text-[#f87171]"
+                className="mt-0.5 shrink-0 text-dash-error"
               />
-              <p className="text-xs text-[#f87171]">{error}</p>
+              <p className="text-xs text-dash-error">{error}</p>
             </div>
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
+          <div className="flex items-center justify-end gap-2 border-t border-dash-border pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              className="h-9 rounded-lg border border-dash-border px-4 text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit || addAddress.isPending}
-              className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {addAddress.isPending && (
                 <Loader2 size={13} className="animate-spin" />

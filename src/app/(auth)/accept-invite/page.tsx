@@ -9,6 +9,7 @@ import {
   AuthField,
   AuthAlert,
   AuthButton,
+  AuthLogo,
   PasswordInput,
   PasswordStrength,
   AuthInput,
@@ -56,49 +57,55 @@ function AcceptInviteForm() {
   // ── No token ────────────────────────────────────────────────────────────
   if (!token) {
     return (
-      <AuthCard className="w-full max-w-md">
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#78350F]/40 bg-[#451A03]/40">
-            <AlertTriangle size={22} className="text-[#F59E0B]" />
+      <div className="w-full max-w-md flex flex-col items-center">
+        <AuthLogo />
+        <AuthCard className="w-full">
+          <div className="flex flex-col items-center gap-4 py-4 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dash-warning-border bg-dash-warning-bg">
+              <AlertTriangle size={22} className="text-dash-warning" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-dash-foreground">
+                Invalid invitation link
+              </p>
+              <p className="mt-1 text-sm text-dash-muted">
+                The link you followed is missing a token. Please use the
+                original link from your invitation email.
+              </p>
+            </div>
+            <a
+              href="/login"
+              className="text-sm font-medium text-dash-muted transition-colors hover:text-dash-foreground"
+            >
+              Back to login
+            </a>
           </div>
-          <div>
-            <p className="text-base font-semibold text-[#FAFAFA]">
-              Invalid invitation link
-            </p>
-            <p className="mt-1 text-sm text-[#71717A]">
-              The link you followed is missing a token. Please use the
-              original link from your invitation email.
-            </p>
-          </div>
-          <a
-            href="/login"
-            className="text-sm font-medium text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
-          >
-            Back to login
-          </a>
-        </div>
-      </AuthCard>
+        </AuthCard>
+      </div>
     );
   }
 
   // ── Success ─────────────────────────────────────────────────────────────
   if (done) {
     return (
-      <AuthCard className="w-full max-w-md">
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#14532D]/50 bg-[#052E16]/60">
-            <Check size={24} className="text-[#22C55E]" />
+      <div className="w-full max-w-md flex flex-col items-center">
+        <AuthLogo />
+        <AuthCard className="w-full">
+          <div className="flex flex-col items-center gap-4 py-4 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dash-success-border bg-dash-success-bg">
+              <Check size={24} className="text-dash-success" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-dash-foreground">
+                You&apos;re in!
+              </p>
+              <p className="mt-1 text-sm text-dash-muted">
+                Your account is ready. Redirecting to login&hellip;
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-base font-semibold text-[#FAFAFA]">
-              You&apos;re in!
-            </p>
-            <p className="mt-1 text-sm text-[#71717A]">
-              Your account is ready. Redirecting to login&hellip;
-            </p>
-          </div>
-        </div>
-      </AuthCard>
+        </AuthCard>
+      </div>
     );
   }
 
@@ -110,16 +117,18 @@ function AcceptInviteForm() {
     confirmPassword !== "";
 
   return (
-    <AuthCard className="w-full max-w-md">
+    <div className="w-full max-w-md flex flex-col items-center">
+      <AuthLogo />
+      <AuthCard className="w-full">
       {/* Header */}
       <div className="mb-7 flex flex-col items-center text-center">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0F2640]">
-          <Users size={22} className="text-[#3B82F6]" />
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-dash-accent-soft">
+          <Users size={22} className="text-dash-accent" />
         </div>
-        <h1 className="text-xl font-bold tracking-tight text-[#FAFAFA]">
+        <h1 className="text-xl font-bold tracking-tight text-dash-foreground">
           Accept Your Invitation
         </h1>
-        <p className="mt-1.5 text-sm text-[#71717A]">
+        <p className="mt-1.5 text-sm text-dash-muted">
           Set up your account to join your team workspace.
         </p>
       </div>
@@ -170,7 +179,7 @@ function AcceptInviteForm() {
             required
           />
           {mismatch && (
-            <p className="mt-1.5 text-xs text-[#EF4444]">
+            <p className="mt-1.5 text-xs text-dash-error">
               Passwords do not match.
             </p>
           )}
@@ -192,16 +201,17 @@ function AcceptInviteForm() {
         </AuthButton>
       </form>
 
-      <p className="mt-5 text-center text-xs text-[#52525B]">
+      <p className="mt-5 text-center text-xs text-dash-faint">
         Already have an account?{" "}
         <a
           href="/login"
-          className="font-medium text-[#A1A1AA] transition-colors hover:text-[#FAFAFA]"
+          className="font-medium text-dash-muted transition-colors hover:text-dash-foreground"
         >
           Log in
         </a>
       </p>
-    </AuthCard>
+      </AuthCard>
+    </div>
   );
 }
 

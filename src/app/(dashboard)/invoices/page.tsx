@@ -31,13 +31,13 @@ import { toast } from "sonner";
 // ── Config ─────────────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<InvoiceStatus, { label: string; cls: string }> = {
-  draft:     { label: "Draft",     cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50" },
-  sent:      { label: "Sent",      cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50" },
-  viewed:    { label: "Viewed",    cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50" },
-  paid:      { label: "Paid",      cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50" },
-  overdue:   { label: "Overdue",   cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50" },
-  cancelled: { label: "Cancelled", cls: "bg-[#18181B]/60 text-[#52525B] border-[#27272A]/50" },
-  void:      { label: "Void",      cls: "bg-[#18181B]/60 text-[#52525B] border-[#27272A]/50" },
+  draft:     { label: "Draft",     cls: "bg-dash-hover text-dash-muted border-dash-border" },
+  sent:      { label: "Sent",      cls: "bg-dash-accent-soft text-dash-accent border-dash-accent-soft" },
+  viewed:    { label: "Viewed",    cls: "bg-dash-purple-bg text-dash-purple border-dash-purple-border" },
+  paid:      { label: "Paid",      cls: "bg-dash-success-bg text-dash-success border-dash-success-border" },
+  overdue:   { label: "Overdue",   cls: "bg-dash-error-bg text-dash-error border-dash-error-border" },
+  cancelled: { label: "Cancelled", cls: "bg-dash-hover text-dash-faint border-dash-border" },
+  void:      { label: "Void",      cls: "bg-dash-hover text-dash-faint border-dash-border" },
 };
 
 const STATUS_OPTIONS = [
@@ -107,9 +107,9 @@ function CopyLinkButton({ url }: { url: string }) {
       type="button"
       onClick={copy}
       title="Copy payment link"
-      className="flex h-7 w-7 items-center justify-center rounded-lg text-[#52525B] hover:bg-[#1C1C1F] hover:text-[#A1A1AA] transition-colors"
+      className="flex h-7 w-7 items-center justify-center rounded-lg text-dash-faint hover:bg-dash-hover hover:text-dash-muted transition-colors"
     >
-      {copied ? <Check size={13} className="text-[#4ade80]" /> : <Link size={13} />}
+      {copied ? <Check size={13} className="text-dash-success" /> : <Link size={13} />}
     </button>
   );
 }
@@ -150,11 +150,11 @@ function InvoiceDrawer({
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-[#1C1C1F] bg-[#09090B] shadow-2xl">
+      <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-dash-border bg-dash-bg shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-sm font-semibold text-[#FAFAFA]">
+            <span className="font-mono text-sm font-semibold text-dash-foreground">
               {invoice.invoice_number}
             </span>
             <StatusBadge status={invoice.status} />
@@ -162,82 +162,82 @@ function InvoiceDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Amount hero */}
-        <div className="border-b border-[#1C1C1F] px-5 py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">Total</p>
-          <p className="mt-1 text-3xl font-bold tracking-tight text-[#FAFAFA]">
+        <div className="border-b border-dash-border px-5 py-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-dash-faint">Total</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight text-dash-foreground">
             {fmtAmount(invoice)}
           </p>
           {invoice.paid_at && (
-            <p className="mt-0.5 text-xs text-[#4ade80]">Paid on {fmtDate(invoice.paid_at)}</p>
+            <p className="mt-0.5 text-xs text-dash-success">Paid on {fmtDate(invoice.paid_at)}</p>
           )}
         </div>
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {/* Payment link */}
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] px-3 py-2.5">
-            <Copy size={12} className="shrink-0 text-[#52525B]" />
-            <span className="flex-1 truncate font-mono text-xs text-[#71717A]">{payUrl}</span>
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-dash-border bg-dash-card px-3 py-2.5">
+            <Copy size={12} className="shrink-0 text-dash-faint" />
+            <span className="flex-1 truncate font-mono text-xs text-dash-muted">{payUrl}</span>
             <CopyLinkButton url={payUrl} />
           </div>
 
           {/* Customer */}
           {invoice.customer && (
-            <div className="mb-4 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] px-4 py-3">
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">Customer</p>
-              <p className="text-sm font-medium text-[#FAFAFA]">{customerName(invoice)}</p>
+            <div className="mb-4 rounded-xl border border-dash-border bg-dash-card px-4 py-3">
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">Customer</p>
+              <p className="text-sm font-medium text-dash-foreground">{customerName(invoice)}</p>
               {invoice.customer.email && (
-                <p className="mt-0.5 text-xs text-[#71717A]">{invoice.customer.email}</p>
+                <p className="mt-0.5 text-xs text-dash-muted">{invoice.customer.email}</p>
               )}
               {invoice.customer.phone && (
-                <p className="mt-0.5 text-xs text-[#71717A]">{invoice.customer.phone}</p>
+                <p className="mt-0.5 text-xs text-dash-muted">{invoice.customer.phone}</p>
               )}
             </div>
           )}
 
           {/* Line items */}
-          <div className="mb-4 rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] px-4 py-3">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">Line Items</p>
+          <div className="mb-4 rounded-xl border border-dash-border bg-dash-card px-4 py-3">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">Line Items</p>
             <div className="flex flex-col gap-2">
               {invoice.line_items.map((item, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 text-sm">
                   <div className="min-w-0">
-                    <p className="truncate text-[#FAFAFA]">{item.description}</p>
-                    <p className="text-xs text-[#52525B]">
+                    <p className="truncate text-dash-foreground">{item.description}</p>
+                    <p className="text-xs text-dash-faint">
                       {item.quantity} × {invoice.currency} {Number(item.unit_price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
-                  <span className="shrink-0 font-mono text-sm text-[#A1A1AA]">
+                  <span className="shrink-0 font-mono text-sm text-dash-muted">
                     {Number(item.amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               ))}
             </div>
-            <div className="mt-3 border-t border-[#1C1C1F] pt-3 text-sm">
-              <div className="flex justify-between text-[#71717A]">
+            <div className="mt-3 border-t border-dash-border pt-3 text-sm">
+              <div className="flex justify-between text-dash-muted">
                 <span>Subtotal</span>
                 <span className="font-mono">{Number(invoice.subtotal).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               {Number(invoice.tax_amount) > 0 && (
-                <div className="mt-1 flex justify-between text-[#71717A]">
+                <div className="mt-1 flex justify-between text-dash-muted">
                   <span>Tax ({invoice.tax_rate}%)</span>
                   <span className="font-mono">{Number(invoice.tax_amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               )}
               {Number(invoice.discount_amount) > 0 && (
-                <div className="mt-1 flex justify-between text-[#71717A]">
+                <div className="mt-1 flex justify-between text-dash-muted">
                   <span>Discount</span>
-                  <span className="font-mono text-[#f87171]">−{Number(invoice.discount_amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="font-mono text-dash-error">−{Number(invoice.discount_amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               )}
-              <div className="mt-2 flex justify-between border-t border-[#1C1C1F] pt-2 font-semibold text-[#FAFAFA]">
+              <div className="mt-2 flex justify-between border-t border-dash-border pt-2 font-semibold text-dash-foreground">
                 <span>Total</span>
                 <span className="font-mono">{fmtAmount(invoice)}</span>
               </div>
@@ -252,32 +252,32 @@ function InvoiceDrawer({
               { label: "Currency", value: invoice.currency },
               { label: "Invoice #", value: invoice.invoice_number },
             ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2.5">
-                <p className="text-[#52525B]">{label}</p>
-                <p className="mt-0.5 font-mono text-[#A1A1AA]">{value}</p>
+              <div key={label} className="rounded-lg border border-dash-border bg-dash-card p-2.5">
+                <p className="text-dash-faint">{label}</p>
+                <p className="mt-0.5 font-mono text-dash-muted">{value}</p>
               </div>
             ))}
           </div>
 
           {invoice.notes && (
-            <div className="mt-2 rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] p-2.5 text-xs">
-              <p className="text-[#52525B]">Notes</p>
-              <p className="mt-0.5 text-[#A1A1AA]">{invoice.notes}</p>
+            <div className="mt-2 rounded-lg border border-dash-border bg-dash-card p-2.5 text-xs">
+              <p className="text-dash-faint">Notes</p>
+              <p className="mt-0.5 text-dash-muted">{invoice.notes}</p>
             </div>
           )}
         </div>
 
         {/* Actions */}
         {(canMarkPaid || canCancel) && (
-          <div className="shrink-0 border-t border-[#1C1C1F] px-5 py-4">
+          <div className="shrink-0 border-t border-dash-border px-5 py-4">
             {confirmCancel ? (
               <div className="flex gap-2">
                 <button type="button" onClick={() => setConfirmCancel(false)}
-                  className="flex-1 h-9 rounded-lg border border-[#1C1C1F] text-sm text-[#A1A1AA] hover:bg-[#1C1C1F] transition-colors">
+                  className="flex-1 h-9 rounded-lg border border-dash-border text-sm text-dash-muted hover:bg-dash-hover transition-colors">
                   Keep Invoice
                 </button>
                 <button type="button" onClick={handleCancel} disabled={cancelInvoice.isPending}
-                  className="flex flex-1 h-9 items-center justify-center gap-1.5 rounded-lg bg-[#450a0a]/60 text-sm text-[#f87171] hover:bg-[#450a0a]/90 disabled:opacity-50 transition-colors">
+                  className="flex flex-1 h-9 items-center justify-center gap-1.5 rounded-lg bg-dash-error-bg text-sm text-dash-error hover:bg-dash-error disabled:opacity-50 transition-colors">
                   {cancelInvoice.isPending ? <Loader2 size={13} className="animate-spin" /> : null}
                   {cancelInvoice.isPending ? "Cancelling…" : "Yes, Cancel"}
                 </button>
@@ -286,14 +286,14 @@ function InvoiceDrawer({
               <div className="flex gap-2">
                 {canMarkPaid && (
                   <button type="button" onClick={handleMarkPaid} disabled={markPaid.isPending}
-                    className="flex flex-1 h-9 items-center justify-center gap-1.5 rounded-lg bg-[#052e16]/60 text-sm font-medium text-[#4ade80] hover:bg-[#052e16]/90 disabled:opacity-50 transition-colors">
+                    className="flex flex-1 h-9 items-center justify-center gap-1.5 rounded-lg bg-dash-success-bg text-sm font-medium text-dash-success hover:bg-dash-success disabled:opacity-50 transition-colors">
                     {markPaid.isPending ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle2 size={14} />}
                     {markPaid.isPending ? "Updating…" : "Mark as Paid"}
                   </button>
                 )}
                 {canCancel && (
                   <button type="button" onClick={() => setConfirmCancel(true)}
-                    className="flex-1 h-9 rounded-lg border border-[#1C1C1F] text-sm text-[#71717A] hover:border-[#7f1d1d]/40 hover:text-[#f87171] transition-colors">
+                    className="flex-1 h-9 rounded-lg border border-dash-border text-sm text-dash-muted hover:border-dash-error-border hover:text-dash-error transition-colors">
                     Cancel Invoice
                   </button>
                 )}
@@ -350,7 +350,7 @@ export default function InvoicesPage() {
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
             >
               <Plus size={15} />
               Create Invoice
@@ -367,18 +367,18 @@ export default function InvoicesPage() {
         </div>
 
         {/* Table */}
-        <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1C1C1F] px-5 py-4">
-            <h2 className="text-sm font-semibold text-[#FAFAFA]">All Invoices</h2>
+        <section className="rounded-xl border border-dash-border bg-dash-card">
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-dash-border px-5 py-4">
+            <h2 className="text-sm font-semibold text-dash-foreground">All Invoices</h2>
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]" />
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by number or customer…"
-                  className="h-9 w-64 rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                  className="h-9 w-64 rounded-lg border border-dash-border bg-dash-card pl-9 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 />
               </div>
               <FilterSelect
@@ -392,24 +392,24 @@ export default function InvoicesPage() {
 
           {isLoading ? (
             <div className="flex items-center justify-center py-24">
-              <Loader2 size={22} className="animate-spin text-[#3F3F46]" />
+              <Loader2 size={22} className="animate-spin text-dash-faint" />
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
-              <AlertCircle size={24} className="text-[#3F3F46]" strokeWidth={1.5} />
-              <p className="text-sm text-[#71717A]">Failed to load invoices.</p>
+              <AlertCircle size={24} className="text-dash-faint" strokeWidth={1.5} />
+              <p className="text-sm text-dash-muted">Failed to load invoices.</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-              <FileText size={32} className="text-[#3F3F46]" strokeWidth={1.5} />
+              <FileText size={32} className="text-dash-faint" strokeWidth={1.5} />
               <div>
-                <p className="text-sm font-semibold text-[#FAFAFA]">
+                <p className="text-sm font-semibold text-dash-foreground">
                   {search || statusFilter !== "all"
                     ? "No invoices match your filters."
                     : "No invoices yet."}
                 </p>
                 {!search && statusFilter === "all" && (
-                  <p className="mt-1 text-xs text-[#71717A]">
+                  <p className="mt-1 text-xs text-dash-muted">
                     Create your first invoice to get started.
                   </p>
                 )}
@@ -418,7 +418,7 @@ export default function InvoicesPage() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(true)}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
                 >
                   <Plus size={14} /> Create Invoice
                 </button>
@@ -428,9 +428,9 @@ export default function InvoicesPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#1C1C1F]">
+                  <tr className="border-b border-dash-border">
                     {["Invoice #", "Customer", "Amount", "Status", "Due Date", "Created", ""].map((h) => (
-                      <th key={h} className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+                      <th key={h} className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                         {h}
                       </th>
                     ))}
@@ -441,39 +441,39 @@ export default function InvoicesPage() {
                     <tr
                       key={inv.id}
                       onClick={() => setSelected(inv)}
-                      className="cursor-pointer border-b border-[#1C1C1F] last:border-0 hover:bg-[#111113] transition-colors"
+                      className="cursor-pointer border-b border-dash-border last:border-0 hover:bg-dash-hover transition-colors"
                     >
                       <td className="px-5 py-3.5">
-                        <span className="font-mono text-xs font-semibold text-[#FAFAFA]">
+                        <span className="font-mono text-xs font-semibold text-dash-foreground">
                           {inv.invoice_number}
                         </span>
                       </td>
                       <td className="px-5 py-3.5">
                         <div>
-                          <p className="text-sm text-[#FAFAFA]">{customerName(inv)}</p>
+                          <p className="text-sm text-dash-foreground">{customerName(inv)}</p>
                           {inv.customer?.email && (
-                            <p className="text-xs text-[#52525B]">{inv.customer.email}</p>
+                            <p className="text-xs text-dash-faint">{inv.customer.email}</p>
                           )}
                         </div>
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="font-mono text-sm font-medium text-[#FAFAFA]">
+                        <span className="font-mono text-sm font-medium text-dash-foreground">
                           {fmtAmount(inv)}
                         </span>
                       </td>
                       <td className="px-5 py-3.5">
                         <StatusBadge status={inv.status} />
                       </td>
-                      <td className="px-5 py-3.5 text-xs text-[#52525B]">
+                      <td className="px-5 py-3.5 text-xs text-dash-faint">
                         {fmtDate(inv.due_date)}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-3.5 text-xs text-[#52525B]">
+                      <td className="whitespace-nowrap px-5 py-3.5 text-xs text-dash-faint">
                         {fmtDate(inv.created_at)}
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <CopyLinkButton url={invoicePayUrl(inv.invoice_number)} />
-                          <ChevronRight size={14} className="text-[#3F3F46]" />
+                          <ChevronRight size={14} className="text-dash-faint" />
                         </div>
                       </td>
                     </tr>

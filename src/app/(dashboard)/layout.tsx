@@ -42,8 +42,8 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#09090B]">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent" />
+      <div className="flex h-screen items-center justify-center bg-dash-bg">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-dash-accent border-t-transparent" />
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function DashboardLayout({
   if (isError) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#09090B]">
+    <div className="flex h-screen overflow-hidden bg-dash-bg">
       <Sidebar
         user={user}
         collapsed={collapsed}

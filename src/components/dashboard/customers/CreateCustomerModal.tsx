@@ -76,21 +76,21 @@ export default function CreateCustomerModal({ open, onClose, onSuccess }: Props)
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between px-6 pb-2 pt-5">
           <div>
-            <h2 className="text-base font-semibold text-[#FAFAFA]">
+            <h2 className="text-base font-semibold text-dash-foreground">
               Create Customer
             </h2>
-            <p className="mt-0.5 text-xs text-[#71717A]">
+            <p className="mt-0.5 text-xs text-dash-muted">
               At least one field is required.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={16} />
           </button>
@@ -100,38 +100,38 @@ export default function CreateCustomerModal({ open, onClose, onSuccess }: Props)
           {/* Name row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 First Name
               </label>
               <div className="relative">
                 <User
                   size={13}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
                 />
                 <input
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="John"
-                  className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                  className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 />
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 Last Name
               </label>
               <div className="relative">
                 <User
                   size={13}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
                 />
                 <input
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Doe"
-                  className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                  className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -139,62 +139,62 @@ export default function CreateCustomerModal({ open, onClose, onSuccess }: Props)
 
           {/* Email */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Email
             </label>
             <div className="relative">
               <Mail
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@example.com"
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
               />
             </div>
           </div>
 
           {/* Phone */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Phone
             </label>
             <div className="relative">
               <Phone
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+2348012345678"
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
               />
             </div>
           </div>
 
           {error && (
-            <p className="rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/60 px-3 py-2.5 text-xs text-[#f87171]">
+            <p className="rounded-lg border border-dash-error-border bg-dash-error-bg px-3 py-2.5 text-xs text-dash-error">
               {error}
             </p>
           )}
 
-          <div className="flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
+          <div className="flex items-center justify-end gap-2 border-t border-dash-border pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              className="h-9 rounded-lg border border-dash-border px-4 text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit || createCustomer.isPending}
-              className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {createCustomer.isPending && (
                 <Loader2 size={13} className="animate-spin" />

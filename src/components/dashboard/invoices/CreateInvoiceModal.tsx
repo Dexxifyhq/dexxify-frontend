@@ -19,7 +19,7 @@ interface Props {
 }
 
 const inputCls =
-  "h-9 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors";
+  "h-9 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors";
 
 function Field({
   label,
@@ -34,13 +34,13 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+      <label className="mb-1.5 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
         <span>
           {label}
-          {required && <span className="ml-0.5 text-[#EF4444]">*</span>}
+          {required && <span className="ml-0.5 text-dash-error">*</span>}
         </span>
         {hint && (
-          <span className="text-[10px] normal-case text-[#52525B]">{hint}</span>
+          <span className="text-[10px] normal-case text-dash-faint">{hint}</span>
         )}
       </label>
       {children}
@@ -193,21 +193,21 @@ export default function CreateInvoiceModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-[#1C1C1F] px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between border-b border-dash-border px-6 py-4">
           <div>
-            <h2 className="text-base font-semibold text-[#FAFAFA]">
+            <h2 className="text-base font-semibold text-dash-foreground">
               Create Invoice
             </h2>
-            <p className="mt-0.5 text-xs text-[#71717A]">
+            <p className="mt-0.5 text-xs text-dash-muted">
               A shareable payment link will be generated for your customer.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={16} />
           </button>
@@ -219,7 +219,7 @@ export default function CreateInvoiceModal({
           <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-5">
             {/* Customer */}
             <section>
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                 Customer
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -270,7 +270,7 @@ export default function CreateInvoiceModal({
 
             {/* Invoice settings */}
             <section>
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                 Invoice Settings
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -289,7 +289,7 @@ export default function CreateInvoiceModal({
                     type="datetime-local"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className={cn(inputCls, "scheme-dark")}
+                    className={cn(inputCls, "scheme-light")}
                   />
                 </Field>
               </div>
@@ -298,13 +298,13 @@ export default function CreateInvoiceModal({
             {/* Line items */}
             <section>
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                   Line Items
                 </p>
                 <button
                   type="button"
                   onClick={addItem}
-                  className="inline-flex items-center gap-1 text-[11px] font-medium text-[#2563EB] hover:text-[#60A5FA] transition-colors"
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-dash-accent hover:text-dash-accent-hover transition-colors"
                 >
                   <Plus size={12} /> Add Item
                 </button>
@@ -313,7 +313,7 @@ export default function CreateInvoiceModal({
                 {["Description", "Qty", "Unit Price", "Amount", ""].map((h) => (
                   <span
                     key={h}
-                    className="text-[10px] font-semibold uppercase tracking-wider text-[#52525B]"
+                    className="text-[10px] font-semibold uppercase tracking-wider text-dash-faint"
                   >
                     {h}
                   </span>
@@ -358,14 +358,14 @@ export default function CreateInvoiceModal({
                       className={inputCls}
                       required
                     />
-                    <div className="flex h-9 items-center rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#71717A]">
+                    <div className="flex h-9 items-center rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-muted">
                       {fmt(row.quantity * row.unit_price)}
                     </div>
                     <button
                       type="button"
                       onClick={() => removeItem(row._id)}
                       disabled={items.length === 1}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#52525B] hover:bg-[#1C1C1F] hover:text-[#f87171] disabled:pointer-events-none disabled:opacity-30 transition-colors"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-faint hover:bg-dash-hover hover:text-dash-error disabled:pointer-events-none disabled:opacity-30 transition-colors"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -376,7 +376,7 @@ export default function CreateInvoiceModal({
 
             {/* Adjustments */}
             <section>
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                 Adjustments
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -418,15 +418,15 @@ export default function CreateInvoiceModal({
             </Field>
 
             {/* Totals */}
-            <div className="rounded-xl border border-[#1C1C1F] bg-[#09090B] px-4 py-3.5 text-sm">
-              <div className="flex justify-between text-[#71717A]">
+            <div className="rounded-xl border border-dash-border bg-dash-card px-4 py-3.5 text-sm">
+              <div className="flex justify-between text-dash-muted">
                 <span>Subtotal</span>
                 <span className="font-mono">
                   {currency} {fmt(subtotal)}
                 </span>
               </div>
               {taxAmt > 0 && (
-                <div className="mt-1.5 flex justify-between text-[#71717A]">
+                <div className="mt-1.5 flex justify-between text-dash-muted">
                   <span>Tax ({taxRate}%)</span>
                   <span className="font-mono">
                     {currency} {fmt(taxAmt)}
@@ -434,14 +434,14 @@ export default function CreateInvoiceModal({
                 </div>
               )}
               {discAmt > 0 && (
-                <div className="mt-1.5 flex justify-between text-[#71717A]">
+                <div className="mt-1.5 flex justify-between text-dash-muted">
                   <span>Discount</span>
-                  <span className="font-mono text-[#f87171]">
+                  <span className="font-mono text-dash-error">
                     −{currency} {fmt(discAmt)}
                   </span>
                 </div>
               )}
-              <div className="mt-2 flex justify-between border-t border-[#1C1C1F] pt-2 font-semibold text-[#FAFAFA]">
+              <div className="mt-2 flex justify-between border-t border-dash-border pt-2 font-semibold text-dash-foreground">
                 <span>Total</span>
                 <span className="font-mono">
                   {currency} {fmt(total)}
@@ -451,29 +451,29 @@ export default function CreateInvoiceModal({
 
             {/* Error */}
             {error && (
-              <div className="flex items-start gap-2 rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/60 px-3 py-2.5">
+              <div className="flex items-start gap-2 rounded-lg border border-dash-error-border bg-dash-error-bg px-3 py-2.5">
                 <AlertCircle
                   size={13}
-                  className="mt-0.5 shrink-0 text-[#f87171]"
+                  className="mt-0.5 shrink-0 text-dash-error"
                 />
-                <p className="text-xs text-[#f87171]">{error}</p>
+                <p className="text-xs text-dash-error">{error}</p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex shrink-0 items-center justify-end gap-2 border-t border-[#1C1C1F] px-6 py-4">
+          <div className="flex shrink-0 items-center justify-end gap-2 border-t border-dash-border px-6 py-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              className="h-9 rounded-lg border border-dash-border px-4 text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit || createInvoice.isPending}
-              className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {createInvoice.isPending && (
                 <Loader2 size={13} className="animate-spin" />

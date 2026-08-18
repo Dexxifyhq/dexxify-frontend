@@ -166,14 +166,14 @@ export default function LinkBankModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between px-6 pb-2 pt-5">
           <div>
-            <h2 className="text-base font-semibold text-[#FAFAFA]">
+            <h2 className="text-base font-semibold text-dash-foreground">
               Link Bank Account
             </h2>
-            <p className="mt-0.5 text-xs text-[#71717A]">
+            <p className="mt-0.5 text-xs text-dash-muted">
               Add a verified bank account for payouts.
             </p>
           </div>
@@ -181,7 +181,7 @@ export default function LinkBankModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={16} />
           </button>
@@ -190,43 +190,43 @@ export default function LinkBankModal({
         <div className="flex flex-col gap-4 px-6 py-5">
           {/* Bank selector */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Bank Name
             </label>
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setDropdownOpen((v) => !v)}
-                className="flex h-10 w-full items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-3 pr-3 text-sm transition-colors focus:border-[#2563EB] focus:outline-none"
+                className="flex h-10 w-full items-center gap-2 rounded-lg border border-dash-border bg-dash-card pl-3 pr-3 text-sm transition-colors focus:border-dash-accent focus:outline-none"
               >
-                <Landmark size={14} className="shrink-0 text-[#52525B]" />
+                <Landmark size={14} className="shrink-0 text-dash-faint" />
                 <span
-                  className={`flex-1 text-left truncate ${selectedBank ? "text-[#FAFAFA]" : "text-[#3F3F46]"}`}
+                  className={`flex-1 text-left truncate ${selectedBank ? "text-dash-foreground" : "text-dash-faint"}`}
                 >
                   {selectedBank ? selectedBank.name : "Select your bank…"}
                 </span>
                 <ChevronDown
                   size={14}
-                  className={`shrink-0 text-[#52525B] transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                  className={`shrink-0 text-dash-faint transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute z-20 mt-1 w-full rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] shadow-xl">
-                  <div className="flex items-center gap-2 border-b border-[#1C1C1F] px-3 py-2">
-                    <Search size={13} className="shrink-0 text-[#52525B]" />
+                <div className="absolute z-20 mt-1 w-full rounded-lg border border-dash-border bg-dash-card shadow-xl">
+                  <div className="flex items-center gap-2 border-b border-dash-border px-3 py-2">
+                    <Search size={13} className="shrink-0 text-dash-faint" />
                     <input
                       autoFocus
                       type="text"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Search banks…"
-                      className="flex-1 bg-transparent text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:outline-none"
+                      className="flex-1 bg-transparent text-sm text-dash-foreground placeholder:text-dash-faint focus:outline-none"
                     />
                   </div>
                   <ul className="max-h-52 overflow-y-auto py-1">
                     {filtered.length === 0 ? (
-                      <li className="px-3 py-2 text-xs text-[#52525B]">
+                      <li className="px-3 py-2 text-xs text-dash-faint">
                         No banks found
                       </li>
                     ) : (
@@ -235,14 +235,14 @@ export default function LinkBankModal({
                           <button
                             type="button"
                             onClick={() => handleBankSelect(bank)}
-                            className={`flex w-full items-center gap-3 px-3 py-2 text-sm transition-colors hover:bg-[#1C1C1F] ${
+                            className={`flex w-full items-center gap-3 px-3 py-2 text-sm transition-colors hover:bg-dash-hover ${
                               selectedBank?.code === bank.code
-                                ? "text-[#FAFAFA]"
-                                : "text-[#A1A1AA]"
+                                ? "text-dash-foreground"
+                                : "text-dash-muted"
                             }`}
                           >
                             <span className="truncate">{bank.name}</span>
-                            <span className="ml-auto shrink-0 font-mono text-[10px] text-[#3F3F46]">
+                            <span className="ml-auto shrink-0 font-mono text-[10px] text-dash-faint">
                               {bank.code}
                             </span>
                           </button>
@@ -257,13 +257,13 @@ export default function LinkBankModal({
 
           {/* Account number */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Account Number
             </label>
             <div className="relative">
               <Hash
                 size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="text"
@@ -274,7 +274,7 @@ export default function LinkBankModal({
                 }
                 maxLength={10}
                 placeholder="0123456789"
-                className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-9 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -282,11 +282,11 @@ export default function LinkBankModal({
           {/* Verified account name */}
           {verifiedName && (
             <>
-              <div className="flex items-center gap-2 rounded-lg border border-[#166534]/40 bg-[#052e16]/60 px-3 py-2.5">
-                <CheckCircle2 size={14} className="shrink-0 text-[#4ade80]" />
+              <div className="flex items-center gap-2 rounded-lg border border-dash-success-border bg-dash-success-bg px-3 py-2.5">
+                <CheckCircle2 size={14} className="shrink-0 text-dash-success" />
                 <p className="text-xs">
-                  <span className="text-[#71717A]">Account name: </span>
-                  <span className="font-medium text-[#FAFAFA]">
+                  <span className="text-dash-muted">Account name: </span>
+                  <span className="font-medium text-dash-foreground">
                     {verifiedName}
                   </span>
                 </p>
@@ -294,21 +294,21 @@ export default function LinkBankModal({
 
               {/* Optional label */}
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Label{" "}
-                  <span className="normal-case text-[#3F3F46]">(optional)</span>
+                  <span className="normal-case text-dash-faint">(optional)</span>
                 </label>
                 <div className="relative">
                   <Tag
                     size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
                   />
                   <input
                     type="text"
                     value={label}
                     onChange={(e) => setLabel(e.target.value)}
                     placeholder="e.g. My GTBank"
-                    className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-9 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors"
+                    className="h-10 w-full rounded-lg border border-dash-border bg-dash-card pl-9 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -319,31 +319,31 @@ export default function LinkBankModal({
                 onClick={() => setIsDefault((v) => !v)}
                 className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${
                   isDefault
-                    ? "border-[#14532D]/40 bg-[#052e16]/40"
-                    : "border-[#1C1C1F] bg-[#09090B]"
+                    ? "border-dash-success-border bg-dash-success-bg"
+                    : "border-dash-border bg-dash-card"
                 }`}
               >
                 <Star
                   size={14}
                   className={
                     isDefault
-                      ? "fill-[#22C55E] text-[#22C55E]"
-                      : "text-[#52525B]"
+                      ? "fill-dash-success text-dash-success"
+                      : "text-dash-faint"
                   }
                 />
                 <div>
-                  <p className="text-xs font-medium text-[#FAFAFA]">
+                  <p className="text-xs font-medium text-dash-foreground">
                     Set as primary account
                   </p>
-                  <p className="text-[11px] text-[#71717A]">
+                  <p className="text-[11px] text-dash-muted">
                     Payouts default to this account
                   </p>
                 </div>
                 <div
                   className={`ml-auto h-4 w-4 shrink-0 rounded border transition-colors ${
                     isDefault
-                      ? "border-[#22C55E] bg-[#22C55E]"
-                      : "border-[#3F3F46] bg-transparent"
+                      ? "border-dash-success bg-dash-success"
+                      : "border-dash-border-strong bg-transparent"
                   } flex items-center justify-center`}
                 >
                   {isDefault && (
@@ -364,17 +364,17 @@ export default function LinkBankModal({
 
           {/* Error */}
           {error && (
-            <p className="rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/60 px-3 py-2.5 text-xs text-[#f87171]">
+            <p className="rounded-lg border border-dash-error-border bg-dash-error-bg px-3 py-2.5 text-xs text-dash-error">
               {error}
             </p>
           )}
 
           {/* Actions */}
-          <div className="mt-2 flex items-center justify-end gap-2 border-t border-[#1C1C1F] pt-4">
+          <div className="mt-2 flex items-center justify-end gap-2 border-t border-dash-border pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-lg border border-[#1C1C1F] bg-transparent px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+              className="h-9 rounded-lg border border-dash-border bg-transparent px-4 text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
             >
               Cancel
             </button>
@@ -384,7 +384,7 @@ export default function LinkBankModal({
                 type="button"
                 onClick={handleVerify}
                 disabled={!canVerify || isVerifying}
-                className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
               >
                 {isVerifying && <Loader2 size={13} className="animate-spin" />}
                 {isVerifying ? "Verifying…" : "Verify Account"}
@@ -394,7 +394,7 @@ export default function LinkBankModal({
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
               >
                 {isSaving && <Loader2 size={13} className="animate-spin" />}
                 {isSaving ? "Saving…" : "Confirm & Save"}

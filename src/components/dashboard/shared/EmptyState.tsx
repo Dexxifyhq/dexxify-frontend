@@ -16,11 +16,11 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className={cn("flex flex-col items-center justify-center gap-2 py-16 text-center", className)}>
-      <div className="text-[#3F3F46]">
+      <div className="text-dash-faint">
         {icon ?? <Filter size={28} strokeWidth={1.5} />}
       </div>
-      {title && <p className="text-sm font-medium text-[#71717A]">{title}</p>}
-      <p className="text-sm text-[#52525B]">{description}</p>
+      {title && <p className="text-sm font-medium text-dash-muted">{title}</p>}
+      <p className="text-sm text-dash-faint">{description}</p>
     </div>
   );
 }

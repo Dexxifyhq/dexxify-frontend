@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import { useCountdown } from "@/lib/hooks/useCountdown";
-import { AuthAlert, AuthCard, AuthField, AuthBackLink } from "@/components/ui/auth";
+import { AuthAlert, AuthCard, AuthField, AuthBackLink, AuthLogo } from "@/components/ui/auth";
 
 function VerifyEmailForm() {
   const router = useRouter();
@@ -62,18 +62,19 @@ function VerifyEmailForm() {
 
   return (
     <div className="w-full max-w-sm">
+      <AuthLogo />
       <AuthBackLink href="/register" label="Back to register" />
 
       <div className="mb-8">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center mb-4">
+        <div className="w-10 h-10 rounded-xl bg-dash-accent-soft border border-dash-accent/20 flex items-center justify-center mb-4">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M2 5l7 5 7-5M2 5h14v10H2V5z" stroke="#2563EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 5l7 5 7-5M2 5h14v10H2V5z" stroke="var(--dash-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">Check your email</h1>
-        <p className="text-sm text-[#71717A]">
+        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">Check your email</h1>
+        <p className="text-sm text-dash-muted">
           We sent a 6-digit code to{" "}
-          {email ? <span className="text-[#FAFAFA] font-medium">{email}</span> : "your email address"}
+          {email ? <span className="text-dash-foreground font-medium">{email}</span> : "your email address"}
         </p>
       </div>
 
@@ -91,27 +92,27 @@ function VerifyEmailForm() {
             placeholder="000000"
             disabled={isLoading}
             autoFocus
-            className="w-full h-12 px-4 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-lg font-mono text-center text-[#FAFAFA] placeholder:text-[#3F3F46] tracking-[0.4em] focus:outline-none focus:border-[#2563EB] disabled:opacity-50 transition-colors"
+            className="w-full h-12 px-4 bg-dash-card border border-dash-border rounded-lg text-lg font-mono text-center text-dash-foreground placeholder:text-dash-faint tracking-[0.4em] focus:outline-none focus:border-dash-accent disabled:opacity-50 transition-colors"
           />
-          <p className="text-xs text-[#71717A] mt-1">Enter the 6-digit code — it expires in 10 minutes</p>
+          <p className="text-xs text-dash-muted mt-1">Enter the 6-digit code — it expires in 10 minutes</p>
         </AuthField>
 
         <button
           type="button"
           disabled={isLoading || code.length < 6}
           onClick={() => verifyMutation.mutate(code)}
-          className="w-full h-10 flex items-center justify-center gap-2 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-full h-10 flex items-center justify-center gap-2 bg-dash-accent text-white text-sm font-medium rounded-lg hover:bg-dash-accent-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
         >
           {isLoading ? <Loader2 size={15} className="animate-spin" /> : "Verify email"}
         </button>
 
-        <div className="pt-1 border-t border-[#1C1C1F] text-center">
-          <p className="text-xs text-[#71717A] mb-2">Didn&apos;t receive a code?</p>
+        <div className="pt-1 border-t border-dash-border text-center">
+          <p className="text-xs text-dash-muted mb-2">Didn&apos;t receive a code?</p>
           <button
             type="button"
             disabled={isResending || count > 0}
             onClick={handleResend}
-            className="inline-flex items-center gap-1.5 text-sm text-[#2563EB] hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 text-sm text-dash-accent hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
           >
             {isResending ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
             {count > 0 ? `Resend in ${count}s` : "Resend code"}

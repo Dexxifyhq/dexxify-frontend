@@ -18,7 +18,7 @@ export default function TeamsPage() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
           >
             <UserPlus size={15} />
             Invite Staff
@@ -26,7 +26,7 @@ export default function TeamsPage() {
         }
       />
 
-      <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
+      <section className="rounded-xl border border-dash-border bg-dash-card">
         <EmptyState
           icon={<Users size={30} strokeWidth={1.5} />}
           title="No team members yet"

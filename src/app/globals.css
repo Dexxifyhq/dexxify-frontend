@@ -27,9 +27,51 @@
   --code-yellow: #FCD34D;
   --code-purple: #C4B5FD;
 
-  /* Typography — TT Interphases Pro, loaded in layout.tsx via next/font/local */
-  --font-tt-sans: var(--font-tt-interphases), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-tt-mono: var(--font-tt-interphases-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Dashboard (protected app) — light theme.
+     Kept distinct from the marketing tokens above: the dashboard's existing
+     blue accent (#2563EB) is a different brand blue than the marketing site's
+     cyan --accent, so this is its own token set rather than a shared one. */
+  --dash-bg: #F5F7FA;
+  --dash-card: #FFFFFF;
+  --dash-border: #E5E7EB;
+  --dash-border-strong: #D1D5DB;
+  --dash-foreground: #111827;
+  --dash-muted: #6B7280;
+  --dash-faint: #9CA3AF;
+  --dash-hover: #F3F4F6;
+  --dash-accent: #2563EB;
+  --dash-accent-hover: #1D4ED8;
+  --dash-accent-soft: #EFF6FF;
+  --dash-success: #16A34A;
+  --dash-success-bg: #ECFDF5;
+  --dash-success-border: #BBF7D0;
+  --dash-error: #DC2626;
+  --dash-error-bg: #FEF2F2;
+  --dash-error-border: #FECACA;
+  --dash-warning: #D97706;
+  --dash-warning-bg: #FFFBEB;
+  --dash-warning-border: #FDE68A;
+  --dash-purple: #9333EA;
+  --dash-purple-bg: #F5F3FF;
+  --dash-purple-border: #DDD6FE;
+  --dash-orange: #EA580C;
+  --dash-orange-bg: #FFF7ED;
+  --dash-orange-border: #FED7AA;
+
+  /* Categorical chart palette — 6 series, shared across dashboard charts */
+  --chart-1: #2563EB;
+  --chart-2: #10B981;
+  --chart-3: #F59E0B;
+  --chart-4: #A855F7;
+  --chart-5: #EC4899;
+  --chart-6: #06B6D4;
+
+  /* Typography — TT Interphases Pro, loaded in layout.tsx via next/font/local.
+     Font loading is currently commented out in src/fonts/index.ts (no licensed
+     binary available), so these fall back to the system stack via the var()
+     default until it's restored. */
+  --font-tt-sans: var(--font-tt-interphases, ui-sans-serif), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-tt-mono: var(--font-tt-interphases-mono, ui-monospace), SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @theme inline {
@@ -51,6 +93,40 @@
   --color-error: var(--error);
   --font-sans: var(--font-tt-sans);
   --font-mono: var(--font-tt-mono);
+
+  --color-dash-bg: var(--dash-bg);
+  --color-dash-card: var(--dash-card);
+  --color-dash-border: var(--dash-border);
+  --color-dash-border-strong: var(--dash-border-strong);
+  --color-dash-foreground: var(--dash-foreground);
+  --color-dash-muted: var(--dash-muted);
+  --color-dash-faint: var(--dash-faint);
+  --color-dash-hover: var(--dash-hover);
+  --color-dash-accent: var(--dash-accent);
+  --color-dash-accent-hover: var(--dash-accent-hover);
+  --color-dash-accent-soft: var(--dash-accent-soft);
+  --color-dash-success: var(--dash-success);
+  --color-dash-success-bg: var(--dash-success-bg);
+  --color-dash-success-border: var(--dash-success-border);
+  --color-dash-error: var(--dash-error);
+  --color-dash-error-bg: var(--dash-error-bg);
+  --color-dash-error-border: var(--dash-error-border);
+  --color-dash-warning: var(--dash-warning);
+  --color-dash-warning-bg: var(--dash-warning-bg);
+  --color-dash-warning-border: var(--dash-warning-border);
+  --color-dash-purple: var(--dash-purple);
+  --color-dash-purple-bg: var(--dash-purple-bg);
+  --color-dash-purple-border: var(--dash-purple-border);
+  --color-dash-orange: var(--dash-orange);
+  --color-dash-orange-bg: var(--dash-orange-bg);
+  --color-dash-orange-border: var(--dash-orange-border);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
 }
 
 html {

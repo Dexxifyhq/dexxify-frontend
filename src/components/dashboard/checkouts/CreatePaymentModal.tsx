@@ -26,7 +26,7 @@ const CURRENCIES = [
 ];
 
 const inputCls =
-  "h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2a2a30] focus:outline-none transition-colors";
+  "h-10 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors";
 
 function Field({
   label,
@@ -37,7 +37,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-[#71717A]">{label}</label>
+      <label className="text-xs font-medium text-dash-muted">{label}</label>
       {children}
     </div>
   );
@@ -132,23 +132,23 @@ export default function CreatePaymentModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {!payLink ? (
           <>
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-[#1C1C1F] px-5 py-4">
+            <div className="flex items-start justify-between border-b border-dash-border px-5 py-4">
               <div>
-                <h2 className="text-sm font-semibold text-[#FAFAFA]">
+                <h2 className="text-sm font-semibold text-dash-foreground">
                   Create Payment Session
                 </h2>
-                <p className="mt-0.5 text-xs text-[#71717A]">
+                <p className="mt-0.5 text-xs text-dash-muted">
                   Customer will choose their crypto token to pay with.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-[#52525B] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-dash-faint hover:bg-dash-hover hover:text-dash-foreground transition-colors"
               >
                 <X size={14} />
               </button>
@@ -158,11 +158,11 @@ export default function CreatePaymentModal({
               {/* Amount + currency */}
               <div className="px-5 pt-5 pb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-medium text-[#71717A]">
+                  <label className="text-xs font-medium text-dash-muted">
                     Amount
                   </label>
                   {/* Currency toggle */}
-                  <div className="flex items-center gap-0.5 rounded-lg border border-[#1C1C1F] bg-[#111113] p-0.5">
+                  <div className="flex items-center gap-0.5 rounded-lg border border-dash-border bg-dash-hover p-0.5">
                     {CURRENCIES.map((c) => (
                       <button
                         key={c.value}
@@ -171,8 +171,8 @@ export default function CreatePaymentModal({
                         className={cn(
                           "h-6 rounded-md px-2.5 text-xs font-semibold transition-colors",
                           currency === c.value
-                            ? "bg-[#FAFAFA] text-[#09090B]"
-                            : "text-[#71717A] hover:text-[#A1A1AA]",
+                            ? "bg-dash-accent text-white"
+                            : "text-dash-muted hover:text-dash-foreground",
                         )}
                       >
                         {c.label}
@@ -180,8 +180,8 @@ export default function CreatePaymentModal({
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 rounded-xl border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
-                  <span className="shrink-0 text-2xl font-light text-[#3F3F46]">
+                <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-card px-4 py-3">
+                  <span className="shrink-0 text-2xl font-light text-dash-faint">
                     {currencySymbol}
                   </span>
                   <input
@@ -192,7 +192,7 @@ export default function CreatePaymentModal({
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="min-w-0 flex-1 bg-transparent text-3xl font-semibold text-[#FAFAFA] placeholder:text-[#2a2a30] focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-3xl font-semibold text-dash-foreground placeholder:text-dash-faint focus:outline-none"
                     required
                   />
                 </div>
@@ -200,13 +200,13 @@ export default function CreatePaymentModal({
 
               {/* Divider with label */}
               <div className="flex items-center gap-3 px-5 pb-4">
-                <div className="h-px flex-1 bg-[#1C1C1F]" />
-                <span className="flex items-center gap-1.5 text-[11px] font-medium text-[#3F3F46]">
+                <div className="h-px flex-1 bg-dash-border" />
+                <span className="flex items-center gap-1.5 text-[11px] font-medium text-dash-faint">
                   <User size={11} />
                   Customer Info
-                  <span className="text-[#2a2a30]">(optional)</span>
+                  <span className="text-dash-faint">(optional)</span>
                 </span>
-                <div className="h-px flex-1 bg-[#1C1C1F]" />
+                <div className="h-px flex-1 bg-dash-border" />
               </div>
 
               {/* Customer fields */}
@@ -236,7 +236,7 @@ export default function CreatePaymentModal({
                   <div className="relative">
                     <Mail
                       size={13}
-                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#3F3F46]"
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
                     />
                     <input
                       type="email"
@@ -251,25 +251,25 @@ export default function CreatePaymentModal({
 
               {/* Error */}
               {createSession.isError && (
-                <p className="mx-5 mb-4 rounded-lg border border-red-900/40 bg-red-950/30 px-3 py-2 text-xs text-red-400">
+                <p className="mx-5 mb-4 rounded-lg border border-dash-error-border bg-dash-error-bg px-3 py-2 text-xs text-dash-error">
                   {(createSession.error as any)?.message ??
                     "Something went wrong."}
                 </p>
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-2 border-t border-[#1C1C1F] px-5 py-4">
+              <div className="flex items-center justify-end gap-2 border-t border-dash-border px-5 py-4">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-9 rounded-lg px-4 text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+                  className="h-9 rounded-lg px-4 text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className="flex h-9 items-center gap-2 rounded-lg bg-[#FAFAFA] px-5 text-sm font-semibold text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                  className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-semibold text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
                 >
                   {createSession.isPending ? (
                     <>
@@ -287,31 +287,31 @@ export default function CreatePaymentModal({
           /* ── Success state ── */
           <div className="flex flex-col gap-5 px-6 py-6">
             <div className="flex flex-col items-center gap-2 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#14532D]/50 bg-[#052E16]/60">
-                <Check size={22} className="text-[#22C55E]" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dash-success-border bg-dash-success-bg">
+                <Check size={22} className="text-dash-success" />
               </div>
-              <h2 className="text-base font-semibold text-[#FAFAFA]">
+              <h2 className="text-base font-semibold text-dash-foreground">
                 Session Created
               </h2>
-              <p className="max-w-xs text-xs text-[#71717A]">
+              <p className="max-w-xs text-xs text-dash-muted">
                 Share this link with your customer — they&apos;ll choose their
                 token and complete payment.
               </p>
             </div>
 
             {/* Link box */}
-            <div className="flex items-center gap-2 rounded-xl border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
-              <span className="flex-1 truncate font-mono text-xs text-[#A1A1AA]">
+            <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-card px-3 py-2.5">
+              <span className="flex-1 truncate font-mono text-xs text-dash-muted">
                 {payLink}
               </span>
               <button
                 type="button"
                 onClick={handleCopy}
-                className="shrink-0 text-[#52525B] hover:text-[#FAFAFA] transition-colors"
+                className="shrink-0 text-dash-faint hover:text-dash-foreground transition-colors"
                 aria-label="Copy link"
               >
                 {copied ? (
-                  <Check size={14} className="text-[#22C55E]" />
+                  <Check size={14} className="text-dash-success" />
                 ) : (
                   <Copy size={14} />
                 )}
@@ -322,7 +322,7 @@ export default function CreatePaymentModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 h-9 rounded-lg border border-[#1C1C1F] text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+                className="flex-1 h-9 rounded-lg border border-dash-border text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
               >
                 Done
               </button>
@@ -330,7 +330,7 @@ export default function CreatePaymentModal({
                 href={payLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+                className="flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
               >
                 <ExternalLink size={13} />
                 Preview

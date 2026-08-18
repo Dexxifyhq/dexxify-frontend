@@ -11,11 +11,18 @@ import {
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import StatCard from "@/components/dashboard/shared/StatCard";
-import RevenueChart from "@/components/dashboard/overview/RevenueChart";
 import AssetDistribution from "@/components/dashboard/overview/AssetDistribution";
 import RecentActivity from "@/components/dashboard/overview/RecentActivity";
+import BalanceCarousel from "@/components/dashboard/overview/BalanceCarousel";
+import FanGauge from "@/components/dashboard/charts/FanGauge";
+import AreaLineChart from "@/components/dashboard/charts/AreaLineChart";
+import ActivityHeatmap from "@/components/dashboard/charts/ActivityHeatmap";
+import GroupedBarChart from "@/components/dashboard/charts/GroupedBarChart";
+import DonutChart from "@/components/dashboard/charts/DonutChart";
+import StackedBarChart from "@/components/dashboard/charts/StackedBarChart";
 import {
   useDashboardStats,
+  useDashboardOverview,
   useRevenueChart,
   useAssetDistribution,
   useRecentActivity,
@@ -49,7 +56,7 @@ function SelectButton({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 appearance-none rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] pl-3 pr-8 text-sm font-medium text-[#A1A1AA] hover:border-[#2563EB] focus:border-[#2563EB] focus:outline-none transition-colors cursor-pointer"
+        className="h-9 appearance-none rounded-lg border border-dash-border bg-dash-card pl-3 pr-8 text-sm font-medium text-dash-muted hover:border-dash-accent focus:border-dash-accent focus:outline-none transition-colors cursor-pointer"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -59,7 +66,7 @@ function SelectButton({
       </select>
       <ChevronDown
         size={13}
-        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#52525B]"
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-dash-faint"
       />
     </div>
   );
@@ -70,12 +77,18 @@ function SelectButton({
 export default function DashboardPage() {
   const [range, setRange] = useState<DateRange>("30d");
   const [currency, setCurrency] = useState<FiatCurrency>("NGN");
+  const [stackedRange, setStackedRange] = useState<DateRange>("30d");
 
   const params = { range, currency };
 
   const { data: stats, isLoading: statsLoading } = useDashboardStats(params);
+  const { data: overview, isLoading: overviewLoading } = useDashboardOverview();
   const { data: revenueChart, isLoading: chartLoading } =
     useRevenueChart(params);
+  const { data: stackedChart, isLoading: stackedLoading } = useRevenueChart({
+    range: stackedRange,
+    currency,
+  });
   const { data: assetDist, isLoading: assetLoading } = useAssetDistribution();
   const { data: activity, isLoading: activityLoading } = useRecentActivity(10);
 
@@ -83,6 +96,23 @@ export default function DashboardPage() {
 
   const fmtNgn = (v: number) =>
     `₦${v.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const sessionSegments = overview
+    ? [
+        { label: "Completed", value: overview.payment_sessions.completed?.count ?? 0, color: "var(--dash-success)" },
+        { label: "Pending", value: overview.payment_sessions.pending?.count ?? 0, color: "var(--dash-warning)" },
+        { label: "Expired", value: overview.payment_sessions.expired?.count ?? 0, color: "var(--dash-faint)" },
+        { label: "Failed", value: overview.payment_sessions.failed?.count ?? 0, color: "var(--dash-error)" },
+      ]
+    : undefined;
+
+  const invoiceSlices = overview
+    ? [
+        { label: "Paid", value: overview.invoices.paid?.count ?? 0, color: "var(--dash-success)" },
+        { label: "Pending", value: overview.invoices.pending?.count ?? 0, color: "var(--dash-warning)" },
+        { label: "Overdue", value: overview.invoices.overdue?.count ?? 0, color: "var(--dash-error)" },
+      ]
+    : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -101,7 +131,7 @@ export default function DashboardPage() {
               options={CURRENCIES.map((c) => ({ label: c, value: c }))}
               onChange={(v) => setCurrency(v as FiatCurrency)}
             />
-            <button className="flex h-9 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] px-3 text-sm text-[#A1A1AA] hover:border-[#2563EB] hover:text-[#FAFAFA] transition-colors">
+            <button className="flex h-9 items-center gap-2 rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-muted hover:border-dash-accent hover:text-dash-foreground transition-colors">
               <SlidersHorizontal size={13} />
               Filters
             </button>
@@ -149,17 +179,76 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Revenue chart + Asset distribution */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
-        <RevenueChart data={revenueChart || undefined} loading={chartLoading} />
-        <AssetDistribution
-          data={assetDist || undefined}
-          loading={assetLoading}
+      {/* Session breakdown + revenue trend */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <FanGauge
+          title="Payment Sessions"
+          description="Breakdown by status"
+          segments={sessionSegments}
+          total={overview?.payment_sessions.total}
+          totalLabel="Sessions"
+          loading={overviewLoading}
+        />
+        <div className="lg:col-span-2">
+          <AreaLineChart
+            title="Revenue Trend"
+            description="Daily revenue over the selected period"
+            data={revenueChart?.data}
+            loading={chartLoading}
+          />
+        </div>
+      </div>
+
+      {/* NGN vs stablecoin + invoice status */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <GroupedBarChart
+            title="NGN vs Stablecoin"
+            description="Revenue split by settlement currency"
+            data={revenueChart?.data}
+            loading={chartLoading}
+          />
+        </div>
+        <DonutChart
+          title="Invoices"
+          description="Breakdown by status"
+          slices={invoiceSlices}
+          total={overview?.invoices.total}
+          centerLabel="Invoices"
+          loading={overviewLoading}
         />
       </div>
 
-      {/* Recent activity */}
-      <RecentActivity items={activity || undefined} loading={activityLoading} />
+      {/* Asset mix + activity heatmap */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <AssetDistribution data={assetDist || undefined} loading={assetLoading} />
+        <div className="lg:col-span-2">
+          <ActivityHeatmap
+            title="Transaction Activity"
+            description="Daily transaction volume"
+            data={revenueChart?.data}
+            loading={chartLoading}
+          />
+        </div>
+      </div>
+
+      {/* Revenue by currency + balances/activity */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <StackedBarChart
+            title="Revenue by Currency"
+            description="Daily revenue split across settlement currencies"
+            data={stackedChart?.data}
+            loading={stackedLoading}
+            range={stackedRange}
+            onRangeChange={setStackedRange}
+          />
+        </div>
+        <div className="flex flex-col gap-4">
+          <BalanceCarousel balances={overview?.balances} loading={overviewLoading} />
+          <RecentActivity items={activity || undefined} loading={activityLoading} />
+        </div>
+      </div>
     </div>
   );
 }

@@ -20,15 +20,15 @@ import { useIndividualKycStatus } from "@/lib/hooks/kyc/useKyc";
 
 function PendingActionsPanel({ onClose: _onClose }: { onClose: () => void }) {
   return (
-    <div className="absolute right-2 top-12 z-50 w-72 max-w-[calc(100vw-1rem)] rounded-xl border border-[#1C1C1F] bg-[#111113] p-4 shadow-xl sm:right-16">
+    <div className="absolute right-2 top-12 z-50 w-72 max-w-[calc(100vw-1rem)] rounded-xl border border-dash-border bg-dash-card p-4 shadow-xl sm:right-16">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="text-sm font-medium text-[#FAFAFA]">Pending Actions</p>
-          <p className="text-xs text-[#71717A]">No pending actions</p>
+          <p className="text-sm font-medium text-dash-foreground">Pending Actions</p>
+          <p className="text-xs text-dash-muted">No pending actions</p>
         </div>
       </div>
       <div className="flex items-center justify-center py-4">
-        <p className="text-xs text-[#52525B]">You&apos;re all caught up</p>
+        <p className="text-xs text-dash-faint">You&apos;re all caught up</p>
       </div>
     </div>
   );
@@ -72,14 +72,14 @@ export default function Topbar({
         <div className="fixed inset-0 z-40" onClick={closeAll} />
       )}
 
-      <header className="sticky top-0 z-30 flex h-18 items-center justify-between border-b border-[#1C1C1F] bg-[#09090B]/95 backdrop-blur-sm px-4 sm:px-6">
+      <header className="sticky top-0 z-30 flex h-18 items-center justify-between border-b border-dash-border bg-dash-card/95 backdrop-blur-sm px-4 sm:px-6">
         {/* Left: sidebar toggle + verification banner */}
         <div className="flex items-center gap-3">
           {/* Mobile: open drawer */}
           <button
             onClick={onOpenMobile}
             aria-label="Open menu"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors lg:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors lg:hidden"
           >
             <Menu size={18} />
           </button>
@@ -87,22 +87,22 @@ export default function Topbar({
           <button
             onClick={onToggleSidebar}
             aria-label="Toggle sidebar"
-            className="hidden h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors lg:flex"
+            className="hidden h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors lg:flex"
           >
             <PanelLeft size={16} />
           </button>
           {showBanner && (
-            <div className="hidden items-center gap-2 rounded-lg border border-[#78350F]/40 bg-[#78350F]/10 px-3 py-1.5 md:flex">
-              <AlertTriangle size={13} className="shrink-0 text-[#F59E0B]" />
+            <div className="hidden items-center gap-2 rounded-lg border border-dash-warning-border bg-dash-warning-bg px-3 py-1.5 md:flex">
+              <AlertTriangle size={13} className="shrink-0 text-dash-warning" />
               <Link
                 href="/settings"
-                className="text-xs font-medium text-[#F59E0B] transition-colors hover:text-[#FCD34D]"
+                className="text-xs font-medium text-dash-warning transition-colors hover:opacity-80"
               >
                 Complete verification
               </Link>
               <button
                 onClick={() => setBannerDismissed(true)}
-                className="ml-1 text-[#F59E0B]/60 transition-colors hover:text-[#F59E0B]"
+                className="ml-1 text-dash-warning/60 transition-colors hover:text-dash-warning"
               >
                 <X size={12} />
               </button>
@@ -115,7 +115,7 @@ export default function Topbar({
           {/* Notification bell */}
           <button
             onClick={() => setShowNotifications((v) => !v)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:text-dash-foreground hover:bg-dash-hover transition-colors"
           >
             <Bell size={15} />
           </button>
@@ -127,8 +127,8 @@ export default function Topbar({
             className={cn(
               "hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs cursor-pointer font-semibold transition-colors border disabled:opacity-60 disabled:cursor-not-allowed lg:flex",
               isLive
-                ? "bg-[#052E16]/60 border-[#14532D]/50 text-[#22C55E]"
-                : "bg-[#451A03]/60 border-[#78350F]/50 text-[#F59E0B]",
+                ? "bg-dash-success-bg border-dash-success-border text-dash-success"
+                : "bg-dash-warning-bg border-dash-warning-border text-dash-warning",
             )}
           >
             {switchMode.isPending ? (
@@ -137,7 +137,7 @@ export default function Topbar({
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full",
-                  isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
+                  isLive ? "bg-dash-success" : "bg-dash-warning",
                 )}
               />
             )}
@@ -145,7 +145,7 @@ export default function Topbar({
           </button>
 
           {/* Sparkle / what's new */}
-          <button className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors">
+          <button className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:text-dash-foreground hover:bg-dash-hover transition-colors">
             <Sparkles size={15} />
           </button>
 

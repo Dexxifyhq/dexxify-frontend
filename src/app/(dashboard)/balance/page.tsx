@@ -66,66 +66,66 @@ type ActiveTab = "history" | "swaps";
 const TX_TYPE_CFG: Record<LedgerTxType, { label: string; cls: string }> = {
   deposit: {
     label: "Deposit",
-    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   onramp: {
     label: "Onramp",
-    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   refund: {
     label: "Refund",
-    cls: "bg-[#052e16]/60 text-[#86efac] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   withdrawal: {
     label: "Withdrawal",
-    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+    cls: "bg-dash-error-bg text-dash-error border-dash-error-border",
   },
   offramp: {
     label: "Offramp",
-    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+    cls: "bg-dash-error-bg text-dash-error border-dash-error-border",
   },
   payout: {
     label: "Payout",
-    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+    cls: "bg-dash-orange-bg text-dash-orange border-dash-orange-border",
   },
   fee: {
     label: "Fee",
-    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+    cls: "bg-dash-warning-bg text-dash-warning border-dash-warning-border",
   },
   transfer: {
     label: "Transfer",
-    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+    cls: "bg-dash-accent-soft text-dash-accent border-dash-accent-soft",
   },
   swap: {
     label: "Swap",
-    cls: "bg-[#1a0a2e]/60 text-[#a855f7] border-[#3b0764]/50",
+    cls: "bg-dash-purple-bg text-dash-purple border-dash-purple-border",
   },
 };
 
 const STATUS_CFG: Record<LedgerEntryStatus, { label: string; cls: string }> = {
   completed: {
     label: "Completed",
-    cls: "bg-[#052e16]/60 text-[#4ade80] border-[#14532D]/50",
+    cls: "bg-dash-success-bg text-dash-success border-dash-success-border",
   },
   pending: {
     label: "Pending",
-    cls: "bg-[#2d1a00]/60 text-[#F59E0B] border-[#78350F]/50",
+    cls: "bg-dash-warning-bg text-dash-warning border-dash-warning-border",
   },
   initiated: {
     label: "Initiated",
-    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+    cls: "bg-dash-hover text-dash-muted border-dash-border",
   },
   processing: {
     label: "Processing",
-    cls: "bg-[#1e3a5f]/60 text-[#60A5FA] border-[#1d3461]/50",
+    cls: "bg-dash-accent-soft text-dash-accent border-dash-accent-soft",
   },
   rejected: {
     label: "Rejected",
-    cls: "bg-[#450a0a]/60 text-[#f87171] border-[#7f1d1d]/50",
+    cls: "bg-dash-error-bg text-dash-error border-dash-error-border",
   },
   reversed: {
     label: "Reversed",
-    cls: "bg-[#3b0d07]/60 text-[#fb923c] border-[#7c2d12]/50",
+    cls: "bg-dash-orange-bg text-dash-orange border-dash-orange-border",
   },
 };
 
@@ -179,7 +179,7 @@ function generateUUID() {
 function TxTypeBadge({ type }: { type: LedgerTxType }) {
   const cfg = TX_TYPE_CFG[type] ?? {
     label: type,
-    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+    cls: "bg-dash-hover text-dash-muted border-dash-border",
   };
   return (
     <span
@@ -196,7 +196,7 @@ function TxTypeBadge({ type }: { type: LedgerTxType }) {
 function StatusBadge({ status }: { status: LedgerEntryStatus | string }) {
   const cfg = STATUS_CFG[status as LedgerEntryStatus] ?? {
     label: status,
-    cls: "bg-[#18181B]/60 text-[#71717A] border-[#27272A]/50",
+    cls: "bg-dash-hover text-dash-muted border-dash-border",
   };
   return (
     <span
@@ -222,10 +222,10 @@ function CopyButton({ value }: { value: string }) {
     <button
       type="button"
       onClick={copy}
-      className="ml-1.5 inline-flex h-6 w-6 items-center justify-center rounded text-[#52525B] hover:text-[#A1A1AA] transition-colors"
+      className="ml-1.5 inline-flex h-6 w-6 items-center justify-center rounded text-dash-faint hover:text-dash-muted transition-colors"
     >
       {copied ? (
-        <Check size={12} className="text-[#4ade80]" />
+        <Check size={12} className="text-dash-success" />
       ) : (
         <Copy size={12} />
       )}
@@ -266,17 +266,17 @@ function ModalShell({
     >
       <div
         className={cn(
-          "relative w-full rounded-2xl border border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl",
+          "relative w-full rounded-2xl border border-dash-border bg-dash-card shadow-2xl",
           maxWidth,
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
-          <h2 className="text-sm font-semibold text-[#FAFAFA]">{title}</h2>
+        <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
+          <h2 className="text-sm font-semibold text-dash-foreground">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={15} />
           </button>
@@ -291,7 +291,7 @@ function ModalShell({
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#52525B] mb-1.5">
+    <label className="block text-[11px] font-semibold uppercase tracking-wider text-dash-faint mb-1.5">
       {children}
     </label>
   );
@@ -302,7 +302,7 @@ function Input({ ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...props}
       className={cn(
-        "h-9 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors",
+        "h-9 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors",
         props.className,
       )}
     />
@@ -318,7 +318,7 @@ function Select({
       <select
         {...props}
         className={cn(
-          "h-9 w-full appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-3 pr-8 text-sm text-[#A1A1AA] focus:border-[#2563EB] focus:outline-none transition-colors cursor-pointer",
+          "h-9 w-full appearance-none rounded-lg border border-dash-border bg-dash-card pl-3 pr-8 text-sm text-dash-muted focus:border-dash-accent focus:outline-none transition-colors cursor-pointer",
           props.className,
         )}
       >
@@ -326,7 +326,7 @@ function Select({
       </select>
       <ChevronDown
         size={13}
-        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#52525B]"
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-dash-faint"
       />
     </div>
   );
@@ -335,7 +335,7 @@ function Select({
 function ErrorMsg({ message }: { message: string | null | undefined }) {
   if (!message) return null;
   return (
-    <p className="mt-2 flex items-center gap-1.5 text-xs text-[#f87171]">
+    <p className="mt-2 flex items-center gap-1.5 text-xs text-dash-error">
       <AlertCircle size={12} /> {message}
     </p>
   );
@@ -352,7 +352,7 @@ function PrimaryButton({
       {...props}
       disabled={loading || disabled}
       className={cn(
-        "flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-[#FAFAFA] text-sm font-semibold text-[#09090B] transition-opacity hover:opacity-90 disabled:opacity-40",
+        "flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-dash-accent text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40",
         props.className,
       )}
     >
@@ -482,7 +482,7 @@ function DepositModal({
           <div>
             <Label>Asset &amp; Network</Label>
             {assetsLoading ? (
-              <div className="h-9 animate-pulse rounded-lg bg-[#1C1C1F]" />
+              <div className="h-9 animate-pulse rounded-lg bg-dash-hover" />
             ) : (
               <Select
                 value={selectedKey}
@@ -499,12 +499,12 @@ function DepositModal({
           </div>
 
           {selectedAsset && (
-            <div className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3 space-y-1">
-              <p className="text-xs text-[#52525B]">Selected</p>
-              <p className="text-sm font-semibold text-[#FAFAFA]">
+            <div className="rounded-lg border border-dash-border bg-dash-card px-4 py-3 space-y-1">
+              <p className="text-xs text-dash-faint">Selected</p>
+              <p className="text-sm font-semibold text-dash-foreground">
                 {selectedAsset.name} ({selectedAsset.symbol})
               </p>
-              <p className="text-xs text-[#71717A]">
+              <p className="text-xs text-dash-muted">
                 Network: {selectedAsset.networkDisplay}
               </p>
             </div>
@@ -530,16 +530,16 @@ function DepositModal({
         <div className="flex flex-col gap-4">
           {/* Asset + Network summary */}
           {selectedAsset && (
-            <div className="flex items-center justify-between rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3">
+            <div className="flex items-center justify-between rounded-lg border border-dash-border bg-dash-card px-4 py-3">
               <div>
-                <p className="text-xs text-[#52525B]">Asset</p>
-                <p className="text-sm font-semibold text-[#FAFAFA]">
+                <p className="text-xs text-dash-faint">Asset</p>
+                <p className="text-sm font-semibold text-dash-foreground">
                   {selectedAsset.symbol}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-[#52525B]">Network</p>
-                <p className="text-sm font-semibold text-[#FAFAFA]">
+                <p className="text-xs text-dash-faint">Network</p>
+                <p className="text-sm font-semibold text-dash-foreground">
                   {selectedAsset.networkDisplay}
                 </p>
               </div>
@@ -553,20 +553,20 @@ function DepositModal({
               <div className="flex justify-center">
                 <WalletQRCode address={matchedAddress.address} size={160} />
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
-                <span className="flex-1 break-all font-mono text-xs text-[#A1A1AA]">
+              <div className="flex items-center gap-2 rounded-lg border border-dash-border bg-dash-card px-3 py-2.5">
+                <span className="flex-1 break-all font-mono text-xs text-dash-muted">
                   {matchedAddress.address}
                 </span>
                 <CopyButton value={matchedAddress.address} />
               </div>
-              <p className="text-[10px] text-[#52525B]">
+              <p className="text-[10px] text-dash-faint">
                 Only send {selectedAsset?.symbol} on the{" "}
                 {selectedAsset?.networkDisplay} network to this address.
               </p>
             </div>
           ) : (
-            <div className="rounded-lg border border-[#27272A] bg-[#18181B] px-4 py-3">
-              <p className="text-xs text-[#71717A]">
+            <div className="rounded-lg border border-dash-border bg-dash-hover px-4 py-3">
+              <p className="text-xs text-dash-muted">
                 No deposit address found for the selected network. Try a
                 different asset or network.
               </p>
@@ -581,20 +581,20 @@ function DepositModal({
                 {ngnAccounts.map((va, i) => (
                   <div
                     key={i}
-                    className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5 space-y-0.5"
+                    className="rounded-lg border border-dash-border bg-dash-card px-3 py-2.5 space-y-0.5"
                   >
                     {va.bankName && (
-                      <p className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+                      <p className="text-[10px] font-semibold text-dash-faint uppercase tracking-wider">
                         {va.bankName}
                       </p>
                     )}
                     <div className="flex items-center gap-1">
-                      <p className="font-mono text-sm text-[#FAFAFA]">
+                      <p className="font-mono text-sm text-dash-foreground">
                         {va.accountNumber}
                       </p>
                       <CopyButton value={va.accountNumber} />
                     </div>
-                    <p className="text-xs text-[#71717A]">{va.accountName}</p>
+                    <p className="text-xs text-dash-muted">{va.accountName}</p>
                   </div>
                 ))}
               </div>
@@ -604,7 +604,7 @@ function DepositModal({
           <button
             type="button"
             onClick={() => setStep("select")}
-            className="text-xs text-[#52525B] hover:text-[#A1A1AA] transition-colors text-center"
+            className="text-xs text-dash-faint hover:text-dash-muted transition-colors text-center"
           >
             ← Choose a different asset
           </button>
@@ -694,7 +694,7 @@ function WithdrawModal({
   return (
     <ModalShell open={open} onClose={handleClose} title="Withdraw Funds">
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border border-[#1C1C1F] bg-[#09090B] p-1 mb-5">
+      <div className="flex gap-1 rounded-lg border border-dash-border bg-dash-card p-1 mb-5">
         {(["stablecoin", "fiat"] as WithdrawTab[]).map((t) => (
           <button
             key={t}
@@ -703,8 +703,8 @@ function WithdrawModal({
             className={cn(
               "flex-1 rounded-md py-1.5 text-xs font-semibold transition-colors",
               tab === t
-                ? "bg-[#1C1C1F] text-[#FAFAFA]"
-                : "text-[#71717A] hover:text-[#A1A1AA]",
+                ? "bg-dash-hover text-dash-foreground"
+                : "text-dash-muted hover:text-dash-muted",
             )}
           >
             {t === "stablecoin" ? "Stablecoin" : "Fiat (NGN)"}
@@ -716,17 +716,17 @@ function WithdrawModal({
         <>
           {scSuccess ? (
             <div className="flex flex-col items-center gap-3 py-6">
-              <CheckCircle2 size={40} className="text-[#4ade80]" />
-              <p className="text-sm font-semibold text-[#FAFAFA]">
+              <CheckCircle2 size={40} className="text-dash-success" />
+              <p className="text-sm font-semibold text-dash-foreground">
                 Withdrawal Submitted
               </p>
-              <p className="text-xs text-[#71717A]">
+              <p className="text-xs text-dash-muted">
                 Your stablecoin withdrawal has been submitted.
               </p>
               <button
                 type="button"
                 onClick={handleClose}
-                className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-[#FAFAFA] text-sm font-semibold text-[#09090B]"
+                className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-dash-accent text-sm font-semibold text-white"
               >
                 Done
               </button>
@@ -786,13 +786,13 @@ function WithdrawModal({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Network</Label>
-                  <div className="flex h-9 items-center rounded-lg border border-[#1C1C1F] bg-[#18181B] px-3 text-sm text-[#A1A1AA]">
+                  <div className="flex h-9 items-center rounded-lg border border-dash-border bg-dash-hover px-3 text-sm text-dash-muted">
                     {scNetwork || "—"}
                   </div>
                 </div>
                 <div>
                   <Label>Token</Label>
-                  <div className="flex h-9 items-center rounded-lg border border-[#1C1C1F] bg-[#18181B] px-3 text-sm text-[#A1A1AA]">
+                  <div className="flex h-9 items-center rounded-lg border border-dash-border bg-dash-hover px-3 text-sm text-dash-muted">
                     {scToken || "—"}
                   </div>
                 </div>
@@ -814,17 +814,17 @@ function WithdrawModal({
         <>
           {fiatSuccess ? (
             <div className="flex flex-col items-center gap-3 py-6">
-              <CheckCircle2 size={40} className="text-[#4ade80]" />
-              <p className="text-sm font-semibold text-[#FAFAFA]">
+              <CheckCircle2 size={40} className="text-dash-success" />
+              <p className="text-sm font-semibold text-dash-foreground">
                 Fiat Withdrawal Submitted
               </p>
-              <p className="text-xs text-[#71717A]">
+              <p className="text-xs text-dash-muted">
                 Your fiat withdrawal has been submitted.
               </p>
               <button
                 type="button"
                 onClick={handleClose}
-                className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-[#FAFAFA] text-sm font-semibold text-[#09090B]"
+                className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-dash-accent text-sm font-semibold text-white"
               >
                 Done
               </button>
@@ -979,15 +979,15 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
   if (step === "success") {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
-        <CheckCircle2 size={40} className="text-[#4ade80]" />
-        <p className="text-sm font-semibold text-[#FAFAFA]">Swap Executed!</p>
-        <p className="text-xs text-[#71717A]">
+        <CheckCircle2 size={40} className="text-dash-success" />
+        <p className="text-sm font-semibold text-dash-foreground">Swap Executed!</p>
+        <p className="text-xs text-dash-muted">
           Your swap has been successfully executed.
         </p>
         <button
           type="button"
           onClick={onDone}
-          className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-[#FAFAFA] text-sm font-semibold text-[#09090B]"
+          className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-dash-accent text-sm font-semibold text-white"
         >
           Done
         </button>
@@ -998,33 +998,33 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
   if (step === "quotation" && quotation) {
     return (
       <div className="flex flex-col gap-4">
-        <div className="rounded-lg border border-[#1C1C1F] bg-[#09090B] p-4 space-y-2.5">
+        <div className="rounded-lg border border-dash-border bg-dash-card p-4 space-y-2.5">
           <div className="flex justify-between text-sm">
-            <span className="text-[#71717A]">From</span>
-            <span className="font-semibold text-[#FAFAFA]">
+            <span className="text-dash-muted">From</span>
+            <span className="font-semibold text-dash-foreground">
               {fmt(quotation.sourceAmount)} {quotation.fromCurrency}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[#71717A]">To</span>
-            <span className="font-semibold text-[#4ade80]">
+            <span className="text-dash-muted">To</span>
+            <span className="font-semibold text-dash-success">
               {fmt(quotation.targetAmount)} {quotation.toCurrency}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[#71717A]">Rate</span>
-            <span className="font-mono text-[#A1A1AA]">{quotation.rate}</span>
+            <span className="text-dash-muted">Rate</span>
+            <span className="font-mono text-dash-muted">{quotation.rate}</span>
           </div>
-          <div className="border-t border-[#1C1C1F] pt-2 flex justify-between text-sm">
-            <span className="text-[#71717A]">Expires in</span>
+          <div className="border-t border-dash-border pt-2 flex justify-between text-sm">
+            <span className="text-dash-muted">Expires in</span>
             <span
               className={cn(
                 "font-mono font-semibold",
                 timerExpired
-                  ? "text-[#f87171]"
+                  ? "text-dash-error"
                   : countdown <= 30
-                    ? "text-[#F59E0B]"
-                    : "text-[#FAFAFA]",
+                    ? "text-dash-warning"
+                    : "text-dash-foreground",
               )}
             >
               {timerExpired
@@ -1049,7 +1049,7 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
               executeSwap.reset();
               setStep("form");
             }}
-            className="flex h-9 w-full items-center justify-center rounded-lg border border-[#1C1C1F] text-sm text-[#A1A1AA] hover:border-[#2563EB] transition-colors"
+            className="flex h-9 w-full items-center justify-center rounded-lg border border-dash-border text-sm text-dash-muted hover:border-dash-accent transition-colors"
           >
             Get New Quote
           </button>
@@ -1106,15 +1106,15 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
 
       {/* Live estimate */}
       {estimateEnabled && (
-        <div className="rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
+        <div className="rounded-lg border border-dash-border bg-dash-card px-3 py-2.5">
           {estimateFetching ? (
-            <p className="text-xs text-[#52525B]">Fetching estimate…</p>
+            <p className="text-xs text-dash-faint">Fetching estimate…</p>
           ) : estimate ? (
             <div className="flex justify-between text-xs">
-              <span className="text-[#71717A]">Estimated output</span>
-              <span className="font-mono font-semibold text-[#FAFAFA]">
+              <span className="text-dash-muted">Estimated output</span>
+              <span className="font-mono font-semibold text-dash-foreground">
                 {fmt(estimate.targetAmount)} {estimate.toCurrency}
-                <span className="ml-2 text-[#52525B]">@ {estimate.rate}</span>
+                <span className="ml-2 text-dash-faint">@ {estimate.rate}</span>
               </span>
             </div>
           ) : null}
@@ -1164,17 +1164,17 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
   if (success) {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
-        <CheckCircle2 size={40} className="text-[#4ade80]" />
-        <p className="text-sm font-semibold text-[#FAFAFA]">
+        <CheckCircle2 size={40} className="text-dash-success" />
+        <p className="text-sm font-semibold text-dash-foreground">
           Offramp Submitted
         </p>
-        <p className="text-xs text-[#71717A]">
+        <p className="text-xs text-dash-muted">
           Your offramp has been successfully submitted.
         </p>
         <button
           type="button"
           onClick={onDone}
-          className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-[#FAFAFA] text-sm font-semibold text-[#09090B]"
+          className="mt-2 flex h-9 w-full items-center justify-center rounded-lg bg-dash-accent text-sm font-semibold text-white"
         >
           Done
         </button>
@@ -1214,7 +1214,7 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
       <div>
         <Label>Recipient</Label>
         {banksLoading ? (
-          <div className="h-9 animate-pulse rounded-lg bg-[#1C1C1F]" />
+          <div className="h-9 animate-pulse rounded-lg bg-dash-hover" />
         ) : bankList.length > 0 ? (
           <Select
             value={recipientId}
@@ -1265,7 +1265,7 @@ function SwapModal({ open, onClose }: { open: boolean; onClose: () => void }) {
       maxWidth="max-w-lg"
     >
       {/* Sub-tabs */}
-      <div className="flex gap-1 rounded-lg border border-[#1C1C1F] bg-[#09090B] p-1 mb-5">
+      <div className="flex gap-1 rounded-lg border border-dash-border bg-dash-card p-1 mb-5">
         {(["crypto", "offramp"] as SwapModalTab[]).map((t) => (
           <button
             key={t}
@@ -1274,8 +1274,8 @@ function SwapModal({ open, onClose }: { open: boolean; onClose: () => void }) {
             className={cn(
               "flex-1 rounded-md py-1.5 text-xs font-semibold transition-colors",
               tab === t
-                ? "bg-[#1C1C1F] text-[#FAFAFA]"
-                : "text-[#71717A] hover:text-[#A1A1AA]",
+                ? "bg-dash-hover text-dash-foreground"
+                : "text-dash-muted hover:text-dash-muted",
             )}
           >
             {t === "crypto" ? "Crypto Swap" : "Offramp (→ NGN)"}
@@ -1331,23 +1331,23 @@ function HistoryTab({
   };
 
   return (
-    <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-      <div className="border-b border-[#1C1C1F] px-5 py-4">
-        <p className="text-sm font-semibold text-[#FAFAFA]">
+    <div className="rounded-xl border border-dash-border bg-dash-card">
+      <div className="border-b border-dash-border px-5 py-4">
+        <p className="text-sm font-semibold text-dash-foreground">
           Transaction History
         </p>
       </div>
 
       {isLoading && (
-        <div className="divide-y divide-[#1C1C1F]">
+        <div className="divide-y divide-dash-border">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5">
-              <div className="h-4 w-16 animate-pulse rounded-full bg-[#1C1C1F]" />
-              <div className="h-3 flex-1 animate-pulse rounded bg-[#1C1C1F]" />
-              <div className="h-3 w-24 animate-pulse rounded bg-[#1C1C1F]" />
-              <div className="h-4 w-14 animate-pulse rounded-full bg-[#1C1C1F]" />
-              <div className="h-3 w-32 animate-pulse rounded bg-[#1C1C1F]" />
-              <div className="h-3 w-28 animate-pulse rounded bg-[#1C1C1F]" />
+              <div className="h-4 w-16 animate-pulse rounded-full bg-dash-hover" />
+              <div className="h-3 flex-1 animate-pulse rounded bg-dash-hover" />
+              <div className="h-3 w-24 animate-pulse rounded bg-dash-hover" />
+              <div className="h-4 w-14 animate-pulse rounded-full bg-dash-hover" />
+              <div className="h-3 w-32 animate-pulse rounded bg-dash-hover" />
+              <div className="h-3 w-28 animate-pulse rounded bg-dash-hover" />
             </div>
           ))}
         </div>
@@ -1355,8 +1355,8 @@ function HistoryTab({
 
       {!isLoading && isError && (
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-          <AlertCircle size={24} className="text-[#3F3F46]" strokeWidth={1.5} />
-          <p className="text-sm text-[#71717A]">Failed to load transactions.</p>
+          <AlertCircle size={24} className="text-dash-faint" strokeWidth={1.5} />
+          <p className="text-sm text-dash-muted">Failed to load transactions.</p>
         </div>
       )}
 
@@ -1364,10 +1364,10 @@ function HistoryTab({
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
           <ArrowLeftRight
             size={28}
-            className="text-[#3F3F46]"
+            className="text-dash-faint"
             strokeWidth={1.5}
           />
-          <p className="text-sm font-semibold text-[#FAFAFA]">
+          <p className="text-sm font-semibold text-dash-foreground">
             No transactions yet.
           </p>
         </div>
@@ -1377,7 +1377,7 @@ function HistoryTab({
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#1C1C1F]">
+              <tr className="border-b border-dash-border">
                 {[
                   "Type",
                   "Asset",
@@ -1388,7 +1388,7 @@ function HistoryTab({
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
+                    className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint"
                   >
                     {h}
                   </th>
@@ -1408,13 +1408,13 @@ function HistoryTab({
                   return (
                     <tr
                       key={tx.id}
-                      className="border-b border-[#1C1C1F] last:border-0 hover:bg-[#111113] transition-colors"
+                      className="border-b border-dash-border last:border-0 hover:bg-dash-hover transition-colors"
                     >
                       <td className="px-5 py-3.5">
                         <TxTypeBadge type={tx.tx_type} />
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="rounded-md border border-[#1C1C1F] px-2 py-0.5 font-mono text-[11px] text-[#A1A1AA]">
+                        <span className="rounded-md border border-dash-border px-2 py-0.5 font-mono text-[11px] text-dash-muted">
                           {tx.asset ?? "—"}
                         </span>
                       </td>
@@ -1422,7 +1422,7 @@ function HistoryTab({
                         <span
                           className={cn(
                             "font-mono text-sm font-medium",
-                            positive ? "text-[#4ade80]" : "text-[#FAFAFA]",
+                            positive ? "text-dash-success" : "text-dash-foreground",
                           )}
                         >
                           {amtValue}
@@ -1432,11 +1432,11 @@ function HistoryTab({
                         <StatusBadge status={tx.status} />
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="font-mono text-xs text-[#71717A]">
+                        <span className="font-mono text-xs text-dash-muted">
                           {truncate(tx.reference_id)}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-3.5 text-xs text-[#52525B]">
+                      <td className="whitespace-nowrap px-5 py-3.5 text-xs text-dash-faint">
                         {fmtDate(tx.created_at)}
                       </td>
                     </tr>
@@ -1448,10 +1448,10 @@ function HistoryTab({
       )}
 
       {/* Footer link */}
-      <div className="border-t border-[#1C1C1F] px-5 py-3">
+      <div className="border-t border-dash-border px-5 py-3">
         <Link
           href="/transactions"
-          className="text-xs text-[#2563EB] hover:underline"
+          className="text-xs text-dash-accent hover:underline"
         >
           View all transactions →
         </Link>
@@ -1470,24 +1470,24 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
     (Array.isArray(data) ? (data as unknown[]) : []);
 
   return (
-    <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-      <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
-        <p className="text-sm font-semibold text-[#FAFAFA]">Swaps</p>
+    <div className="rounded-xl border border-dash-border bg-dash-card">
+      <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
+        <p className="text-sm font-semibold text-dash-foreground">Swaps</p>
         <button
           type="button"
           onClick={onNewSwap}
-          className="flex h-8 items-center gap-1.5 rounded-lg bg-[#2563EB] px-3 text-xs font-semibold text-white hover:brightness-110 transition-all"
+          className="flex h-8 items-center gap-1.5 rounded-lg bg-dash-accent px-3 text-xs font-semibold text-white hover:brightness-110 transition-all"
         >
           <ArrowLeftRight size={12} /> New Swap
         </button>
       </div>
 
       {isLoading && (
-        <div className="divide-y divide-[#1C1C1F]">
+        <div className="divide-y divide-dash-border">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5">
-              <div className="h-3 flex-1 animate-pulse rounded bg-[#1C1C1F]" />
-              <div className="h-3 w-20 animate-pulse rounded bg-[#1C1C1F]" />
+              <div className="h-3 flex-1 animate-pulse rounded bg-dash-hover" />
+              <div className="h-3 w-20 animate-pulse rounded bg-dash-hover" />
             </div>
           ))}
         </div>
@@ -1497,14 +1497,14 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
           <ArrowLeftRight
             size={28}
-            className="text-[#3F3F46]"
+            className="text-dash-faint"
             strokeWidth={1.5}
           />
-          <p className="text-sm font-semibold text-[#FAFAFA]">No swaps yet.</p>
+          <p className="text-sm font-semibold text-dash-foreground">No swaps yet.</p>
           <button
             type="button"
             onClick={onNewSwap}
-            className="mt-1 text-xs text-[#2563EB] hover:underline"
+            className="mt-1 text-xs text-dash-accent hover:underline"
           >
             Create your first swap
           </button>
@@ -1515,11 +1515,11 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#1C1C1F]">
+              <tr className="border-b border-dash-border">
                 {["From", "To", "Rate", "Status", "Date"].map((h) => (
                   <th
                     key={h}
-                    className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
+                    className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint"
                   >
                     {h}
                   </th>
@@ -1539,27 +1539,27 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
                 return (
                   <tr
                     key={String(s.id ?? idx)}
-                    className="border-b border-[#1C1C1F] last:border-0 hover:bg-[#111113] transition-colors"
+                    className="border-b border-dash-border last:border-0 hover:bg-dash-hover transition-colors"
                   >
-                    <td className="px-5 py-3.5 text-[#FAFAFA]">
+                    <td className="px-5 py-3.5 text-dash-foreground">
                       {fromAmt != null ? fmt(Number(fromAmt)) : "—"}{" "}
-                      <span className="text-[#71717A]">
+                      <span className="text-dash-muted">
                         {String(fromCur ?? "")}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-[#4ade80]">
+                    <td className="px-5 py-3.5 text-dash-success">
                       {toAmt != null ? fmt(Number(toAmt)) : "—"}{" "}
-                      <span className="text-[#71717A]">
+                      <span className="text-dash-muted">
                         {String(toCur ?? "")}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 font-mono text-xs text-[#A1A1AA]">
+                    <td className="px-5 py-3.5 font-mono text-xs text-dash-muted">
                       {rate != null ? String(rate) : "—"}
                     </td>
                     <td className="px-5 py-3.5">
                       <StatusBadge status={status} />
                     </td>
-                    <td className="whitespace-nowrap px-5 py-3.5 text-xs text-[#52525B]">
+                    <td className="whitespace-nowrap px-5 py-3.5 text-xs text-dash-faint">
                       {createdAt ? fmtDate(createdAt) : "—"}
                     </td>
                   </tr>
@@ -1674,7 +1674,7 @@ export default function BalancePage() {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value as Currency)}
-                  className="h-9 appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-3 pr-8 text-sm font-medium text-[#A1A1AA] hover:border-[#2563EB] focus:border-[#2563EB] focus:outline-none transition-colors cursor-pointer"
+                  className="h-9 appearance-none rounded-lg border border-dash-border bg-dash-card pl-3 pr-8 text-sm font-medium text-dash-muted hover:border-dash-accent focus:border-dash-accent focus:outline-none transition-colors cursor-pointer"
                 >
                   <option value="NGN">NGN</option>
                   <option value="USDT">USDT</option>
@@ -1682,35 +1682,35 @@ export default function BalancePage() {
                 </select>
                 <ChevronDown
                   size={13}
-                  className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#52525B]"
+                  className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-dash-faint"
                 />
               </div>
 
               <button
                 type="button"
                 onClick={handleExportCsv}
-                className="flex h-9 items-center gap-1.5 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#A1A1AA] hover:border-[#2563EB] hover:text-[#FAFAFA] transition-colors"
+                className="flex h-9 items-center gap-1.5 rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-muted hover:border-dash-accent hover:text-dash-foreground transition-colors"
               >
                 <Download size={13} /> Export CSV
               </button>
               <button
                 type="button"
                 onClick={() => setDepositOpen(true)}
-                className="flex h-9 items-center gap-1.5 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#A1A1AA] hover:border-[#2563EB] hover:text-[#FAFAFA] transition-colors"
+                className="flex h-9 items-center gap-1.5 rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-muted hover:border-dash-accent hover:text-dash-foreground transition-colors"
               >
                 <ArrowDownToLine size={13} /> Deposit
               </button>
               <button
                 type="button"
                 onClick={() => setSwapOpen(true)}
-                className="flex h-9 items-center gap-1.5 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#A1A1AA] hover:border-[#2563EB] hover:text-[#FAFAFA] transition-colors"
+                className="flex h-9 items-center gap-1.5 rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-muted hover:border-dash-accent hover:text-dash-foreground transition-colors"
               >
                 <ArrowLeftRight size={13} /> Swap
               </button>
               <button
                 type="button"
                 onClick={() => setWithdrawOpen(true)}
-                className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3 text-sm font-semibold text-[#09090B] hover:opacity-90 transition-opacity"
+                className="flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
               >
                 <ArrowUpFromLine size={13} /> Withdraw
               </button>
@@ -1748,7 +1748,7 @@ export default function BalancePage() {
 
         {/* Tab bar */}
         <div>
-          <div className="flex items-center border-b border-[#1C1C1F] gap-1">
+          <div className="flex items-center border-b border-dash-border gap-1">
             {TABS.map((tab) => (
               <button
                 key={tab.value}
@@ -1757,8 +1757,8 @@ export default function BalancePage() {
                 className={cn(
                   "px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
                   activeTab === tab.value
-                    ? "border-[#2563EB] text-[#FAFAFA]"
-                    : "border-transparent text-[#71717A] hover:text-[#A1A1AA]",
+                    ? "border-dash-accent text-dash-foreground"
+                    : "border-transparent text-dash-muted hover:text-dash-muted",
                 )}
               >
                 {tab.label}
