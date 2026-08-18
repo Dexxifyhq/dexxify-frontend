@@ -2,8 +2,8 @@ export default function Hero() {
   return (
     <section className="relative">
       {/* Vertical rails mark the content container, as in the reference */}
-      <div className="max-w-[1600px] mx-auto border-x border-border">
-        <div className="px-6 sm:px-10 pt-32 pb-28 lg:pt-40 lg:pb-36">
+      <div className="max-w-[1200px] mx-auto border-x border-border">
+        <div className="px-6  pt-32 pb-28 lg:pt-32 lg:pb-36">
           {/* Announcement pill */}
           <a
             href="#"
@@ -28,7 +28,7 @@ export default function Hero() {
           </a>
 
           {/* Headline — bold statement, then a lighter continuation */}
-          <h1 className="mt-8 max-w-[950px] text-4xl sm:text-5xl lg:text-[3.6rem] tracking-tight leading-[1.12]">
+          <h1 className="mt-5 max-w-[800px] text-4xl sm:text-5xl tracking-tight leading-[1.12]">
             <span className="font-bold text-foreground">
               Crypto payments and payouts, settled in Naira.
             </span>{' '}
