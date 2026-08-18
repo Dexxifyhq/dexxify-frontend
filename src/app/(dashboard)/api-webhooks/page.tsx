@@ -29,25 +29,25 @@ const TABS = [
 const SDKS = [
   {
     name: "Node.js SDK",
-    install: "npm install coincircuit",
+    install: "npm install dexxify",
     badge: "JS",
     color: "#F7DF1E",
   },
   {
     name: "Python SDK",
-    install: "pip install coincircuit",
+    install: "pip install dexxify",
     badge: "Py",
     color: "#3776AB",
   },
   {
     name: "Checkout SDK",
-    install: "npm install @coincircuit/checkout",
+    install: "npm install @dexxify/checkout",
     badge: "⚛",
     color: "#61DAFB",
   },
 ];
 
-const BASE_URL = "https://api.coincircuit.io";
+const BASE_URL = "https://api.dexxify.com";
 
 export default function ApiWebhooksPage() {
   const [tab, setTab] = useState("keys");
@@ -184,7 +184,9 @@ export default function ApiWebhooksPage() {
                 size="sm"
                 ariaLabel="Enable Events"
               />
-              <span className="text-sm text-dash-foreground">Enable Events</span>
+              <span className="text-sm text-dash-foreground">
+                Enable Events
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -264,9 +266,7 @@ export default function ApiWebhooksPage() {
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <DocCard
-                icon={
-                  <Terminal size={16} className="text-dash-purple" />
-                }
+                icon={<Terminal size={16} className="text-dash-purple" />}
                 iconBg="rgba(167,139,250,0.12)"
                 title="API Reference"
                 description="Endpoints, parameters, and code examples."

@@ -1,4 +1,4 @@
-import type { DateRange, FiatCurrency } from "./common";
+import type { DateRange } from "./common";
 
 // ── Stat change ────────────────────────────────────────────────────────────
 
@@ -37,25 +37,7 @@ export interface DashboardOverviewResponse {
     overdue?: InvoiceBreakdown;
   };
   customers: { total: number; new_this_month: number };
-  deposit_accounts: number;
   pending_payouts: { count: number; total_amount: number };
-}
-
-// ── UI-facing stats (4 cards) ─────────────────────────────────────────────
-
-export interface DashboardStats {
-  ngn_balance: { value: number; change: StatChange };
-  total_received_ngn: { value: number; change: StatChange };
-  payment_sessions: {
-    total: number;
-    completed: number;
-    change: StatChange;
-  };
-  customers: {
-    total: number;
-    new_this_month: number;
-    change: StatChange;
-  };
 }
 
 // ── Revenue chart (matches GET /dashboard/revenue-chart) ──────────────────
@@ -110,5 +92,4 @@ export interface ActivityItem {
 
 export interface DashboardParams {
   range: DateRange;
-  currency: FiatCurrency;
 }

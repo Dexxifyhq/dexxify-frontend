@@ -332,6 +332,15 @@ function Select({
   );
 }
 
+function FeeNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-center gap-1.5 text-xs text-dash-muted">
+      <AlertCircle size={12} className="shrink-0 text-dash-faint" />
+      {children}
+    </p>
+  );
+}
+
 function ErrorMsg({ message }: { message: string | null | undefined }) {
   if (!message) return null;
   return (
@@ -783,6 +792,7 @@ function WithdrawModal({
                   onChange={(e) => setScAmount(e.target.value)}
                 />
               </div>
+              <FeeNote>Fee: $1.00 (Deducted from balance)</FeeNote>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Network</Label>
@@ -868,6 +878,7 @@ function WithdrawModal({
                   onChange={(e) => setFiatAmount(e.target.value)}
                 />
               </div>
+              <FeeNote>Fee: ₦200.00 (Deducted from balance)</FeeNote>
               <div>
                 <Label>Narration (optional)</Label>
                 <Input
