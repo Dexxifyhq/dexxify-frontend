@@ -14,7 +14,12 @@ interface GroupedBarChartProps {
   loading?: boolean;
 }
 
-export default function GroupedBarChart({ title, description, data, loading }: GroupedBarChartProps) {
+export default function GroupedBarChart({
+  title,
+  description,
+  data,
+  loading,
+}: GroupedBarChartProps) {
   const [hovered, setHovered] = useState<number | null>(null);
   const isEmpty = !loading && (!data || data.length === 0);
 
@@ -33,8 +38,12 @@ export default function GroupedBarChart({ title, description, data, loading }: G
       emptyDescription="No revenue data for the selected period."
       actions={
         <div className="flex items-center gap-3 text-xs text-dash-muted">
-          <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-chart-1" /> NGN</span>
-          <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-chart-2" /> Stablecoin</span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-chart-1" /> NGN
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-chart-2" /> Stablecoin
+          </span>
         </div>
       }
     >
@@ -42,24 +51,40 @@ export default function GroupedBarChart({ title, description, data, loading }: G
         {rows.map((row, i) => (
           <div
             key={i}
-            className="group relative flex flex-1 items-end justify-center gap-0.5"
+            className="group relative flex h-full flex-1 items-end justify-center gap-0.5"
             onMouseEnter={() => setHovered(i)}
             onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
           >
             <div
               className="w-full rounded-t-sm bg-chart-1 transition-opacity"
-              style={{ height: `${Math.max((row.ngn / max) * 100, row.ngn > 0 ? 2 : 0)}%` }}
+              style={{
+                height: `${Math.max((row.ngn / max) * 100, row.ngn > 0 ? 2 : 0)}%`,
+              }}
             />
             <div
               className="w-full rounded-t-sm bg-chart-2 transition-opacity"
-              style={{ height: `${Math.max((row.stable / max) * 100, row.stable > 0 ? 2 : 0)}%` }}
+              style={{
+                height: `${Math.max((row.stable / max) * 100, row.stable > 0 ? 2 : 0)}%`,
+              }}
             />
 
             {hovered === i && (
               <div className="pointer-events-none absolute bottom-full mb-2 z-10 w-max -translate-x-1/2 left-1/2 rounded-lg border border-dash-border bg-dash-card px-3 py-2 text-xs shadow-lg">
-                <p className="font-medium text-dash-foreground">{formatDateShort(row.point.date)}</p>
-                <p className="text-dash-muted">NGN: <span className="font-medium text-dash-foreground">₦{row.ngn.toLocaleString()}</span></p>
-                <p className="text-dash-muted">Stablecoin: <span className="font-medium text-dash-foreground">${row.stable.toLocaleString()}</span></p>
+                <p className="font-medium text-dash-foreground">
+                  {formatDateShort(row.point.date)}
+                </p>
+                <p className="text-dash-muted">
+                  NGN:{" "}
+                  <span className="font-medium text-dash-foreground">
+                    ₦{row.ngn.toLocaleString()}
+                  </span>
+                </p>
+                <p className="text-dash-muted">
+                  Stablecoin:{" "}
+                  <span className="font-medium text-dash-foreground">
+                    ${row.stable.toLocaleString()}
+                  </span>
+                </p>
               </div>
             )}
           </div>
@@ -67,7 +92,13 @@ export default function GroupedBarChart({ title, description, data, loading }: G
       </div>
       <div className="flex justify-between text-[9px] text-dash-faint">
         {rows.map((row, i) => (
-          <span key={i} className={cn("flex-1 text-center", i % labelEvery !== 0 && "invisible")}>
+          <span
+            key={i}
+            className={cn(
+              "flex-1 text-center",
+              i % labelEvery !== 0 && "invisible",
+            )}
+          >
             {formatDateShort(row.point.date)}
           </span>
         ))}
