@@ -78,27 +78,27 @@ export default function CreatePaymentPageForm() {
   if (createdPage) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 p-6 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#14532D]/50 bg-[#052E16]/60">
-          <Check size={24} className="text-[#22C55E]" />
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dash-success-border bg-dash-success-bg">
+          <Check size={24} className="text-dash-success" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-[#FAFAFA]">Page Created</h2>
-          <p className="mt-1 text-sm text-[#71717A]">
+          <h2 className="text-lg font-semibold text-dash-foreground">Page Created</h2>
+          <p className="mt-1 text-sm text-dash-muted">
             Share this link — anyone who visits can pay you.
           </p>
         </div>
 
         <div className="w-full max-w-md">
-          <div className="flex items-center gap-2 rounded-xl border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5">
-            <span className="flex-1 truncate font-mono text-xs text-[#A1A1AA]">
+          <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-card px-3 py-2.5">
+            <span className="flex-1 truncate font-mono text-xs text-dash-muted">
               {publicUrl}
             </span>
             <button
               onClick={handleCopy}
-              className="shrink-0 text-[#71717A] transition-colors hover:text-[#FAFAFA]"
+              className="shrink-0 text-dash-muted transition-colors hover:text-dash-foreground"
             >
               {copied ? (
-                <Check size={14} className="text-[#22C55E]" />
+                <Check size={14} className="text-dash-success" />
               ) : (
                 <Copy size={14} />
               )}
@@ -109,7 +109,7 @@ export default function CreatePaymentPageForm() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/payment-pages")}
-            className="h-9 rounded-lg border border-[#1C1C1F] px-4 text-sm font-medium text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            className="h-9 rounded-lg border border-dash-border px-4 text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             View all pages
           </button>
@@ -117,7 +117,7 @@ export default function CreatePaymentPageForm() {
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] transition-colors hover:bg-white"
+            className="flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover"
           >
             <ExternalLink size={13} />
             Preview page
@@ -135,16 +135,16 @@ export default function CreatePaymentPageForm() {
         <div className="flex items-center gap-3">
           <Link
             href="/payment-pages"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-dash-border bg-dash-card text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
             aria-label="Back"
           >
             <ArrowLeft size={15} />
           </Link>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-[#FAFAFA]">
+            <h1 className="text-xl font-bold tracking-tight text-dash-foreground">
               New Payment Page
             </h1>
-            <p className="text-xs text-[#52525B]">
+            <p className="text-xs text-dash-faint">
               Configure your page then share the link to collect payments.
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function CreatePaymentPageForm() {
           type="button"
           onClick={handleCreate}
           disabled={!canCreate || createPage.isPending}
-          className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
         >
           {createPage.isPending ? (
             <Loader2 size={14} className="animate-spin" />
@@ -168,10 +168,10 @@ export default function CreatePaymentPageForm() {
         {/* ── Left: form fields ────────────────────────────────────────── */}
         <div className="flex flex-col gap-4">
           {/* General */}
-          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-            <div className="flex items-center gap-2.5 border-b border-[#1C1C1F] px-5 py-3.5">
-              <FileText size={14} className="text-[#52525B]" />
-              <h2 className="text-sm font-semibold text-[#FAFAFA]">General</h2>
+          <section className="rounded-xl border border-dash-border bg-dash-card">
+            <div className="flex items-center gap-2.5 border-b border-dash-border px-5 py-3.5">
+              <FileText size={14} className="text-dash-faint" />
+              <h2 className="text-sm font-semibold text-dash-foreground">General</h2>
             </div>
             <div className="flex flex-col gap-4 p-5">
               <Field label="Page Title *">
@@ -205,10 +205,10 @@ export default function CreatePaymentPageForm() {
           </section>
 
           {/* Pricing */}
-          <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-            <div className="flex items-center gap-2.5 border-b border-[#1C1C1F] px-5 py-3.5">
-              <DollarSign size={14} className="text-[#52525B]" />
-              <h2 className="text-sm font-semibold text-[#FAFAFA]">Pricing</h2>
+          <section className="rounded-xl border border-dash-border bg-dash-card">
+            <div className="flex items-center gap-2.5 border-b border-dash-border px-5 py-3.5">
+              <DollarSign size={14} className="text-dash-faint" />
+              <h2 className="text-sm font-semibold text-dash-foreground">Pricing</h2>
             </div>
             <div className="p-5">
               <Field label="Amount & Currency *">
@@ -228,7 +228,7 @@ export default function CreatePaymentPageForm() {
                       onChange={(e) =>
                         setCurrency(e.target.value as typeof currency)
                       }
-                      className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-8 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+                      className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-dash-border bg-dash-card px-3 pr-8 text-sm text-dash-foreground transition-colors focus:border-dash-accent focus:outline-none"
                     >
                       {CURRENCIES.map((o) => (
                         <option key={o.value} value={o.value}>
@@ -238,7 +238,7 @@ export default function CreatePaymentPageForm() {
                     </select>
                     <ChevronDown
                       size={14}
-                      className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+                      className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-dash-muted"
                     />
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export default function CreatePaymentPageForm() {
 
         {/* ── Right: live preview ──────────────────────────────────────── */}
         <aside className="h-fit">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
             Live Preview
           </p>
 
@@ -333,7 +333,7 @@ export default function CreatePaymentPageForm() {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const inputCls =
-  "h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors";
+  "h-10 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors";
 
 function Field({
   label,
@@ -344,7 +344,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+      <label className="mb-1.5 block text-xs font-medium text-dash-muted">
         {label}
       </label>
       {children}
@@ -376,7 +376,7 @@ function SelectField({
       </select>
       <ChevronDown
         size={14}
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-dash-muted"
       />
     </div>
   );

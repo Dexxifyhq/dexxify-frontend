@@ -17,8 +17,8 @@ export default function Toggle({
 }: ToggleProps) {
   const onColors =
     color === "blue"
-      ? "border-[#2563EB] bg-[#2563EB]"
-      : "border-[#22C55E] bg-[#22C55E]";
+      ? "border-dash-accent bg-dash-accent"
+      : "border-dash-success bg-dash-success";
   const dims =
     size === "sm"
       ? "h-5 w-9"
@@ -33,14 +33,14 @@ export default function Toggle({
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex shrink-0 items-center rounded-full border transition-colors ${dims} ${
-        checked ? onColors : "border-[#1C1C1F] bg-[#09090B]"
+        checked ? onColors : "border-dash-border bg-dash-hover"
       }`}
     >
       <span
         className={`absolute top-1/2 -translate-y-1/2 rounded-full transition-all ${knob} ${
           checked
             ? "right-[2px] bg-white"
-            : "left-[2px] bg-[#52525B]"
+            : "left-[2px] bg-dash-faint"
         }`}
       />
     </button>

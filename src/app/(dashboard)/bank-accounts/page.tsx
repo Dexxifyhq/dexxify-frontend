@@ -38,27 +38,27 @@ function BankDetailDrawer({
     {
       label: "Account Name",
       value: bank.account_name,
-      icon: <BadgeCheck size={13} className="text-[#52525B]" />,
+      icon: <BadgeCheck size={13} className="text-dash-faint" />,
     },
     {
       label: "Account Number",
       value: bank.account_number,
-      icon: <Hash size={13} className="text-[#52525B]" />,
+      icon: <Hash size={13} className="text-dash-faint" />,
     },
     {
       label: "Bank",
       value: bank.bank_name,
-      icon: <Landmark size={13} className="text-[#52525B]" />,
+      icon: <Landmark size={13} className="text-dash-faint" />,
     },
     {
       label: "Currency",
       value: bank.currency.toUpperCase(),
-      icon: <CreditCard size={13} className="text-[#52525B]" />,
+      icon: <CreditCard size={13} className="text-dash-faint" />,
     },
     {
       label: "Account Type",
       value: bank.type?.toUpperCase() ?? "—",
-      icon: <Building2 size={13} className="text-[#52525B]" />,
+      icon: <Building2 size={13} className="text-dash-faint" />,
     },
     {
       label: "Added",
@@ -67,7 +67,7 @@ function BankDetailDrawer({
         month: "long",
         day: "numeric",
       }),
-      icon: <Calendar size={13} className="text-[#52525B]" />,
+      icon: <Calendar size={13} className="text-dash-faint" />,
     },
   ];
 
@@ -77,20 +77,20 @@ function BankDetailDrawer({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 flex h-full w-full max-w-sm flex-col border-l border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 flex h-full w-full max-w-sm flex-col border-l border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
           <div>
-            <p className="text-sm font-semibold text-[#FAFAFA]">
+            <p className="text-sm font-semibold text-dash-foreground">
               {bank.bank_name}
             </p>
-            <p className="mt-0.5 text-xs text-[#71717A]">
+            <p className="mt-0.5 text-xs text-dash-muted">
               {bank.account_number}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={15} />
           </button>
@@ -99,12 +99,12 @@ function BankDetailDrawer({
         {/* Badges */}
         <div className="flex flex-wrap gap-2 px-5 pt-4">
           {bank.primary && (
-            <span className="rounded-full border border-[#14532D]/50 bg-[#052E16]/60 px-2.5 py-0.5 text-[11px] font-semibold text-[#22C55E]">
+            <span className="rounded-full border border-dash-success-border bg-dash-success-bg px-2.5 py-0.5 text-[11px] font-semibold text-dash-success">
               Primary
             </span>
           )}
           {bank.is_trusted && (
-            <span className="rounded-full border border-[#1d3461]/50 bg-[#0f172a]/60 px-2.5 py-0.5 text-[11px] font-semibold text-[#60A5FA]">
+            <span className="rounded-full border border-dash-accent bg-dash-accent-soft px-2.5 py-0.5 text-[11px] font-semibold text-dash-accent">
               Trusted
             </span>
           )}
@@ -112,14 +112,14 @@ function BankDetailDrawer({
 
         {/* Details */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <ul className="flex flex-col divide-y divide-[#1C1C1F] rounded-xl border border-[#1C1C1F]">
+          <ul className="flex flex-col divide-y divide-dash-border rounded-xl border border-dash-border">
             {rows.map(({ label, value, icon }) => (
               <li key={label} className="flex items-center gap-3 px-4 py-3">
                 <span className="shrink-0">{icon}</span>
-                <span className="w-28 shrink-0 text-xs text-[#71717A]">
+                <span className="w-28 shrink-0 text-xs text-dash-muted">
                   {label}
                 </span>
-                <span className="truncate text-xs font-medium text-[#FAFAFA]">
+                <span className="truncate text-xs font-medium text-dash-foreground">
                   {value}
                 </span>
               </li>
@@ -128,11 +128,11 @@ function BankDetailDrawer({
         </div>
 
         {/* Delete */}
-        <div className="border-t border-[#1C1C1F] px-5 py-4">
+        <div className="border-t border-dash-border px-5 py-4">
           <button
             onClick={() => onDelete(bank.id)}
             disabled={deleting}
-            className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/40 text-sm font-medium text-[#f87171] hover:bg-[#450a0a]/70 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+            className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-dash-error-border bg-dash-error-bg text-sm font-medium text-dash-error hover:bg-dash-error-border disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
           >
             {deleting ? (
               <Loader2 size={14} className="animate-spin" />
@@ -181,7 +181,7 @@ export default function BankAccountsPage() {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#1C1C1F] bg-[#0D0D0F] px-3.5 text-sm font-medium text-[#FAFAFA] hover:bg-[#1C1C1F] transition-colors"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-dash-border bg-dash-card px-3.5 text-sm font-medium text-dash-foreground hover:bg-dash-hover transition-colors"
           >
             <Plus size={15} />
             Add Account
@@ -189,21 +189,21 @@ export default function BankAccountsPage() {
         }
       />
 
-      <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
+      <section className="rounded-xl border border-dash-border bg-dash-card">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 size={22} className="animate-spin text-[#3F3F46]" />
+            <Loader2 size={22} className="animate-spin text-dash-faint" />
           </div>
         ) : banks.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-            <div className="text-[#3F3F46]">
+            <div className="text-dash-faint">
               <Landmark size={36} strokeWidth={1.5} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <h3 className="text-base font-semibold text-[#FAFAFA]">
+              <h3 className="text-base font-semibold text-dash-foreground">
                 No Bank Accounts
               </h3>
-              <p className="max-w-sm text-sm text-[#71717A]">
+              <p className="max-w-sm text-sm text-dash-muted">
                 You haven&apos;t connected any bank accounts yet. Add your first
                 account to start receiving fiat withdrawals.
               </p>
@@ -211,49 +211,49 @@ export default function BankAccountsPage() {
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-4 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+              className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
             >
               <Plus size={15} />
               Add Bank Account
             </button>
           </div>
         ) : (
-          <ul className="divide-y divide-[#1C1C1F]">
+          <ul className="divide-y divide-dash-border">
             {banks.map((bank) => (
               <li key={bank.id}>
                 <button
                   type="button"
                   onClick={() => setSelected(bank)}
-                  className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-[#111113]"
+                  className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-dash-hover"
                 >
                   {/* Icon */}
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1C1C1F] bg-[#111113]">
-                    <Landmark size={15} className="text-[#52525B]" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-dash-border bg-dash-hover">
+                    <Landmark size={15} className="text-dash-faint" />
                   </div>
 
                   {/* Main info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                      <p className="truncate text-sm font-medium text-dash-foreground">
                         {bank.account_name}
                       </p>
                       {bank.primary && (
-                        <span className="shrink-0 rounded-full border border-[#14532D]/50 bg-[#052E16]/60 px-2 py-px text-[10px] font-semibold text-[#22C55E]">
+                        <span className="shrink-0 rounded-full border border-dash-success-border bg-dash-success-bg px-2 py-px text-[10px] font-semibold text-dash-success">
                           Primary
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 text-xs text-[#71717A]">
+                    <p className="mt-0.5 text-xs text-dash-muted">
                       {bank.bank_name} · {bank.account_number}
                     </p>
                   </div>
 
                   {/* Currency pill + chevron */}
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="rounded-md border border-[#1C1C1F] px-2 py-0.5 text-[11px] font-medium text-[#71717A]">
+                    <span className="rounded-md border border-dash-border px-2 py-0.5 text-[11px] font-medium text-dash-muted">
                       {bank.currency.toUpperCase()}
                     </span>
-                    <ChevronRight size={15} className="text-[#3F3F46]" />
+                    <ChevronRight size={15} className="text-dash-faint" />
                   </div>
                 </button>
               </li>

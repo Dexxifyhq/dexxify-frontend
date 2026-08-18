@@ -13,6 +13,7 @@ import {
   AuthField,
   AuthButton,
   AuthBackLink,
+  AuthLogo,
   PasswordInput,
   PasswordStrength,
 } from '@/components/ui/auth';
@@ -73,10 +74,11 @@ function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-sm">
+      <AuthLogo />
       <AuthBackLink href="/forgot-password" label="Back" />
 
       <div className="mb-8">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center mb-4">
+        <div className="w-10 h-10 rounded-xl bg-dash-accent-soft border border-dash-accent/20 flex items-center justify-center mb-4">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <rect
               x="3"
@@ -84,24 +86,24 @@ function ResetPasswordForm() {
               width="12"
               height="9"
               rx="1.5"
-              stroke="#2563EB"
+              stroke="var(--dash-accent)"
               strokeWidth="1.5"
             />
             <path
               d="M6 8V5.5a3 3 0 016 0V8"
-              stroke="#2563EB"
+              stroke="var(--dash-accent)"
               strokeWidth="1.5"
               strokeLinecap="round"
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">
+        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">
           Reset your password
         </h1>
-        <p className="text-sm text-[#71717A]">
+        <p className="text-sm text-dash-muted">
           Enter the 6-digit code sent to{' '}
           {email ? (
-            <span className="text-[#FAFAFA] font-medium">{email}</span>
+            <span className="text-dash-foreground font-medium">{email}</span>
           ) : (
             'your email'
           )}{' '}
@@ -127,7 +129,7 @@ function ResetPasswordForm() {
                 setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
                 resetMutation.reset();
               }}
-              className="w-full h-12 px-4 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-lg font-mono text-center text-[#FAFAFA] placeholder:text-[#3F3F46] tracking-[0.4em] focus:outline-none focus:border-[#2563EB] transition-colors"
+              className="w-full h-12 px-4 bg-dash-card border border-dash-border rounded-lg text-lg font-mono text-center text-dash-foreground placeholder:text-dash-faint tracking-[0.4em] focus:outline-none focus:border-dash-accent transition-colors"
             />
           </AuthField>
 
@@ -153,15 +155,15 @@ function ResetPasswordForm() {
             Reset password <ArrowRight size={14} />
           </AuthButton>
 
-          <div className="pt-1 border-t border-[#1C1C1F] text-center">
-            <p className="text-xs text-[#71717A] mb-2">
+          <div className="pt-1 border-t border-dash-border text-center">
+            <p className="text-xs text-dash-muted mb-2">
               Didn&apos;t receive a code?
             </p>
             <button
               type="button"
               disabled={resendMutation.isPending || count > 0}
               onClick={handleResend}
-              className="inline-flex items-center gap-1.5 text-sm text-[#2563EB] hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 text-sm text-dash-accent hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
             >
               {resendMutation.isPending ? (
                 <Loader2 size={13} className="animate-spin" />

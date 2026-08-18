@@ -1,6 +1,5 @@
 import axios, {
   AxiosError,
-  AxiosInstance,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
@@ -96,7 +95,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axios.post(
+        await axios.post(
           `${API_BASE}/auth/refresh`,
           {},
           {
@@ -213,13 +212,30 @@ export async function get<T>(
 export async function getPaginated<T>(
   url: string,
   params?: Record<string, unknown>,
-): Promise<{ data: T[]; meta: { total: number; page: number; limit: number; total_pages: number; has_next: boolean; has_prev: boolean } }> {
+): Promise<{
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  };
+}> {
   try {
     const res = await apiClient.get(url, { params });
     const body = res.data ?? {};
     return {
       data: body.data ?? [],
-      meta: body.meta ?? { total: 0, page: 1, limit: 20, total_pages: 0, has_next: false, has_prev: false },
+      meta: body.meta ?? {
+        total: 0,
+        page: 1,
+        limit: 20,
+        total_pages: 0,
+        has_next: false,
+        has_prev: false,
+      },
     };
   } catch (err) {
     throw toApiError(err);

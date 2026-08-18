@@ -34,11 +34,11 @@ const STATUS_CFG: Record<CustomerStatus, { label: string; className: string }> =
   {
     active: {
       label: "Active",
-      className: "border-[#14532D]/50 bg-[#052E16]/60 text-[#22C55E]",
+      className: "border-dash-success-border bg-dash-success-bg text-dash-success",
     },
     inactive: {
       label: "Inactive",
-      className: "border-[#78350F]/50 bg-[#451A03]/60 text-[#F59E0B]",
+      className: "border-dash-border bg-dash-hover text-dash-muted",
     },
   };
 
@@ -63,11 +63,11 @@ function CustomerAvatar({ customer }: { customer: Customer }) {
     "?";
 
   const COLORS = [
-    "bg-[#1e3a5f] text-[#60A5FA]",
-    "bg-[#14532D] text-[#4ade80]",
-    "bg-[#451A03] text-[#F59E0B]",
-    "bg-[#3b0764] text-[#c084fc]",
-    "bg-[#164e63] text-[#67e8f9]",
+    "bg-dash-accent-soft text-dash-accent",
+    "bg-dash-purple-bg text-dash-purple",
+    "bg-dash-success-bg text-dash-success",
+    "bg-dash-warning-bg text-dash-warning",
+    "bg-chart-6/10 text-chart-6",
   ];
   const colorIdx =
     (customer.first_name?.charCodeAt(0) ?? customer.email?.charCodeAt(0) ?? 0) %
@@ -164,7 +164,7 @@ function CustomerDrawer({
   };
 
   const inputCls =
-    "h-9 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors";
+    "h-9 w-full rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors";
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -172,32 +172,32 @@ function CustomerDrawer({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 flex h-full w-full max-w-sm flex-col border-l border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 flex h-full w-full max-w-sm flex-col border-l border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="flex items-start justify-between border-b border-dash-border px-5 py-4">
           <div className="flex items-center gap-3 min-w-0">
             <CustomerAvatar customer={customer} />
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+              <p className="truncate text-sm font-semibold text-dash-foreground">
                 {fullName(customer)}
               </p>
-              <p className="mt-0.5 truncate text-xs text-[#71717A]">
+              <p className="mt-0.5 truncate text-xs text-dash-muted">
                 {customer.email ?? "No email"}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={15} />
           </button>
         </div>
 
         {/* Status + joined */}
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-3">
+        <div className="flex items-center justify-between border-b border-dash-border px-5 py-3">
           <StatusBadge status={customer.status} />
-          <span className="flex items-center gap-1.5 text-xs text-[#52525B]">
+          <span className="flex items-center gap-1.5 text-xs text-dash-faint">
             <Calendar size={11} />
             Joined {formatDate(customer.created_at)}
           </span>
@@ -205,14 +205,14 @@ function CustomerDrawer({
 
         {/* Edit fields */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
             Details
           </p>
           <div className="flex flex-col gap-3">
             {/* Name row */}
             <div className="grid grid-cols-2 gap-2">
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[#52525B]">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-dash-faint">
                   F
                 </span>
                 <input
@@ -224,7 +224,7 @@ function CustomerDrawer({
                 />
               </div>
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[#52525B]">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-dash-faint">
                   L
                 </span>
                 <input
@@ -241,7 +241,7 @@ function CustomerDrawer({
             <div className="relative">
               <Mail
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="email"
@@ -256,7 +256,7 @@ function CustomerDrawer({
             <div className="relative">
               <Phone
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="tel"
@@ -273,7 +273,7 @@ function CustomerDrawer({
               type="button"
               onClick={handleSave}
               disabled={updateCustomer.isPending}
-              className="mt-4 flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-[#FAFAFA] text-sm font-medium text-[#09090B] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="mt-4 flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-dash-accent text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {updateCustomer.isPending && (
                 <Loader2 size={13} className="animate-spin" />
@@ -284,17 +284,17 @@ function CustomerDrawer({
         </div>
 
         {/* Delete */}
-        <div className="border-t border-[#1C1C1F] px-5 py-4">
+        <div className="border-t border-dash-border px-5 py-4">
           {confirmDelete ? (
             <div className="flex flex-col gap-2">
-              <p className="text-xs text-[#f87171]">
+              <p className="text-xs text-dash-error">
                 This will permanently delete this customer. Are you sure?
               </p>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setConfirmDelete(false)}
-                  className="flex-1 h-9 rounded-lg border border-[#1C1C1F] text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] transition-colors"
+                  className="flex-1 h-9 rounded-lg border border-dash-border text-sm font-medium text-dash-muted hover:bg-dash-hover transition-colors"
                 >
                   Cancel
                 </button>
@@ -302,7 +302,7 @@ function CustomerDrawer({
                   type="button"
                   onClick={handleDelete}
                   disabled={deleteCustomer.isPending}
-                  className="flex flex-1 h-9 items-center justify-center gap-2 rounded-lg bg-[#7f1d1d] text-sm font-medium text-[#f87171] hover:bg-[#991b1b] disabled:opacity-50 transition-colors"
+                  className="flex flex-1 h-9 items-center justify-center gap-2 rounded-lg bg-dash-error-bg text-sm font-medium text-dash-error hover:bg-dash-error hover:text-white disabled:opacity-50 transition-colors"
                 >
                   {deleteCustomer.isPending && (
                     <Loader2 size={13} className="animate-spin" />
@@ -315,7 +315,7 @@ function CustomerDrawer({
             <button
               type="button"
               onClick={() => setConfirmDelete(true)}
-              className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-[#7f1d1d]/40 bg-[#450a0a]/40 text-sm font-medium text-[#f87171] hover:bg-[#450a0a]/70 transition-colors"
+              className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-dash-error-border bg-dash-error-bg text-sm font-medium text-dash-error hover:bg-dash-error-border transition-colors"
             >
               Delete Customer
             </button>
@@ -378,7 +378,7 @@ export default function CustomersPage() {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
           >
             <UserPlus size={15} />
             Create Customer
@@ -411,27 +411,27 @@ export default function CustomersPage() {
       </div>
 
       {/* Table */}
-      <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1C1C1F] px-5 py-4">
-          <h2 className="text-sm font-semibold text-[#FAFAFA]">
+      <section className="rounded-xl border border-dash-border bg-dash-card">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-dash-border px-5 py-4">
+          <h2 className="text-sm font-semibold text-dash-foreground">
             All Customers
           </h2>
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative">
               <Search
                 size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
               />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name, email, phone…"
-                className="h-9 w-60 rounded-lg border border-[#1C1C1F] bg-[#09090B] pl-8 pr-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2a2a30] focus:outline-none transition-colors"
+                className="h-9 w-60 rounded-lg border border-dash-border bg-dash-card pl-8 pr-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
               />
             </div>
             {/* Status pills */}
-            <div className="flex items-center gap-1 rounded-lg border border-[#1C1C1F] bg-[#09090B] p-1">
+            <div className="flex items-center gap-1 rounded-lg border border-dash-border bg-dash-card p-1">
               {STATUS_FILTERS.map((opt) => (
                 <button
                   key={opt.value}
@@ -440,8 +440,8 @@ export default function CustomersPage() {
                   className={cn(
                     "h-7 rounded-md px-2.5 text-xs font-medium transition-colors",
                     statusFilter === opt.value
-                      ? "bg-[#1C1C1F] text-[#FAFAFA]"
-                      : "text-[#52525B] hover:text-[#A1A1AA]",
+                      ? "bg-dash-accent-soft text-dash-foreground"
+                      : "text-dash-faint hover:text-dash-muted",
                   )}
                 >
                   {opt.label}
@@ -453,16 +453,16 @@ export default function CustomersPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 size={22} className="animate-spin text-[#3F3F46]" />
+            <Loader2 size={22} className="animate-spin text-dash-faint" />
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <AlertCircle
               size={24}
-              className="text-[#3F3F46]"
+              className="text-dash-faint"
               strokeWidth={1.5}
             />
-            <p className="text-sm text-[#71717A]">Failed to load customers.</p>
+            <p className="text-sm text-dash-muted">Failed to load customers.</p>
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
@@ -477,12 +477,12 @@ export default function CustomersPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1C1C1F]">
+                <tr className="border-b border-dash-border">
                   {["Customer", "Email", "Phone", "Status", "Joined", ""].map(
                     (h) => (
                       <th
                         key={h}
-                        className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
+                        className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-dash-faint"
                       >
                         {h}
                       </th>
@@ -490,22 +490,22 @@ export default function CustomersPage() {
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1C1C1F]">
+              <tbody className="divide-y divide-dash-border">
                 {filtered.map((customer) => (
                   <tr
                     key={customer.id}
                     onClick={() => setSelected(customer)}
-                    className="cursor-pointer transition-colors hover:bg-[#111113]"
+                    className="cursor-pointer transition-colors hover:bg-dash-hover"
                   >
                     {/* Customer */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <CustomerAvatar customer={customer} />
-                        <span className="font-medium text-[#FAFAFA]">
+                        <span className="font-medium text-dash-foreground">
                           {[customer.first_name, customer.last_name]
                             .filter(Boolean)
                             .join(" ") || (
-                            <span className="text-[#52525B]">No name</span>
+                            <span className="text-dash-faint">No name</span>
                           )}
                         </span>
                       </div>
@@ -513,18 +513,18 @@ export default function CustomersPage() {
 
                     {/* Email */}
                     <td className="px-5 py-3.5">
-                      <span className="text-xs text-[#A1A1AA]">
+                      <span className="text-xs text-dash-muted">
                         {customer.email ?? (
-                          <span className="text-[#3F3F46]">—</span>
+                          <span className="text-dash-faint">—</span>
                         )}
                       </span>
                     </td>
 
                     {/* Phone */}
                     <td className="px-5 py-3.5">
-                      <span className="text-xs text-[#A1A1AA]">
+                      <span className="text-xs text-dash-muted">
                         {customer.phone ?? (
-                          <span className="text-[#3F3F46]">—</span>
+                          <span className="text-dash-faint">—</span>
                         )}
                       </span>
                     </td>
@@ -536,14 +536,14 @@ export default function CustomersPage() {
 
                     {/* Joined */}
                     <td className="px-5 py-3.5">
-                      <span className="text-xs text-[#71717A]">
+                      <span className="text-xs text-dash-muted">
                         {formatDate(customer.created_at)}
                       </span>
                     </td>
 
                     {/* Arrow */}
                     <td className="px-5 py-3.5">
-                      <ChevronRight size={14} className="text-[#3F3F46]" />
+                      <ChevronRight size={14} className="text-dash-faint" />
                     </td>
                   </tr>
                 ))}

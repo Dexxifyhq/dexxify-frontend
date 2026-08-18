@@ -4,6 +4,7 @@ import type { DashboardParams } from '@/lib/types/dashboard';
 
 export const dashboardKeys = {
   all: ['dashboard'] as const,
+  overview: () => [...dashboardKeys.all, 'overview'] as const,
   stats: (params: DashboardParams) =>
     [...dashboardKeys.all, 'stats', params] as const,
   revenueChart: (params: DashboardParams) =>
@@ -13,6 +14,13 @@ export const dashboardKeys = {
   recentActivity: (limit: number) =>
     [...dashboardKeys.all, 'recent-activity', limit] as const,
 };
+
+export function useDashboardOverview() {
+  return useQuery({
+    queryKey: dashboardKeys.overview(),
+    queryFn: dashboardApi.getOverview,
+  });
+}
 
 export function useDashboardStats(params: DashboardParams) {
   return useQuery({

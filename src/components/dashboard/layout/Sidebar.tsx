@@ -182,14 +182,14 @@ export default function Sidebar({
             "group relative flex items-center rounded-lg text-sm transition-colors",
             collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
             active
-              ? "bg-[#162038] font-medium text-[#FAFAFA]"
-              : "text-[#71717A] hover:bg-[#111113] hover:text-[#FAFAFA]",
+              ? "bg-dash-accent-soft font-medium text-dash-foreground"
+              : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
           )}
         >
           {active && (
             <span
               className={cn(
-                "absolute top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#2563EB]",
+                "absolute top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-dash-accent",
                 collapsed ? "-left-2" : "-left-3",
               )}
             />
@@ -198,8 +198,8 @@ export default function Sidebar({
             size={16}
             className={
               active
-                ? "text-[#3B82F6]"
-                : "text-[#52525B] group-hover:text-[#FAFAFA]"
+                ? "text-dash-accent"
+                : "text-dash-faint group-hover:text-dash-foreground"
             }
           />
           {!collapsed && entry.label}
@@ -221,19 +221,19 @@ export default function Sidebar({
             "group relative flex w-full items-center rounded-lg text-sm transition-colors",
             collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
             groupActive
-              ? "font-medium text-[#FAFAFA]"
-              : "text-[#71717A] hover:bg-[#111113] hover:text-[#FAFAFA]",
+              ? "font-medium text-dash-foreground"
+              : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
           )}
         >
           {groupActive && collapsed && (
-            <span className="absolute -left-2 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#2563EB]" />
+            <span className="absolute -left-2 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-dash-accent" />
           )}
           <Icon
             size={16}
             className={
               groupActive
-                ? "text-[#3B82F6]"
-                : "text-[#52525B] group-hover:text-[#FAFAFA]"
+                ? "text-dash-accent"
+                : "text-dash-faint group-hover:text-dash-foreground"
             }
           />
           {!collapsed && (
@@ -242,7 +242,7 @@ export default function Sidebar({
               <ChevronDown
                 size={14}
                 className={cn(
-                  "text-[#52525B] transition-transform",
+                  "text-dash-faint transition-transform",
                   isOpen && "rotate-180",
                 )}
               />
@@ -262,13 +262,13 @@ export default function Sidebar({
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg py-2 pl-9 pr-3 text-sm transition-colors",
                     active
-                      ? "bg-[#162038] font-medium text-[#FAFAFA]"
-                      : "text-[#71717A] hover:bg-[#111113] hover:text-[#FAFAFA]",
+                      ? "bg-dash-accent-soft font-medium text-dash-foreground"
+                      : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
                   )}
                 >
                   <CIcon
                     size={15}
-                    className={active ? "text-[#3B82F6]" : "text-[#52525B]"}
+                    className={active ? "text-dash-accent" : "text-dash-faint"}
                   />
                   {child.label}
                 </Link>
@@ -292,7 +292,7 @@ export default function Sidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#1C1C1F] bg-[#09090B] transition-[width,transform] duration-200",
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-dash-border bg-dash-card transition-[width,transform] duration-200",
           // Desktop: collapse rail
           "lg:translate-x-0",
           collapsed ? "lg:w-16" : "lg:w-60",
@@ -302,15 +302,15 @@ export default function Sidebar({
         )}
       >
         {/* Workspace block */}
-        <div className="relative border-b border-[#1C1C1F]">
+        <div className="relative border-b border-dash-border">
           {bizMenuOpen && isExpanded && (
             <>
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setBizMenuOpen(false)}
               />
-              <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
-                <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-widest text-[#52525B]">
+              <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-dash-border bg-dash-card py-1 shadow-xl">
+                <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-widest text-dash-faint">
                   Workspaces
                 </p>
 
@@ -330,8 +330,8 @@ export default function Sidebar({
                       className={cn(
                         "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors disabled:cursor-default",
                         isActive
-                          ? "text-[#FAFAFA]"
-                          : "text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA]",
+                          ? "text-dash-foreground"
+                          : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
                       )}
                     >
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-[10px] font-bold text-white">
@@ -341,28 +341,28 @@ export default function Sidebar({
                         {biz.name}
                       </span>
                       {isActive && (
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#22C55E]" />
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-dash-success" />
                       )}
                       {!isActive &&
                         selectBusiness.isPending &&
                         selectBusiness.variables === biz.id && (
                           <Loader2
                             size={12}
-                            className="animate-spin text-[#52525B]"
+                            className="animate-spin text-dash-faint"
                           />
                         )}
                     </button>
                   );
                 })}
 
-                <div className="my-1 border-t border-[#1C1C1F]" />
+                <div className="my-1 border-t border-dash-border" />
                 <button
                   type="button"
                   onClick={() => {
                     router.push("/settings");
                     setBizMenuOpen(false);
                   }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
                 >
                   <Settings size={14} />
                   Manage businesses
@@ -385,7 +385,7 @@ export default function Sidebar({
               "flex w-full items-center py-4 transition-colors",
               !isExpanded
                 ? "justify-center px-0"
-                : "gap-2.5 px-4 hover:bg-[#111113]",
+                : "gap-2.5 px-4 hover:bg-dash-hover",
             )}
           >
             <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
@@ -394,16 +394,16 @@ export default function Sidebar({
             {isExpanded && (
               <>
                 <div className="min-w-0 flex-1 text-left">
-                  <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+                  <p className="truncate text-sm font-semibold text-dash-foreground">
                     {businessName}
                   </p>
                   {shortId && (
-                    <p className="truncate text-[11px] text-[#52525B]">
+                    <p className="truncate text-[11px] text-dash-faint">
                       ID {shortId}
                     </p>
                   )}
                 </div>
-                <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
+                <ChevronsUpDown size={14} className="shrink-0 text-dash-faint" />
               </>
             )}
           </button>
@@ -417,26 +417,26 @@ export default function Sidebar({
           )}
         >
           <div className="space-y-0.5">{NAV_TOP.map(renderEntry)}</div>
-          <div className="my-3 border-t border-[#1C1C1F]" />
+          <div className="my-3 border-t border-dash-border" />
           <div className="space-y-0.5">{NAV_BOTTOM.map(renderEntry)}</div>
         </nav>
 
         {/* Profile footer */}
-        <div className="relative border-t border-[#1C1C1F] p-3">
+        <div className="relative border-t border-dash-border p-3">
           {menuOpen && !collapsed && (
             <>
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setMenuOpen(false)}
               />
-              <div className="absolute bottom-full left-3 right-3 z-50 mb-2 overflow-hidden rounded-xl border border-[#1C1C1F] bg-[#111113] py-1 shadow-xl">
+              <div className="absolute bottom-full left-3 right-3 z-50 mb-2 overflow-hidden rounded-xl border border-dash-border bg-dash-card py-1 shadow-xl">
                 <button
                   type="button"
                   onClick={() => {
                     router.push("/settings");
                     setMenuOpen(false);
                   }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
                 >
                   <User size={14} />
                   Profile
@@ -447,17 +447,17 @@ export default function Sidebar({
                     router.push("/settings");
                     setMenuOpen(false);
                   }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
                 >
                   <Settings size={14} />
                   Settings
                 </button>
-                <div className="my-1 border-t border-[#1C1C1F]" />
+                <div className="my-1 border-t border-dash-border" />
                 <button
                   type="button"
                   onClick={handleLogout}
                   disabled={loggingOut}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-[#EF4444] transition-colors hover:bg-[#1C1C1F] disabled:opacity-50"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-error transition-colors hover:bg-dash-hover disabled:opacity-50"
                 >
                   {loggingOut ? (
                     <Loader2 size={14} className="animate-spin" />
@@ -481,33 +481,33 @@ export default function Sidebar({
             }}
             title={collapsed ? user.name || "Account" : undefined}
             className={cn(
-              "group flex w-full items-center rounded-lg transition-colors hover:bg-[#111113]",
+              "group flex w-full items-center rounded-lg transition-colors hover:bg-dash-hover",
               collapsed ? "justify-center px-0 py-2" : "gap-2.5 px-2 py-2",
             )}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-xs font-semibold text-white">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-accent text-xs font-semibold text-white">
               {user.initials || "U"}
             </div>
             {!collapsed && (
               <>
                 <div className="min-w-0 flex-1 text-left">
-                  <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                  <p className="truncate text-sm font-medium text-dash-foreground">
                     {user.name || "Account"}
                   </p>
                   {user.role && (
-                    <p className="truncate text-[11px] capitalize text-[#52525B]">
+                    <p className="truncate text-[11px] capitalize text-dash-faint">
                       {user.role.toLowerCase()}
                     </p>
                   )}
                 </div>
-                <ChevronsUpDown size={14} className="shrink-0 text-[#52525B]" />
+                <ChevronsUpDown size={14} className="shrink-0 text-dash-faint" />
               </>
             )}
           </button>
         </div>
 
         {/* Mobile-only: env toggle */}
-        <div className="border-t border-[#1C1C1F] p-3 lg:hidden">
+        <div className="border-t border-dash-border p-3 lg:hidden">
           <button
             type="button"
             onClick={handleEnvToggle}
@@ -515,8 +515,8 @@ export default function Sidebar({
             className={cn(
               "flex w-full items-center justify-center gap-2 rounded-full border py-2 text-xs font-semibold transition-colors disabled:opacity-60",
               isLive
-                ? "border-[#14532D]/50 bg-[#052E16]/60 text-[#22C55E]"
-                : "border-[#78350F]/50 bg-[#451A03]/60 text-[#F59E0B]",
+                ? "border-dash-success-border bg-dash-success-bg text-dash-success"
+                : "border-dash-warning-border bg-dash-warning-bg text-dash-warning",
             )}
           >
             {switchMode.isPending ? (
@@ -525,7 +525,7 @@ export default function Sidebar({
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full",
-                  isLive ? "bg-[#22C55E]" : "bg-[#F59E0B]",
+                  isLive ? "bg-dash-success" : "bg-dash-warning",
                 )}
               />
             )}

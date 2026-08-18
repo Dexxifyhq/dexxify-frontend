@@ -47,31 +47,31 @@ function InstrumentCard({
   merchantSteps,
 }: InstrumentCardProps) {
   return (
-    <div className={`flex flex-col rounded-xl border ${borderColor} bg-[#0D0D0F]`}>
+    <div className={`flex flex-col rounded-xl border ${borderColor} bg-dash-card`}>
       {/* Header */}
       <div className={`flex items-start gap-3 border-b ${borderColor} p-5`}>
         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${bgColor}`}>
           <span className={color}>{icon}</span>
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#FAFAFA]">{name}</p>
-          <p className="mt-0.5 text-xs text-[#71717A]">{tagline}</p>
+          <p className="text-sm font-semibold text-dash-foreground">{name}</p>
+          <p className="mt-0.5 text-xs text-dash-muted">{tagline}</p>
         </div>
       </div>
 
       {/* URL pattern */}
-      <div className="border-b border-[#1C1C1F] px-5 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-[#52525B]">URL</p>
-        <p className="mt-1 font-mono text-xs text-[#71717A]">{url}</p>
+      <div className="border-b border-dash-border px-5 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-dash-faint">URL</p>
+        <p className="mt-1 font-mono text-xs text-dash-muted">{url}</p>
       </div>
 
       {/* Traits */}
-      <div className="border-b border-[#1C1C1F] px-5 py-4">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[#52525B]">Characteristics</p>
+      <div className="border-b border-dash-border px-5 py-4">
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-dash-faint">Characteristics</p>
         <ul className="flex flex-col gap-2">
           {traits.map((t, i) => (
-            <li key={i} className="flex items-center gap-2 text-xs text-[#A1A1AA]">
-              <span className="text-[#52525B]">{t.icon}</span>
+            <li key={i} className="flex items-center gap-2 text-xs text-dash-muted">
+              <span className="text-dash-faint">{t.icon}</span>
               {t.label}
             </li>
           ))}
@@ -80,13 +80,13 @@ function InstrumentCard({
 
       {/* Merchant flow */}
       <div className="flex flex-col gap-2 px-5 py-4">
-        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-[#52525B]">Merchant creates</p>
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-dash-faint">Merchant creates</p>
         {merchantSteps.map((step, i) => (
           <div key={i} className="flex items-start gap-2.5">
             <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${bgColor} ${color}`}>
               {i + 1}
             </span>
-            <p className="text-xs text-[#71717A]">{step}</p>
+            <p className="text-xs text-dash-muted">{step}</p>
           </div>
         ))}
       </div>
@@ -119,19 +119,19 @@ function JourneyStep({
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2563EB]/40 bg-[#1e3a5f]/40 text-[#60A5FA]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dash-accent bg-dash-accent-soft text-dash-accent">
           {icon}
         </div>
         <div className="mt-2 text-center">
-          <p className="text-xs font-semibold text-[#FAFAFA]">{title}</p>
-          <p className="mt-0.5 max-w-[120px] text-[11px] text-[#71717A]">{description}</p>
+          <p className="text-xs font-semibold text-dash-foreground">{title}</p>
+          <p className="mt-0.5 max-w-[120px] text-[11px] text-dash-muted">{description}</p>
         </div>
       </div>
       {!isLast && (
         <div className="mt-3 flex flex-col items-center gap-0.5">
-          <div className="h-1 w-1 rounded-full bg-[#2563EB]/40" />
-          <div className="h-1 w-1 rounded-full bg-[#2563EB]/40" />
-          <div className="h-1 w-1 rounded-full bg-[#2563EB]/40" />
+          <div className="h-1 w-1 rounded-full bg-dash-accent/40" />
+          <div className="h-1 w-1 rounded-full bg-dash-accent/40" />
+          <div className="h-1 w-1 rounded-full bg-dash-accent/40" />
         </div>
       )}
     </div>
@@ -152,11 +152,11 @@ function CompareRow({
   page: string;
 }) {
   return (
-    <tr className="border-t border-[#1C1C1F]">
-      <td className="py-3 pr-4 text-xs font-medium text-[#71717A]">{label}</td>
-      <td className="py-3 pr-4 text-xs text-[#A1A1AA]">{invoice}</td>
-      <td className="py-3 pr-4 text-xs text-[#A1A1AA]">{checkout}</td>
-      <td className="py-3 text-xs text-[#A1A1AA]">{page}</td>
+    <tr className="border-t border-dash-border">
+      <td className="py-3 pr-4 text-xs font-medium text-dash-muted">{label}</td>
+      <td className="py-3 pr-4 text-xs text-dash-muted">{invoice}</td>
+      <td className="py-3 pr-4 text-xs text-dash-muted">{checkout}</td>
+      <td className="py-3 text-xs text-dash-muted">{page}</td>
     </tr>
   );
 }
@@ -168,23 +168,23 @@ export default function WorkflowsPage() {
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold text-[#FAFAFA]">Payment Workflows</h1>
-        <p className="text-sm text-[#71717A]">
+        <h1 className="text-xl font-semibold text-dash-foreground">Payment Workflows</h1>
+        <p className="text-sm text-dash-muted">
           Three instruments, one customer journey. Understand what to use and when.
         </p>
       </div>
 
       {/* ── Three instruments ── */}
       <div>
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
           Payment Instruments
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <InstrumentCard
             icon={<FileText size={16} />}
-            color="text-[#F59E0B]"
-            bgColor="bg-[#451A03]/60"
-            borderColor="border-[#78350F]/40"
+            color="text-dash-warning"
+            bgColor="bg-dash-warning-bg"
+            borderColor="border-dash-warning-border"
             name="Invoice"
             tagline="Bill a specific customer"
             useCase="B2B / Client billing"
@@ -205,9 +205,9 @@ export default function WorkflowsPage() {
 
           <InstrumentCard
             icon={<Link2 size={16} />}
-            color="text-[#60A5FA]"
-            bgColor="bg-[#1e3a5f]/60"
-            borderColor="border-[#2563EB]/30"
+            color="text-dash-accent"
+            bgColor="bg-dash-accent-soft"
+            borderColor="border-dash-accent"
             name="Checkout Session"
             tagline="Quick one-time payment link"
             useCase="One-off / API-driven"
@@ -228,9 +228,9 @@ export default function WorkflowsPage() {
 
           <InstrumentCard
             icon={<Globe size={16} />}
-            color="text-[#22C55E]"
-            bgColor="bg-[#052E16]/60"
-            borderColor="border-[#14532D]/40"
+            color="text-dash-success"
+            bgColor="bg-dash-success-bg"
+            borderColor="border-dash-success-border"
             name="Payment Page"
             tagline="Permanent, reusable storefront"
             useCase="E-commerce / Donations"
@@ -252,8 +252,8 @@ export default function WorkflowsPage() {
       </div>
 
       {/* ── Shared customer journey ── */}
-      <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F] p-6">
-        <p className="mb-6 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+      <div className="rounded-xl border border-dash-border bg-dash-card p-6">
+        <p className="mb-6 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
           Shared Customer Journey — same flow for all three instruments
         </p>
         <div className="flex flex-wrap items-start justify-center gap-2">
@@ -263,7 +263,7 @@ export default function WorkflowsPage() {
             title="Opens link"
             description="Customer clicks the merchant's shared URL"
           />
-          <div className="mt-4 hidden sm:flex items-center text-[#2563EB]/30">
+          <div className="mt-4 hidden sm:flex items-center text-dash-accent/30">
             <ArrowRight size={16} />
           </div>
           <JourneyStep
@@ -272,7 +272,7 @@ export default function WorkflowsPage() {
             title="Sees details"
             description="Amount, description, merchant name"
           />
-          <div className="mt-4 hidden sm:flex items-center text-[#2563EB]/30">
+          <div className="mt-4 hidden sm:flex items-center text-dash-accent/30">
             <ArrowRight size={16} />
           </div>
           <JourneyStep
@@ -281,7 +281,7 @@ export default function WorkflowsPage() {
             title="Enters details"
             description="Name + email address"
           />
-          <div className="mt-4 hidden sm:flex items-center text-[#2563EB]/30">
+          <div className="mt-4 hidden sm:flex items-center text-dash-accent/30">
             <ArrowRight size={16} />
           </div>
           <JourneyStep
@@ -290,7 +290,7 @@ export default function WorkflowsPage() {
             title="Picks token"
             description="Selects crypto from available assets"
           />
-          <div className="mt-4 hidden sm:flex items-center text-[#2563EB]/30">
+          <div className="mt-4 hidden sm:flex items-center text-dash-accent/30">
             <ArrowRight size={16} />
           </div>
           <JourneyStep
@@ -299,7 +299,7 @@ export default function WorkflowsPage() {
             title="Gets address"
             description="Unique deposit address + amount generated"
           />
-          <div className="mt-4 hidden sm:flex items-center text-[#2563EB]/30">
+          <div className="mt-4 hidden sm:flex items-center text-dash-accent/30">
             <ArrowRight size={16} />
           </div>
           <JourneyStep
@@ -308,7 +308,7 @@ export default function WorkflowsPage() {
             title="Sends crypto"
             description="Sends exact amount to the address"
           />
-          <div className="mt-4 hidden sm:flex items-center text-[#2563EB]/30">
+          <div className="mt-4 hidden sm:flex items-center text-dash-accent/30">
             <ArrowRight size={16} />
           </div>
           <JourneyStep
@@ -321,28 +321,28 @@ export default function WorkflowsPage() {
         </div>
 
         {/* Note */}
-        <div className="mt-6 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-4 py-3 text-xs text-[#71717A]">
-          <span className="font-semibold text-[#A1A1AA]">Key principle: </span>
+        <div className="mt-6 rounded-lg border border-dash-border bg-dash-hover px-4 py-3 text-xs text-dash-muted">
+          <span className="font-semibold text-dash-muted">Key principle: </span>
           Each call to{" "}
-          <span className="font-mono text-[#60A5FA]">POST /payment-sessions/:id/pay</span> (or the invoice/page equivalent) generates a fresh, unique on-chain deposit address. The link is safe to share publicly — the address is tied to the individual customer submission, not the link itself.
+          <span className="font-mono text-dash-accent">POST /payment-sessions/:id/pay</span> (or the invoice/page equivalent) generates a fresh, unique on-chain deposit address. The link is safe to share publicly — the address is tied to the individual customer submission, not the link itself.
         </div>
       </div>
 
       {/* ── What the customer page looks like ── */}
-      <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-        <div className="border-b border-[#1C1C1F] px-5 py-4">
-          <p className="text-sm font-semibold text-[#FAFAFA]">What the Customer Page Shows</p>
-          <p className="mt-0.5 text-xs text-[#71717A]">
+      <div className="rounded-xl border border-dash-border bg-dash-card">
+        <div className="border-b border-dash-border px-5 py-4">
+          <p className="text-sm font-semibold text-dash-foreground">What the Customer Page Shows</p>
+          <p className="mt-0.5 text-xs text-dash-muted">
             What differs between instruments on the same page template
           </p>
         </div>
 
-        <div className="grid grid-cols-1 divide-y divide-[#1C1C1F] md:grid-cols-3 md:divide-x md:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-dash-border md:grid-cols-3 md:divide-x md:divide-y-0">
           {/* Invoice */}
           <div className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <FileText size={13} className="text-[#F59E0B]" />
-              <p className="text-xs font-semibold text-[#FAFAFA]">Invoice Page</p>
+              <FileText size={13} className="text-dash-warning" />
+              <p className="text-xs font-semibold text-dash-foreground">Invoice Page</p>
             </div>
             <ul className="flex flex-col gap-2">
               {[
@@ -354,8 +354,8 @@ export default function WorkflowsPage() {
                 "Name + email pre-filled if known",
                 "Token picker → deposit address",
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-[#71717A]">
-                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#F59E0B]/60" />
+                <li key={i} className="flex items-start gap-2 text-xs text-dash-muted">
+                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-dash-warning/60" />
                   {item}
                 </li>
               ))}
@@ -365,8 +365,8 @@ export default function WorkflowsPage() {
           {/* Checkout */}
           <div className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <Link2 size={13} className="text-[#60A5FA]" />
-              <p className="text-xs font-semibold text-[#FAFAFA]">Checkout Session Page</p>
+              <Link2 size={13} className="text-dash-accent" />
+              <p className="text-xs font-semibold text-dash-foreground">Checkout Session Page</p>
             </div>
             <ul className="flex flex-col gap-2">
               {[
@@ -378,8 +378,8 @@ export default function WorkflowsPage() {
                 "Min deposit info per token",
                 "Deposit address + copy button",
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-[#71717A]">
-                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#60A5FA]/60" />
+                <li key={i} className="flex items-start gap-2 text-xs text-dash-muted">
+                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-dash-accent/60" />
                   {item}
                 </li>
               ))}
@@ -389,8 +389,8 @@ export default function WorkflowsPage() {
           {/* Payment Page */}
           <div className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <Globe size={13} className="text-[#22C55E]" />
-              <p className="text-xs font-semibold text-[#FAFAFA]">Payment Page</p>
+              <Globe size={13} className="text-dash-success" />
+              <p className="text-xs font-semibold text-dash-foreground">Payment Page</p>
             </div>
             <ul className="flex flex-col gap-2">
               {[
@@ -402,8 +402,8 @@ export default function WorkflowsPage() {
                 "No expiry — stays open",
                 "Deposit address per submission",
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-[#71717A]">
-                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#22C55E]/60" />
+                <li key={i} className="flex items-start gap-2 text-xs text-dash-muted">
+                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-dash-success/60" />
                   {item}
                 </li>
               ))}
@@ -413,24 +413,24 @@ export default function WorkflowsPage() {
       </div>
 
       {/* ── Comparison table ── */}
-      <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-        <div className="border-b border-[#1C1C1F] px-5 py-4">
-          <p className="text-sm font-semibold text-[#FAFAFA]">Feature Comparison</p>
+      <div className="rounded-xl border border-dash-border bg-dash-card">
+        <div className="border-b border-dash-border px-5 py-4">
+          <p className="text-sm font-semibold text-dash-foreground">Feature Comparison</p>
         </div>
         <div className="overflow-x-auto px-5 pb-5">
           <table className="w-full">
             <thead>
               <tr>
-                <th className="pb-3 pr-4 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-[#52525B]">
+                <th className="pb-3 pr-4 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-dash-faint">
                   Feature
                 </th>
-                <th className="pb-3 pr-4 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-[#F59E0B]">
+                <th className="pb-3 pr-4 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-dash-warning">
                   Invoice
                 </th>
-                <th className="pb-3 pr-4 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-[#60A5FA]">
+                <th className="pb-3 pr-4 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-dash-accent">
                   Checkout
                 </th>
-                <th className="pb-3 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-[#22C55E]">
+                <th className="pb-3 pt-4 text-left text-[10px] font-semibold uppercase tracking-wider text-dash-success">
                   Payment Page
                 </th>
               </tr>
@@ -451,17 +451,17 @@ export default function WorkflowsPage() {
       </div>
 
       {/* ── What needs to be built ── */}
-      <div className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-        <div className="border-b border-[#1C1C1F] px-5 py-4">
-          <p className="text-sm font-semibold text-[#FAFAFA]">Build Checklist</p>
-          <p className="mt-0.5 text-xs text-[#71717A]">What still needs to be wired up</p>
+      <div className="rounded-xl border border-dash-border bg-dash-card">
+        <div className="border-b border-dash-border px-5 py-4">
+          <p className="text-sm font-semibold text-dash-foreground">Build Checklist</p>
+          <p className="mt-0.5 text-xs text-dash-muted">What still needs to be wired up</p>
         </div>
-        <div className="grid grid-cols-1 divide-y divide-[#1C1C1F] md:grid-cols-3 md:divide-x md:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-dash-border md:grid-cols-3 md:divide-x md:divide-y-0">
           {/* Invoice */}
           <div className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <FileText size={13} className="text-[#F59E0B]" />
-              <p className="text-xs font-semibold text-[#FAFAFA]">Invoice</p>
+              <FileText size={13} className="text-dash-warning" />
+              <p className="text-xs font-semibold text-dash-foreground">Invoice</p>
             </div>
             <ul className="flex flex-col gap-2.5">
               {[
@@ -472,10 +472,10 @@ export default function WorkflowsPage() {
                 { done: false, label: "Paid / expired status tracking" },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-2 text-xs">
-                  <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm border text-[9px] ${item.done ? "border-[#22C55E] bg-[#22C55E]/20 text-[#22C55E]" : "border-[#3F3F46] text-transparent"}`}>
+                  <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm border text-[9px] ${item.done ? "border-dash-success bg-dash-success/20 text-dash-success" : "border-dash-faint text-transparent"}`}>
                     ✓
                   </span>
-                  <span className={item.done ? "text-[#71717A] line-through" : "text-[#A1A1AA]"}>
+                  <span className={item.done ? "text-dash-muted line-through" : "text-dash-muted"}>
                     {item.label}
                   </span>
                 </li>
@@ -486,8 +486,8 @@ export default function WorkflowsPage() {
           {/* Checkout */}
           <div className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <Link2 size={13} className="text-[#60A5FA]" />
-              <p className="text-xs font-semibold text-[#FAFAFA]">Checkout Session</p>
+              <Link2 size={13} className="text-dash-accent" />
+              <p className="text-xs font-semibold text-dash-foreground">Checkout Session</p>
             </div>
             <ul className="flex flex-col gap-2.5">
               {[
@@ -501,10 +501,10 @@ export default function WorkflowsPage() {
                 { done: false, label: "Multi-use toggle on create modal" },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-2 text-xs">
-                  <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm border text-[9px] ${item.done ? "border-[#22C55E] bg-[#22C55E]/20 text-[#22C55E]" : "border-[#3F3F46] text-transparent"}`}>
+                  <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm border text-[9px] ${item.done ? "border-dash-success bg-dash-success/20 text-dash-success" : "border-dash-faint text-transparent"}`}>
                     ✓
                   </span>
-                  <span className={item.done ? "text-[#71717A] line-through" : "text-[#A1A1AA]"}>
+                  <span className={item.done ? "text-dash-muted line-through" : "text-dash-muted"}>
                     {item.label}
                   </span>
                 </li>
@@ -515,8 +515,8 @@ export default function WorkflowsPage() {
           {/* Payment Page */}
           <div className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <Globe size={13} className="text-[#22C55E]" />
-              <p className="text-xs font-semibold text-[#FAFAFA]">Payment Page</p>
+              <Globe size={13} className="text-dash-success" />
+              <p className="text-xs font-semibold text-dash-foreground">Payment Page</p>
             </div>
             <ul className="flex flex-col gap-2.5">
               {[
@@ -529,10 +529,10 @@ export default function WorkflowsPage() {
                 { done: false, label: "Embed code / share options" },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-2 text-xs">
-                  <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm border text-[9px] ${item.done ? "border-[#22C55E] bg-[#22C55E]/20 text-[#22C55E]" : "border-[#3F3F46] text-transparent"}`}>
+                  <span className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm border text-[9px] ${item.done ? "border-dash-success bg-dash-success/20 text-dash-success" : "border-dash-faint text-transparent"}`}>
                     ✓
                   </span>
-                  <span className={item.done ? "text-[#71717A] line-through" : "text-[#A1A1AA]"}>
+                  <span className={item.done ? "text-dash-muted line-through" : "text-dash-muted"}>
                     {item.label}
                   </span>
                 </li>

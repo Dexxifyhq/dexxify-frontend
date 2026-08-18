@@ -13,6 +13,7 @@ import {
   AuthInput,
   PasswordInput,
   AuthButton,
+  AuthLogo,
 } from '@/components/ui/auth';
 
 export default function LoginPage() {
@@ -41,10 +42,11 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">
+        <AuthLogo />
+        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">
           Welcome back
         </h1>
-        <p className="text-sm text-[#71717A]">
+        <p className="text-sm text-dash-muted">
           Sign in to your Dexxify account
         </p>
       </div>
@@ -67,7 +69,7 @@ export default function LoginPage() {
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#71717A]">
+              <span className="text-xs font-medium text-dash-muted">
                 Password
               </span>
             </div>
@@ -83,7 +85,7 @@ export default function LoginPage() {
             />
               <Link
                 href="/forgot-password"
-                className="text-xs text-[#2563EB] hover:underline"
+                className="text-xs text-dash-accent hover:underline"
               >
                 Forgot password?
               </Link>
@@ -95,11 +97,11 @@ export default function LoginPage() {
         </form>
       </AuthCard>
 
-      <p className="text-center text-sm text-[#71717A] mt-6">
+      <p className="text-center text-sm text-dash-muted mt-6">
         Don&apos;t have an account?{' '}
         <Link
           href="/register"
-          className="text-[#2563EB] hover:underline font-medium"
+          className="text-dash-accent hover:underline font-medium"
         >
           Create account
         </Link>

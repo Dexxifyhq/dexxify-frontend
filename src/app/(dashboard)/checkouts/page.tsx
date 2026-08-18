@@ -60,31 +60,31 @@ const STATUS_DISPLAY: Record<
 > = {
   initiated: {
     label: "Initiated",
-    className: "border-[#1d3461]/60 bg-[#0f172a]/60 text-[#60A5FA]",
+    className: "border-dash-accent-soft bg-dash-accent-soft text-dash-accent",
   },
   pending: {
     label: "Pending",
-    className: "border-[#78350F]/50 bg-[#451A03]/60 text-[#F59E0B]",
+    className: "border-dash-warning-border bg-dash-warning-bg text-dash-warning",
   },
   processing: {
     label: "Processing",
-    className: "border-[#1e3a5f]/60 bg-[#0c2340]/60 text-[#38BDF8]",
+    className: "border-dash-accent-soft bg-dash-accent-soft text-dash-accent",
   },
   completed: {
     label: "Completed",
-    className: "border-[#14532D]/50 bg-[#052E16]/60 text-[#22C55E]",
+    className: "border-dash-success-border bg-dash-success-bg text-dash-success",
   },
   failed: {
     label: "Failed",
-    className: "border-[#7f1d1d]/50 bg-[#450a0a]/60 text-[#f87171]",
+    className: "border-dash-error-border bg-dash-error-bg text-dash-error",
   },
   expired: {
     label: "Expired",
-    className: "border-[#27272A]/60 bg-[#18181B]/60 text-[#52525B]",
+    className: "border-dash-border bg-dash-hover text-dash-faint",
   },
   cancelled: {
     label: "Cancelled",
-    className: "border-[#27272A]/60 bg-[#18181B]/60 text-[#52525B]",
+    className: "border-dash-border bg-dash-hover text-dash-faint",
   },
 };
 
@@ -187,34 +187,34 @@ function SessionDrawer({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 flex h-full w-full max-w-sm flex-col border-l border-[#1C1C1F] bg-[#0D0D0F] shadow-2xl">
+      <div className="relative z-10 flex h-full w-full max-w-sm flex-col border-l border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="flex items-start justify-between border-b border-dash-border px-5 py-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <p className="truncate text-sm font-semibold text-[#FAFAFA]">
+              <p className="truncate text-sm font-semibold text-dash-foreground">
                 {shortRef(session.reference)}
               </p>
               <StatusBadge status={session.status} />
             </div>
-            <p className="mt-0.5 text-xs text-[#71717A]">
+            <p className="mt-0.5 text-xs text-dash-muted">
               {formatDate(session.created_at)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#71717A] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <X size={15} />
           </button>
         </div>
 
         {/* Amount highlight */}
-        <div className="border-b border-[#1C1C1F] px-5 py-5 text-center">
-          <p className="text-3xl font-bold text-[#FAFAFA]">
+        <div className="border-b border-dash-border px-5 py-5 text-center">
+          <p className="text-3xl font-bold text-dash-foreground">
             {formatAmount(session.amount, session.currency)}
           </p>
-          <p className="mt-0.5 text-xs text-[#71717A]">
+          <p className="mt-0.5 text-xs text-dash-muted">
             {session.currency?.toUpperCase()}
             {session.crypto_asset && (
               <>
@@ -227,13 +227,13 @@ function SessionDrawer({
 
         {/* Rows */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <ul className="flex flex-col divide-y divide-[#1C1C1F] rounded-xl border border-[#1C1C1F]">
+          <ul className="flex flex-col divide-y divide-dash-border rounded-xl border border-dash-border">
             {rows.map(({ label, value }) => (
               <li key={label} className="flex items-start gap-3 px-4 py-3">
-                <span className="w-28 shrink-0 pt-0.5 text-xs text-[#71717A]">
+                <span className="w-28 shrink-0 pt-0.5 text-xs text-dash-muted">
                   {label}
                 </span>
-                <span className="min-w-0 flex-1 text-xs font-medium text-[#FAFAFA]">
+                <span className="min-w-0 flex-1 text-xs font-medium text-dash-foreground">
                   {value}
                 </span>
               </li>
@@ -242,18 +242,18 @@ function SessionDrawer({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-2 border-t border-[#1C1C1F] px-5 py-4">
-          <div className="flex items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2">
-            <span className="flex-1 truncate font-mono text-xs text-[#71717A]">
+        <div className="flex flex-col gap-2 border-t border-dash-border px-5 py-4">
+          <div className="flex items-center gap-2 rounded-lg border border-dash-border bg-dash-card px-3 py-2">
+            <span className="flex-1 truncate font-mono text-xs text-dash-muted">
               {payLink}
             </span>
             <button
               type="button"
               onClick={() => copy(payLink, "link")}
-              className="shrink-0 text-[#52525B] hover:text-[#FAFAFA] transition-colors"
+              className="shrink-0 text-dash-faint hover:text-dash-foreground transition-colors"
             >
               {copied === "link" ? (
-                <Check size={13} className="text-[#22C55E]" />
+                <Check size={13} className="text-dash-success" />
               ) : (
                 <Copy size={13} />
               )}
@@ -263,7 +263,7 @@ function SessionDrawer({
             href={payLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[#1C1C1F] text-sm font-medium text-[#A1A1AA] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+            className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-dash-border text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
             <ExternalLink size={13} />
             Open payment link
@@ -347,7 +347,7 @@ export default function CheckoutsPage() {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] hover:bg-white transition-colors"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
           >
             <Plus size={15} />
             New Payment
@@ -380,19 +380,19 @@ export default function CheckoutsPage() {
       </div>
 
       {/* Table */}
-      <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1C1C1F] px-5 py-4">
-          <h2 className="text-sm font-semibold text-[#FAFAFA]">All Sessions</h2>
+      <section className="rounded-xl border border-dash-border bg-dash-card">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-dash-border px-5 py-4">
+          <h2 className="text-sm font-semibold text-dash-foreground">All Sessions</h2>
           <div className="flex flex-wrap items-center gap-2">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search reference, address…"
-              className="h-9 w-64 rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2a2a30] focus:outline-none transition-colors"
+              className="h-9 w-64 rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-border focus:outline-none transition-colors"
             />
             {/* Status pills */}
-            <div className="flex items-center gap-1 rounded-lg border border-[#1C1C1F] bg-[#09090B] p-1">
+            <div className="flex items-center gap-1 rounded-lg border border-dash-border bg-dash-card p-1">
               {STATUS_FILTER.map((opt) => (
                 <button
                   key={opt.value}
@@ -401,8 +401,8 @@ export default function CheckoutsPage() {
                   className={cn(
                     "h-7 rounded-md px-2.5 text-xs font-medium transition-colors",
                     statusFilter === opt.value
-                      ? "bg-[#1C1C1F] text-[#FAFAFA]"
-                      : "text-[#52525B] hover:text-[#A1A1AA]",
+                      ? "bg-dash-hover text-dash-foreground"
+                      : "text-dash-faint hover:text-dash-muted",
                   )}
                 >
                   {opt.label}
@@ -414,16 +414,16 @@ export default function CheckoutsPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 size={22} className="animate-spin text-[#3F3F46]" />
+            <Loader2 size={22} className="animate-spin text-dash-faint" />
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <AlertCircle
               size={24}
-              className="text-[#3F3F46]"
+              className="text-dash-faint"
               strokeWidth={1.5}
             />
-            <p className="text-sm text-[#71717A]">Failed to load sessions.</p>
+            <p className="text-sm text-dash-muted">Failed to load sessions.</p>
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
@@ -438,7 +438,7 @@ export default function CheckoutsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1C1C1F]">
+                <tr className="border-b border-dash-border">
                   {[
                     "Reference",
                     "Amount",
@@ -449,33 +449,33 @@ export default function CheckoutsPage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#52525B]"
+                      className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-dash-faint"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1C1C1F]">
+              <tbody className="divide-y divide-dash-border">
                 {filtered.map((session) => (
                   <tr
                     key={session.id}
                     onClick={() => setSelected(session)}
-                    className="cursor-pointer transition-colors hover:bg-[#111113]"
+                    className="cursor-pointer transition-colors hover:bg-dash-hover"
                   >
                     {/* Reference */}
                     <td className="px-5 py-3.5">
-                      <span className="font-mono text-xs text-[#A1A1AA]">
+                      <span className="font-mono text-xs text-dash-muted">
                         {shortRef(session.reference)}
                       </span>
                     </td>
 
                     {/* Amount */}
                     <td className="px-5 py-3.5">
-                      <span className="font-semibold text-[#FAFAFA]">
+                      <span className="font-semibold text-dash-foreground">
                         {formatAmount(session.amount, session.currency)}
                       </span>
-                      <span className="ml-1 text-xs text-[#52525B]">
+                      <span className="ml-1 text-xs text-dash-faint">
                         {session.currency?.toUpperCase()}
                       </span>
                     </td>
@@ -484,15 +484,15 @@ export default function CheckoutsPage() {
                     <td className="px-5 py-3.5">
                       {session.crypto_asset ? (
                         <div className="flex flex-col">
-                          <span className="text-xs font-medium text-[#FAFAFA]">
+                          <span className="text-xs font-medium text-dash-foreground">
                             {session.crypto_asset}
                           </span>
-                          <span className="text-[11px] text-[#52525B]">
+                          <span className="text-[11px] text-dash-faint">
                             {session.network}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-xs text-[#3F3F46]">
+                        <span className="text-xs text-dash-faint">
                           Not selected
                         </span>
                       )}
@@ -505,7 +505,7 @@ export default function CheckoutsPage() {
 
                     {/* Created */}
                     <td className="px-5 py-3.5">
-                      <span className="text-xs text-[#71717A]">
+                      <span className="text-xs text-dash-muted">
                         {formatDate(session.created_at)}
                       </span>
                     </td>
@@ -516,16 +516,16 @@ export default function CheckoutsPage() {
                         <button
                           type="button"
                           onClick={(e) => copyLink(session, e)}
-                          className="flex h-7 w-7 items-center justify-center rounded-md text-[#52525B] hover:bg-[#1C1C1F] hover:text-[#FAFAFA] transition-colors"
+                          className="flex h-7 w-7 items-center justify-center rounded-md text-dash-faint hover:bg-dash-hover hover:text-dash-foreground transition-colors"
                           title="Copy payment link"
                         >
                           {copiedId === session.id ? (
-                            <Check size={13} className="text-[#22C55E]" />
+                            <Check size={13} className="text-dash-success" />
                           ) : (
                             <Copy size={13} />
                           )}
                         </button>
-                        <ChevronRight size={14} className="text-[#3F3F46]" />
+                        <ChevronRight size={14} className="text-dash-faint" />
                       </div>
                     </td>
                   </tr>

@@ -171,12 +171,12 @@ export default function InviteStaffModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#1F1F23] bg-[#111113] shadow-2xl">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-7 py-6">
           <div className="flex items-center gap-3">
-            <Send size={18} className="text-[#2563EB]" />
-            <h2 className="text-xl font-bold text-[#FAFAFA]">
+            <Send size={18} className="text-dash-accent" />
+            <h2 className="text-xl font-bold text-dash-foreground">
               Invite Staff Member
             </h2>
           </div>
@@ -184,7 +184,7 @@ export default function InviteStaffModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             <X size={17} />
           </button>
@@ -192,10 +192,10 @@ export default function InviteStaffModal({
 
         {/* Body (scrollable) */}
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="flex-1 overflow-y-auto border-y border-[#1F1F23] px-7 py-6">
+          <div className="flex-1 overflow-y-auto border-y border-dash-border px-7 py-6">
             {/* Work Email */}
             <div className="mb-6">
-              <label className="mb-2 block text-sm font-semibold text-[#FAFAFA]">
+              <label className="mb-2 block text-sm font-semibold text-dash-foreground">
                 Work Email
               </label>
               <input
@@ -203,10 +203,10 @@ export default function InviteStaffModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="colleague@company.com"
-                className="h-11 w-full rounded-lg border border-[#26262B] bg-[#0A0B0E] px-3.5 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+                className="h-11 w-full rounded-lg border border-dash-border bg-dash-card px-3.5 text-sm text-dash-foreground transition-colors placeholder:text-dash-faint focus:border-dash-accent focus:outline-none"
                 required
               />
-              <p className="mt-2 text-xs leading-relaxed text-[#71717A]">
+              <p className="mt-2 text-xs leading-relaxed text-dash-muted">
                 An invitation email will be sent to this address. They will set
                 their own password during onboarding.
               </p>
@@ -214,29 +214,29 @@ export default function InviteStaffModal({
 
             {/* Role */}
             <div className="mb-7">
-              <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#FAFAFA]">
+              <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-dash-foreground">
                 Role
-                <Info size={13} className="text-[#71717A]" />
+                <Info size={13} className="text-dash-muted" />
               </label>
               <Select value={role} onChange={setRole} options={ROLES} />
             </div>
 
             {/* Permissions */}
             <div className="mb-7">
-              <h3 className="mb-4 text-[15px] font-semibold text-[#FAFAFA]">
+              <h3 className="mb-4 text-[15px] font-semibold text-dash-foreground">
                 Permissions
               </h3>
 
               {GROUPS.map((g) => (
                 <div key={g.key} className="mb-6 last:mb-0">
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#71717A]">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-muted">
                       {g.label}
                     </p>
-                    <label className="flex cursor-pointer items-center gap-2 text-sm text-[#FAFAFA]">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm text-dash-foreground">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 cursor-pointer rounded border-[#3F3F46] bg-transparent accent-[#2563EB]"
+                        className="h-4 w-4 cursor-pointer rounded border-dash-border-strong bg-transparent accent-dash-accent"
                         checked={groupAllChecked[g.key] ?? false}
                         onChange={(e) => setGroupAll(g, e.target.checked)}
                       />
@@ -244,7 +244,7 @@ export default function InviteStaffModal({
                     </label>
                   </div>
 
-                  <div className="divide-y divide-[#1F1F23] rounded-xl border border-[#26262B]">
+                  <div className="divide-y divide-dash-border rounded-xl border border-dash-border">
                     {g.permissions.map((perm) => {
                       const on = !!perms[perm.key];
                       return (
@@ -253,10 +253,10 @@ export default function InviteStaffModal({
                           className="flex items-center justify-between gap-4 px-5 py-4"
                         >
                           <div className="min-w-0">
-                            <p className="text-[15px] font-semibold text-[#FAFAFA]">
+                            <p className="text-[15px] font-semibold text-dash-foreground">
                               {perm.title}
                             </p>
-                            <p className="mt-0.5 text-sm text-[#71717A]">
+                            <p className="mt-0.5 text-sm text-dash-muted">
                               {perm.description}
                             </p>
                           </div>
@@ -274,7 +274,7 @@ export default function InviteStaffModal({
 
             {/* Account Status */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[#FAFAFA]">
+              <label className="mb-2 block text-sm font-semibold text-dash-foreground">
                 Account Status
               </label>
               <Select value={status} onChange={setStatus} options={STATUSES} />
@@ -286,14 +286,14 @@ export default function InviteStaffModal({
             <button
               type="button"
               onClick={onClose}
-              className="h-11 rounded-lg border border-[#26262B] bg-transparent px-6 text-sm font-semibold text-[#FAFAFA] transition-colors hover:bg-[#1C1C1F]"
+              className="h-11 rounded-lg border border-dash-border bg-transparent px-6 text-sm font-semibold text-dash-foreground transition-colors hover:bg-dash-hover"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit || submitting}
-              className="h-11 rounded-lg bg-[#FAFAFA] px-6 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="h-11 rounded-lg bg-dash-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               {submitting ? "Sending…" : "Send Invitation"}
             </button>
@@ -320,7 +320,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-[#26262B] bg-[#0A0B0E] px-3.5 pr-10 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+        className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-dash-border bg-dash-card px-3.5 pr-10 text-sm text-dash-foreground transition-colors focus:border-dash-accent focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -330,7 +330,7 @@ function Select({
       </select>
       <ChevronDown
         size={14}
-        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-dash-muted"
       />
     </div>
   );
@@ -352,8 +352,8 @@ function PermPill({
       className={cn(
         "inline-flex h-9 min-w-[64px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-4 text-[13px] font-semibold transition-colors",
         checked
-          ? "border-[#3F3F46] bg-[#1C1C1F] text-[#FAFAFA]"
-          : "border-[#26262B] bg-transparent text-[#52525B] hover:border-[#3F3F46] hover:text-[#A1A1AA]",
+          ? "border-dash-border-strong bg-dash-hover text-dash-foreground"
+          : "border-dash-border bg-transparent text-dash-faint hover:border-dash-border-strong hover:text-dash-muted",
       )}
     >
       {checked && <Check size={13} />}

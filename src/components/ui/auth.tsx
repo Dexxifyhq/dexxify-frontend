@@ -6,6 +6,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Eye, EyeOff, ArrowLeft, Loader2, Check } from "lucide-react";
 
 // ── Alert ──────────────────────────────────────────────────────────────────
@@ -21,16 +22,16 @@ export function AuthAlert({ message, variant }: AlertProps) {
     <div
       className={`flex items-center gap-2 rounded-lg px-3 py-2.5 border ${
         isError
-          ? "bg-[#EF4444]/8 border-[#EF4444]/20"
-          : "bg-[#22C55E]/8 border-[#22C55E]/20"
+          ? "bg-dash-error-bg border-dash-error-border"
+          : "bg-dash-success-bg border-dash-success-border"
       }`}
     >
       <div
         className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-          isError ? "bg-[#EF4444]" : "bg-[#22C55E]"
+          isError ? "bg-dash-error" : "bg-dash-success"
         }`}
       />
-      <p className={`text-sm ${isError ? "text-[#EF4444]" : "text-[#22C55E]"}`}>
+      <p className={`text-sm ${isError ? "text-dash-error" : "text-dash-success"}`}>
         {message}
       </p>
     </div>
@@ -48,7 +49,7 @@ export function AuthCard({
 }) {
   return (
     <div
-      className={`bg-[#111113] border border-[#1C1C1F] rounded-2xl p-6 ${className}`}
+      className={`bg-dash-card border border-dash-border rounded-2xl p-6 ${className}`}
     >
       {children}
     </div>
@@ -65,9 +66,9 @@ export function AuthLabel({
   optional?: boolean;
 }) {
   return (
-    <label className="text-xs font-medium text-[#71717A]">
+    <label className="text-xs font-medium text-dash-muted">
       {children}
-      {optional && <span className="text-[#3F3F46] ml-1">(optional)</span>}
+      {optional && <span className="text-dash-faint ml-1">(optional)</span>}
     </label>
   );
 }
@@ -75,7 +76,7 @@ export function AuthLabel({
 // ── Input ──────────────────────────────────────────────────────────────────
 
 export const inputClass =
-  "w-full h-10 px-3 bg-[#0D0D0F] border border-[#1C1C1F] rounded-lg text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:outline-none focus:border-[#2563EB] transition-colors";
+  "w-full h-10 px-3 bg-dash-card border border-dash-border rounded-lg text-sm text-dash-foreground placeholder:text-dash-faint focus:outline-none focus:border-dash-accent transition-colors";
 
 export function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${inputClass} ${props.className ?? ""}`} />;
@@ -103,7 +104,7 @@ export function PasswordInput({ value, onChange, ...rest }: PasswordInputProps) 
       <button
         type="button"
         onClick={() => setShow((v) => !v)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-dash-muted hover:text-dash-foreground transition-colors"
         tabIndex={-1}
       >
         {show ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -128,16 +129,16 @@ export function PasswordStrength({ password }: { password: string }) {
           <div
             className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${
               c.pass
-                ? "bg-[#22C55E]/10 border border-[#22C55E]/30"
-                : "bg-[#1C1C1F] border border-[#1C1C1F]"
+                ? "bg-dash-success-bg border border-dash-success-border"
+                : "bg-dash-hover border border-dash-border"
             }`}
           >
             {c.pass && (
-              <Check size={8} className="text-[#22C55E]" strokeWidth={3} />
+              <Check size={8} className="text-dash-success" strokeWidth={3} />
             )}
           </div>
           <span
-            className={`text-[10px] ${c.pass ? "text-[#22C55E]" : "text-[#71717A]"}`}
+            className={`text-[10px] ${c.pass ? "text-dash-success" : "text-dash-muted"}`}
           >
             {c.label}
           </span>
@@ -160,7 +161,7 @@ export function AuthButton({ loading, disabled, children }: AuthButtonProps) {
     <button
       type="submit"
       disabled={loading || disabled}
-      className="w-full h-10 flex items-center justify-center gap-2 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+      className="w-full h-10 flex items-center justify-center gap-2 bg-dash-accent text-white text-sm font-medium rounded-lg hover:bg-dash-accent-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
     >
       {loading ? <Loader2 size={15} className="animate-spin" /> : children}
     </button>
@@ -173,7 +174,7 @@ export function AuthBackLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1.5 text-sm text-[#71717A] hover:text-[#FAFAFA] transition-colors mb-8"
+      className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-dash-foreground transition-colors mb-8"
     >
       <ArrowLeft size={14} />
       {label}
@@ -197,5 +198,21 @@ export function AuthField({
       <AuthLabel optional={optional}>{label}</AuthLabel>
       {children}
     </div>
+  );
+}
+
+// ── Logo — links back to the marketing landing page ────────────────────────
+
+export function AuthLogo() {
+  return (
+    <Link href="/" className="mb-6 inline-flex items-center justify-center" aria-label="Back to Dexxify home">
+      <Image
+        src="/dexxify_icon.jpg"
+        alt="Dexxify"
+        width={40}
+        height={40}
+        className="h-10 w-10 rounded-xl object-cover"
+      />
+    </Link>
   );
 }

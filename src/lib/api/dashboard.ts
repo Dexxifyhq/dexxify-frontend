@@ -62,6 +62,14 @@ function assetColor(symbol: string): string {
 export const dashboardApi = {
   /**
    * GET /dashboard/overview
+   * Full response, unmapped — powers widgets that need the session/invoice
+   * status breakdown and per-currency balances that getStats() discards.
+   */
+  getOverview: (): Promise<DashboardOverviewResponse | null> =>
+    safeGet<DashboardOverviewResponse>("/dashboard/overview"),
+
+  /**
+   * GET /dashboard/overview
    * Maps to 4 UI stat cards: NGN balance, total received, sessions, customers.
    */
   getStats: async (_params: DashboardParams): Promise<DashboardStats | null> => {

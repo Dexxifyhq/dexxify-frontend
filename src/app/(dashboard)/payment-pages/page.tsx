@@ -36,10 +36,10 @@ function StatusBadge({ status }: { status: string }) {
       className={cn(
         "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold",
         status === "active"
-          ? "bg-[#052E16]/60 text-[#22C55E] border border-[#14532D]/40"
+          ? "bg-dash-success-bg text-dash-success border border-dash-success-border"
           : status === "draft"
-            ? "bg-[#1C1C1F] text-[#71717A] border border-[#2a2a2e]"
-            : "bg-[#451A03]/60 text-[#F59E0B] border border-[#78350F]/40",
+            ? "bg-dash-hover text-dash-muted border border-dash-border"
+            : "bg-dash-warning-bg text-dash-warning border border-dash-warning-border",
       )}
     >
       {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -57,11 +57,11 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handle}
-      className="text-[#52525B] hover:text-[#FAFAFA] transition-colors"
+      className="text-dash-faint hover:text-dash-foreground transition-colors"
       title="Copy link"
     >
       {copied ? (
-        <Check size={13} className="text-[#22C55E]" />
+        <Check size={13} className="text-dash-success" />
       ) : (
         <Copy size={13} />
       )}
@@ -72,7 +72,7 @@ function CopyButton({ text }: { text: string }) {
 // ── Edit drawer ────────────────────────────────────────────────────────────
 
 const drawerInputCls =
-  "h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none transition-colors";
+  "h-10 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors";
 
 function DrawerField({
   label,
@@ -83,7 +83,7 @@ function DrawerField({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+      <label className="mb-1.5 block text-xs font-medium text-dash-muted">
         {label}
       </label>
       {children}
@@ -102,9 +102,9 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-xs text-[#52525B]">{label}</span>
+      <span className="text-xs text-dash-faint">{label}</span>
       <span
-        className={cn("truncate text-xs text-[#A1A1AA]", mono && "font-mono")}
+        className={cn("truncate text-xs text-dash-muted", mono && "font-mono")}
       >
         {value}
       </span>
@@ -156,20 +156,20 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
       />
 
       {/* Drawer panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-[#1C1C1F] bg-[#111113] shadow-2xl">
+      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1C1C1F] px-6 py-5">
+        <div className="flex items-center justify-between border-b border-dash-border px-6 py-5">
           <div>
-            <h2 className="text-base font-bold text-[#FAFAFA]">
+            <h2 className="text-base font-bold text-dash-foreground">
               Edit Payment Page
             </h2>
-            <p className="mt-0.5 font-mono text-xs text-[#52525B]">
+            <p className="mt-0.5 font-mono text-xs text-dash-faint">
               /p/{page.slug}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             <X size={16} />
           </button>
@@ -210,7 +210,7 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
                   placeholder="0.00"
                   className={`${drawerInputCls} flex-1`}
                 />
-                <span className="shrink-0 text-sm font-semibold text-[#52525B]">
+                <span className="shrink-0 text-sm font-semibold text-dash-faint">
                   {page.currency}
                 </span>
               </div>
@@ -229,14 +229,14 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
                 </select>
                 <ChevronDown
                   size={14}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-dash-muted"
                 />
               </div>
             </DrawerField>
 
             {/* Read-only page info */}
-            <div className="rounded-xl border border-[#1C1C1F] bg-[#0A0B0E] p-4">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+            <div className="rounded-xl border border-dash-border bg-dash-hover p-4">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                 Page info
               </p>
               <div className="flex flex-col gap-2.5">
@@ -257,17 +257,17 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-[#1C1C1F] px-6 py-4">
+        <div className="flex items-center justify-end gap-3 border-t border-dash-border px-6 py-4">
           <button
             onClick={onClose}
-            className="h-10 rounded-lg border border-[#1C1C1F] px-5 text-sm font-medium text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            className="h-10 rounded-lg border border-dash-border px-5 text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!title.trim() || updatePage.isPending}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             {updatePage.isPending ? (
               <Loader2 size={14} className="animate-spin" />
@@ -323,7 +323,7 @@ export default function PaymentPagesPage() {
         actions={
           <Link
             href="/payment-pages/new"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#FAFAFA] px-3.5 text-sm font-medium text-[#09090B] transition-colors hover:bg-white"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover"
           >
             <Plus size={15} />
             New Page
@@ -331,10 +331,10 @@ export default function PaymentPagesPage() {
         }
       />
 
-      <section className="rounded-xl border border-[#1C1C1F] bg-[#0D0D0F]">
+      <section className="rounded-xl border border-dash-border bg-dash-card">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 size={22} className="animate-spin text-[#3F3F46]" />
+            <Loader2 size={22} className="animate-spin text-dash-faint" />
           </div>
         ) : pages.length === 0 ? (
           <EmptyState
@@ -344,26 +344,26 @@ export default function PaymentPagesPage() {
             className="py-24"
           />
         ) : (
-          <ul className="divide-y divide-[#1C1C1F]">
+          <ul className="divide-y divide-dash-border">
             {pages.map((page: any) => {
               const publicUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/p/${page.slug}`;
               return (
                 <li key={page.id} className="flex items-center gap-4 px-5 py-4">
                   {/* Icon */}
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1C1C1F] bg-[#111113]">
-                    <Globe size={15} className="text-[#52525B]" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-dash-border bg-dash-hover">
+                    <Globe size={15} className="text-dash-faint" />
                   </div>
 
                   {/* Main info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                      <p className="truncate text-sm font-medium text-dash-foreground">
                         {page.title}
                       </p>
                       <StatusBadge status={page.status} />
                     </div>
                     <div className="mt-0.5 flex items-center gap-1.5">
-                      <p className="truncate font-mono text-xs text-[#52525B]">
+                      <p className="truncate font-mono text-xs text-dash-faint">
                         /p/{page.slug}
                       </p>
                       <CopyButton text={publicUrl} />
@@ -371,7 +371,7 @@ export default function PaymentPagesPage() {
                         href={publicUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#52525B] transition-colors hover:text-[#FAFAFA]"
+                        className="text-dash-faint transition-colors hover:text-dash-foreground"
                       >
                         <ExternalLink size={11} />
                       </a>
@@ -380,12 +380,12 @@ export default function PaymentPagesPage() {
 
                   {/* Amount */}
                   <div className="hidden shrink-0 text-right sm:block">
-                    <p className="text-sm font-medium text-[#FAFAFA]">
+                    <p className="text-sm font-medium text-dash-foreground">
                       {page.amount_type === "flexible"
                         ? "Flexible"
                         : `$${Number(page.amount).toFixed(2)}`}
                     </p>
-                    <p className="text-xs text-[#52525B]">{page.currency}</p>
+                    <p className="text-xs text-dash-faint">{page.currency}</p>
                   </div>
 
                   {/* Actions */}
@@ -397,10 +397,10 @@ export default function PaymentPagesPage() {
                       title={
                         page.status === "active" ? "Deactivate" : "Activate"
                       }
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA] disabled:opacity-40"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground disabled:opacity-40"
                     >
                       {page.status === "active" ? (
-                        <ToggleRight size={16} className="text-[#22C55E]" />
+                        <ToggleRight size={16} className="text-dash-success" />
                       ) : (
                         <ToggleLeft size={16} />
                       )}
@@ -410,7 +410,7 @@ export default function PaymentPagesPage() {
                     <button
                       onClick={() => setEditingPage(page)}
                       title="Edit"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
                     >
                       <Pencil size={14} />
                     </button>
@@ -419,7 +419,7 @@ export default function PaymentPagesPage() {
                     <button
                       onClick={() => handleDelete(page.id)}
                       disabled={deletePage.isPending}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#2D0A0A] hover:text-[#EF4444] disabled:opacity-40"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-error-bg hover:text-dash-error disabled:opacity-40"
                     >
                       {deletePage.isPending ? (
                         <Loader2 size={14} className="animate-spin" />

@@ -101,14 +101,14 @@ export default function SettingsPage() {
     <div className="mx-auto w-full max-w-6xl px-2 py-4 sm:px-4">
       <div className="flex flex-col gap-10 lg:flex-row">
         <div className="w-full shrink-0 self-start lg:sticky lg:top-0 lg:w-60">
-          <h1 className="text-3xl font-bold tracking-tight text-[#FAFAFA]">
+          <h1 className="text-3xl font-bold tracking-tight text-dash-foreground">
             Settings
           </h1>
 
           <nav className="mt-8">
             {NAV_GROUPS.map((group) => (
               <div key={group.label} className="mb-6">
-                <p className="mb-2 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+                <p className="mb-2 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-faint">
                   {group.label}
                 </p>
                 <div className="flex flex-col gap-1">
@@ -123,17 +123,17 @@ export default function SettingsPage() {
                         className={cn(
                           "relative flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
                           active
-                            ? "bg-[#0F1626] text-[#FAFAFA]"
-                            : "text-[#A1A1AA] hover:bg-[#101013] hover:text-[#FAFAFA]",
+                            ? "bg-dash-accent-soft text-dash-foreground"
+                            : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
                         )}
                       >
                         {active && (
-                          <span className="absolute left-0 top-1/2 h-5 w-0.75 -translate-y-1/2 rounded-full bg-[#2563EB]" />
+                          <span className="absolute left-0 top-1/2 h-5 w-0.75 -translate-y-1/2 rounded-full bg-dash-accent" />
                         )}
                         <Icon
                           size={16}
                           className={
-                            active ? "text-[#2563EB]" : "text-[#71717A]"
+                            active ? "text-dash-accent" : "text-dash-muted"
                           }
                         />
                         {item.label}
@@ -271,7 +271,7 @@ function GeneralTab() {
         </Field>
         <Field
           label="Support email"
-          badge={<HelpCircle size={13} className="text-[#52525B]" />}
+          badge={<HelpCircle size={13} className="text-dash-faint" />}
         >
           <Input
             value={supportEmail}
@@ -290,27 +290,27 @@ function GeneralTab() {
       </div>
 
       <div className="mt-8">
-        <p className="mb-2 text-sm font-semibold text-[#FAFAFA]">Brand logo</p>
-        <div className="flex items-center gap-4 rounded-xl border border-dashed border-[#26262B] bg-[#0A0B0E] p-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#15151A] text-[#52525B]">
+        <p className="mb-2 text-sm font-semibold text-dash-foreground">Brand logo</p>
+        <div className="flex items-center gap-4 rounded-xl border border-dashed border-dash-border bg-dash-card p-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-dash-hover text-dash-faint">
             <ImageIcon size={20} />
           </div>
           <button
             type="button"
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#1C1C1F] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#27272A]"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-hover px-4 text-sm font-medium text-dash-foreground transition-colors hover:bg-dash-border-strong"
           >
             <Upload size={14} /> Upload Logo
           </button>
-          <p className="text-xs text-[#52525B]">Max 2MB · PNG, JPEG, WEBP</p>
+          <p className="text-xs text-dash-faint">Max 2MB · PNG, JPEG, WEBP</p>
         </div>
       </div>
 
       <div className="mt-8 flex items-start justify-between gap-6">
         <div>
-          <p className="text-sm font-semibold text-[#FAFAFA]">
+          <p className="text-sm font-semibold text-dash-foreground">
             Show Branding on Checkout
           </p>
-          <p className="mt-1 text-sm text-[#71717A]">
+          <p className="mt-1 text-sm text-dash-muted">
             Display your business name and logo on the checkout page header.
           </p>
         </div>
@@ -347,7 +347,7 @@ function GeneralTab() {
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+          className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:opacity-60"
         >
           {saving ? (
             <Loader2 size={14} className="animate-spin" />
@@ -372,20 +372,20 @@ function GeneralTab() {
             value={newBizName}
             onChange={(e) => setNewBizName(e.target.value)}
             placeholder="Business name"
-            className="h-11 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+            className="h-11 w-full rounded-lg border border-dash-border bg-dash-card px-4 text-sm text-dash-foreground transition-colors placeholder:text-dash-faint focus:border-dash-accent focus:outline-none"
           />
           <input
             type="email"
             value={newBizEmail}
             onChange={(e) => setNewBizEmail(e.target.value)}
             placeholder="Business Email"
-            className="h-11 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+            className="h-11 w-full rounded-lg border border-dash-border bg-dash-card px-4 text-sm text-dash-foreground transition-colors placeholder:text-dash-faint focus:border-dash-accent focus:outline-none"
           />
           <div className="relative">
             <select
               value={newBizType}
               onChange={(e) => setNewBizType(e.target.value)}
-              className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 pr-10 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+              className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-dash-border bg-dash-card px-4 pr-10 text-sm text-dash-foreground transition-colors focus:border-dash-accent focus:outline-none"
             >
               <option value="">Business type (optional)</option>
               <option value="ecommerce">E-commerce</option>
@@ -412,7 +412,7 @@ function GeneralTab() {
             </select>
             <ChevronDown
               size={15}
-              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-dash-muted"
             />
           </div>
         </div>
@@ -420,7 +420,7 @@ function GeneralTab() {
           <button
             type="submit"
             disabled={!newBizName.trim() || createBiz.isPending}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             {createBiz.isPending ? (
               <Loader2 size={14} className="animate-spin" />
@@ -491,7 +491,7 @@ function SettlementsTab() {
       <div className="mt-8 grid grid-cols-1 gap-x-12 gap-y-7 sm:grid-cols-2">
         <Field
           label="Settlement Currency"
-          badge={<HelpCircle size={13} className="text-[#52525B]" />}
+          badge={<HelpCircle size={13} className="text-dash-faint" />}
           inlineBadge
         >
           <Select
@@ -520,7 +520,7 @@ function SettlementsTab() {
 
       <SectionHeading title="Payment Logic" />
 
-      <div className="mt-2 divide-y divide-[#17171A]">
+      <div className="mt-2 divide-y divide-dash-border">
         <ToggleRow
           title="Instant Payouts"
           description="Initiate payouts immediately once a payment is completed."
@@ -534,7 +534,7 @@ function SettlementsTab() {
       <SectionHeading title="Accepted Assets" />
 
       <div className="mt-8">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-faint">
           Cryptocurrencies
         </p>
         <div className="flex flex-wrap gap-2">
@@ -545,7 +545,7 @@ function SettlementsTab() {
       </div>
 
       <div className="mt-6">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-faint">
           Networks
         </p>
         <div className="flex flex-wrap gap-2">
@@ -560,7 +560,7 @@ function SettlementsTab() {
           type="button"
           onClick={handleSave}
           disabled={updateSettlements.isPending}
-          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+          className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:opacity-60"
         >
           {updateSettlements.isPending ? (
             <Loader2 size={14} className="animate-spin" />
@@ -613,12 +613,12 @@ function NotificationsTab() {
         description="Choose how and where you want to stay informed about your business activity."
       />
 
-      <p className="mb-2 mt-10 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+      <p className="mb-2 mt-10 text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-faint">
         Merchant Alerts
       </p>
-      <div className="divide-y divide-[#17171A]">
+      <div className="divide-y divide-dash-border">
         <ToggleRow
-          icon={<Bell size={17} className="text-[#F59E0B]" />}
+          icon={<Bell size={17} className="text-dash-warning" />}
           iconBg="rgba(245,158,11,0.10)"
           title="Email Notifications"
           description="Receive summary reports and critical alerts via email."
@@ -626,7 +626,7 @@ function NotificationsTab() {
           onChange={setEmailNotifs}
         />
         <ToggleRow
-          icon={<Bell size={17} className="text-[#2563EB]" />}
+          icon={<Bell size={17} className="text-dash-accent" />}
           iconBg="rgba(37,99,235,0.10)"
           title="Low Balance Alerts"
           description="Get notified when your operating balance reaches a limit."
@@ -635,12 +635,12 @@ function NotificationsTab() {
         />
       </div>
 
-      <p className="mb-2 mt-12 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#52525B]">
+      <p className="mb-2 mt-12 text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-faint">
         Customer Experience
       </p>
-      <div className="divide-y divide-[#17171A]">
+      <div className="divide-y divide-dash-border">
         <ToggleRow
-          icon={<Receipt size={17} className="text-[#2563EB]" />}
+          icon={<Receipt size={17} className="text-dash-accent" />}
           iconBg="rgba(37,99,235,0.10)"
           title="Automated Receipts"
           description="Email a professional receipt after every successful payment."
@@ -648,7 +648,7 @@ function NotificationsTab() {
           onChange={setReceipts}
         />
         <ToggleRow
-          icon={<FileText size={17} className="text-[#A1A1AA]" />}
+          icon={<FileText size={17} className="text-dash-muted" />}
           iconBg="rgba(161,161,170,0.08)"
           title="Invoice Follow-ups"
           description="Send invoice details and payment link reminders to customers."
@@ -662,7 +662,7 @@ function NotificationsTab() {
           type="button"
           onClick={handleSave}
           disabled={updateNotifications.isPending}
-          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+          className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:opacity-60"
         >
           {updateNotifications.isPending ? (
             <Loader2 size={14} className="animate-spin" />
@@ -713,18 +713,18 @@ function KycStatusBadge({ status }: { status: string }) {
   > = {
     verified: {
       label: "Verified",
-      cls: "bg-[#052E16] text-[#22C55E]",
+      cls: "bg-dash-success-bg text-dash-success",
       icon: CheckCircle2,
     },
-    failed: { label: "Failed", cls: "bg-[#2D0A0A] text-[#EF4444]", icon: X },
+    failed: { label: "Failed", cls: "bg-dash-error-bg text-dash-error", icon: X },
     pending: {
       label: "Pending",
-      cls: "bg-[#231A05] text-[#F59E0B]",
+      cls: "bg-dash-warning-bg text-dash-warning",
       icon: Clock,
     },
     incomplete: {
       label: "Not Started",
-      cls: "bg-[#1A1A1D] text-[#71717A]",
+      cls: "bg-dash-hover text-dash-muted",
       icon: Info,
     },
   };
@@ -810,23 +810,23 @@ function VerificationTab() {
 
       <div className="mt-8 flex flex-col gap-5">
         {/* ── Identity card ──────────────────────────────── */}
-        <div className="rounded-xl border border-[#1C1C1F] bg-[#0A0B0E]">
-          <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="rounded-xl border border-dash-border bg-dash-card">
+          <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0F2640]">
-                <IdCard size={17} className="text-[#3B82F6]" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-accent-soft">
+                <IdCard size={17} className="text-dash-accent" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#FAFAFA]">
+                <p className="text-sm font-semibold text-dash-foreground">
                   Identity Verification
                 </p>
-                <p className="text-xs text-[#52525B]">
+                <p className="text-xs text-dash-faint">
                   BVN · NIN · Virtual NIN
                 </p>
               </div>
             </div>
             {loadingIndividual ? (
-              <Loader2 size={14} className="animate-spin text-[#52525B]" />
+              <Loader2 size={14} className="animate-spin text-dash-faint" />
             ) : (
               <KycStatusBadge status={overallStatus} />
             )}
@@ -834,7 +834,7 @@ function VerificationTab() {
 
           <div className="p-5">
             {individualVerified ? (
-              <div className="flex items-center gap-2 text-sm text-[#22C55E]">
+              <div className="flex items-center gap-2 text-sm text-dash-success">
                 <CheckCircle2 size={15} />
                 Your identity has been verified. You can process live
                 transactions.
@@ -844,16 +844,16 @@ function VerificationTab() {
                 {/* Previous attempts */}
                 {(individualStatus?.verifications.length ?? 0) > 0 && (
                   <div className="mb-5">
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#52525B]">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                       Previous attempts
                     </p>
                     <div className="flex flex-col gap-2">
                       {individualStatus!.verifications.map((v) => (
                         <div
                           key={v.id}
-                          className="flex items-center justify-between rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 py-2.5"
+                          className="flex items-center justify-between rounded-lg border border-dash-border bg-dash-hover px-3 py-2.5"
                         >
-                          <span className="text-sm font-medium uppercase text-[#A1A1AA]">
+                          <span className="text-sm font-medium uppercase text-dash-muted">
                             {v.type}
                           </span>
                           <KycStatusBadge status={v.status} />
@@ -868,14 +868,14 @@ function VerificationTab() {
                   className="flex flex-col gap-4"
                 >
                   {loadingIndividual ? null : (
-                    <p className="text-sm text-[#71717A]">
+                    <p className="text-sm text-dash-muted">
                       Submit a government-issued ID to verify your identity.
                     </p>
                   )}
 
                   {/* Type selector */}
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                    <label className="mb-1.5 block text-xs font-medium text-dash-muted">
                       Verification type
                     </label>
                     <div className="flex gap-2">
@@ -893,10 +893,10 @@ function VerificationTab() {
                             className={cn(
                               "flex-1 rounded-lg border px-3 py-2 text-center text-sm font-medium transition-colors",
                               used
-                                ? "cursor-not-allowed border-[#1C1C1F] text-[#3F3F46]"
+                                ? "cursor-not-allowed border-dash-border text-dash-faint"
                                 : idType === t.value
-                                  ? "border-[#2563EB] bg-[#0F2640] text-[#3B82F6]"
-                                  : "border-[#1C1C1F] bg-[#09090B] text-[#71717A] hover:border-[#2563EB]/40 hover:text-[#A1A1AA]",
+                                  ? "border-dash-accent bg-dash-accent-soft text-dash-accent"
+                                  : "border-dash-border bg-dash-card text-dash-muted hover:border-dash-accent hover:text-dash-muted",
                             )}
                           >
                             {t.label}
@@ -912,7 +912,7 @@ function VerificationTab() {
                   {/* ID number input */}
                   {!submittedTypes.has(idType) && (
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                      <label className="mb-1.5 block text-xs font-medium text-dash-muted">
                         {selectedTypeId?.description ?? "ID Number"}
                       </label>
                       <input
@@ -921,13 +921,13 @@ function VerificationTab() {
                         onChange={(e) => setIdNumber(e.target.value)}
                         placeholder={selectedTypeId?.placeholder}
                         required
-                        className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] transition-colors focus:border-[#2563EB] focus:outline-none"
+                        className="h-10 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint transition-colors focus:border-dash-accent focus:outline-none"
                       />
                     </div>
                   )}
 
                   {submittedTypes.has(idType) ? (
-                    <p className="text-xs text-[#52525B]">
+                    <p className="text-xs text-dash-faint">
                       Select an unused verification type above.
                     </p>
                   ) : (
@@ -935,7 +935,7 @@ function VerificationTab() {
                       <button
                         type="submit"
                         disabled={!idNumber.trim() || identityPending}
-                        className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+                        className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {identityPending ? (
                           <Loader2 size={14} className="animate-spin" />
@@ -953,23 +953,23 @@ function VerificationTab() {
         </div>
 
         {/* ── Business / CAC card ────────────────────────── */}
-        <div className="rounded-xl border border-[#1C1C1F] bg-[#0A0B0E]">
-          <div className="flex items-center justify-between border-b border-[#1C1C1F] px-5 py-4">
+        <div className="rounded-xl border border-dash-border bg-dash-card">
+          <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0F2640]">
-                <Building2 size={17} className="text-[#3B82F6]" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-accent-soft">
+                <Building2 size={17} className="text-dash-accent" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#FAFAFA]">
+                <p className="text-sm font-semibold text-dash-foreground">
                   Business Verification
                 </p>
-                <p className="text-xs text-[#52525B]">
+                <p className="text-xs text-dash-faint">
                   CAC Registration Number
                 </p>
               </div>
             </div>
             {loadingBusiness ? (
-              <Loader2 size={14} className="animate-spin text-[#52525B]" />
+              <Loader2 size={14} className="animate-spin text-dash-faint" />
             ) : (
               <KycStatusBadge status={bizVerificationStatus} />
             )}
@@ -977,12 +977,12 @@ function VerificationTab() {
 
           <div className="p-5">
             {businessVerified ? (
-              <div className="flex flex-wrap items-center gap-2 text-sm text-[#22C55E]">
+              <div className="flex flex-wrap items-center gap-2 text-sm text-dash-success">
                 <CheckCircle2 size={15} />
                 Your business is verified.
                 {businessStatus?.verification?.validation_input
                   ?.registration_name && (
-                  <span className="text-[#52525B]">
+                  <span className="text-dash-faint">
                     (
                     {
                       businessStatus.verification.validation_input
@@ -993,7 +993,7 @@ function VerificationTab() {
                 )}
               </div>
             ) : businessStatus?.verification ? (
-              <div className="flex items-center gap-2 text-sm text-[#71717A]">
+              <div className="flex items-center gap-2 text-sm text-dash-muted">
                 <Info size={15} className="shrink-0" />
                 Your CAC verification is{" "}
                 <span className="font-medium capitalize">
@@ -1003,13 +1003,13 @@ function VerificationTab() {
               </div>
             ) : (
               <form onSubmit={handleCacSubmit} className="flex flex-col gap-4">
-                <p className="text-sm text-[#71717A]">
+                <p className="text-sm text-dash-muted">
                   Submit your CAC Registration Number to verify your business
                   and unlock higher transaction limits.
                 </p>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                  <label className="mb-1.5 block text-xs font-medium text-dash-muted">
                     Registration Type *
                   </label>
                   <div className="relative">
@@ -1018,7 +1018,7 @@ function VerificationTab() {
                       onChange={(e) =>
                         setRegType(e.target.value as RegistrationType)
                       }
-                      className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 pr-9 text-sm text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+                      className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-dash-border bg-dash-card px-3 pr-9 text-sm text-dash-foreground transition-colors focus:border-dash-accent focus:outline-none"
                     >
                       {REGISTRATION_TYPES.map((t) => (
                         <option key={t.value} value={t.value}>
@@ -1028,13 +1028,13 @@ function VerificationTab() {
                     </select>
                     <ChevronDown
                       size={14}
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-dash-muted"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                  <label className="mb-1.5 block text-xs font-medium text-dash-muted">
                     CAC Registration Number *
                   </label>
                   <input
@@ -1043,21 +1043,21 @@ function VerificationTab() {
                     onChange={(e) => setRcNumber(e.target.value)}
                     placeholder="RC123456"
                     required
-                    className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] transition-colors focus:border-[#2563EB] focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint transition-colors focus:border-dash-accent focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#A1A1AA]">
+                  <label className="mb-1.5 block text-xs font-medium text-dash-muted">
                     Registered Business Name{" "}
-                    <span className="text-[#52525B]">(optional)</span>
+                    <span className="text-dash-faint">(optional)</span>
                   </label>
                   <input
                     type="text"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     placeholder="Acme Corp Ltd"
-                    className="h-10 w-full rounded-lg border border-[#1C1C1F] bg-[#09090B] px-3 text-sm text-[#FAFAFA] placeholder:text-[#3F3F46] transition-colors focus:border-[#2563EB] focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-dash-border bg-dash-card px-3 text-sm text-dash-foreground placeholder:text-dash-faint transition-colors focus:border-dash-accent focus:outline-none"
                   />
                 </div>
 
@@ -1065,7 +1065,7 @@ function VerificationTab() {
                   <button
                     type="submit"
                     disabled={!rcNumber.trim() || verifyCac.isPending}
-                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {verifyCac.isPending ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -1096,17 +1096,17 @@ function SecurityTab() {
         description="Manage your password, two-factor authentication and connected integrations."
       />
 
-      <div className="mt-6 divide-y divide-[#17171A]">
+      <div className="mt-6 divide-y divide-dash-border">
         <div className="flex flex-wrap items-center justify-between gap-4 py-6">
           <div className="flex min-w-0 items-start gap-5">
             <IconTile>
-              <Lock size={19} className="text-[#A1A1AA]" />
+              <Lock size={19} className="text-dash-muted" />
             </IconTile>
             <div className="min-w-0">
-              <p className="text-[15px] font-semibold text-[#FAFAFA]">
+              <p className="text-[15px] font-semibold text-dash-foreground">
                 Password
               </p>
-              <p className="mt-1.5 text-sm text-[#71717A]">
+              <p className="mt-1.5 text-sm text-dash-muted">
                 Set a strong, unique password to keep your account secure.
               </p>
             </div>
@@ -1114,7 +1114,7 @@ function SecurityTab() {
           <button
             type="button"
             onClick={() => setPwModalOpen(true)}
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#15151A]"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-dash-border bg-dash-card px-4 text-sm font-medium text-dash-foreground transition-colors hover:bg-dash-hover"
           >
             <Key size={14} /> Change password
           </button>
@@ -1123,19 +1123,19 @@ function SecurityTab() {
         <div className="flex flex-wrap items-center justify-between gap-4 py-6">
           <div className="flex min-w-0 items-start gap-5">
             <IconTile>
-              <ShieldCheck size={19} className="text-[#2563EB]" />
+              <ShieldCheck size={19} className="text-dash-accent" />
             </IconTile>
             <div className="min-w-0">
               <div className="flex items-center gap-2.5">
-                <p className="text-[15px] font-semibold text-[#FAFAFA]">
+                <p className="text-[15px] font-semibold text-dash-foreground">
                   Two-Factor Authentication
                 </p>
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#71717A]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#71717A]" />
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-dash-muted">
+                  <span className="h-1.5 w-1.5 rounded-full bg-dash-muted" />
                   Inactive
                 </span>
               </div>
-              <p className="mt-1.5 text-sm text-[#71717A]">
+              <p className="mt-1.5 text-sm text-dash-muted">
                 Use an Authenticator app instead of email OTP for login and
                 withdrawals.
               </p>
@@ -1143,7 +1143,7 @@ function SecurityTab() {
           </div>
           <button
             type="button"
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm font-medium text-[#FAFAFA] transition-colors hover:bg-[#15151A]"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-dash-border bg-dash-card px-4 text-sm font-medium text-dash-foreground transition-colors hover:bg-dash-hover"
           >
             <Zap size={14} /> Enable
           </button>
@@ -1184,18 +1184,18 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#1F1F23] bg-[#111113] shadow-2xl">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         <div className="flex items-center justify-between px-7 py-6">
           <div className="flex items-center gap-3">
-            <Key size={17} className="text-[#2563EB]" />
-            <h2 className="text-lg font-bold text-[#FAFAFA]">
+            <Key size={17} className="text-dash-accent" />
+            <h2 className="text-lg font-bold text-dash-foreground">
               Change Password
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             <X size={16} />
           </button>
@@ -1209,7 +1209,7 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
                 value={currentPw}
                 onChange={(e) => setCurrentPw(e.target.value)}
                 required
-                className="h-12 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+                className="h-12 w-full rounded-lg border border-dash-border bg-dash-card px-4 text-sm text-dash-foreground transition-colors placeholder:text-dash-faint focus:border-dash-accent focus:outline-none"
               />
             </Field>
             <Field label="New password">
@@ -1223,7 +1223,7 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
                 required
                 minLength={8}
                 placeholder="Min. 8 characters"
-                className="h-12 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none"
+                className="h-12 w-full rounded-lg border border-dash-border bg-dash-card px-4 text-sm text-dash-foreground transition-colors placeholder:text-dash-faint focus:border-dash-accent focus:outline-none"
               />
             </Field>
             <Field label="Confirm new password">
@@ -1236,14 +1236,14 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
                 }}
                 required
                 className={cn(
-                  "h-12 w-full rounded-lg border bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors focus:outline-none",
+                  "h-12 w-full rounded-lg border bg-dash-card px-4 text-sm text-dash-foreground transition-colors focus:outline-none",
                   mismatch
-                    ? "border-[#EF4444] focus:border-[#EF4444]"
-                    : "border-[#1C1C1F] focus:border-[#2563EB]",
+                    ? "border-dash-error focus:border-dash-error"
+                    : "border-dash-border focus:border-dash-accent",
                 )}
               />
               {mismatch && (
-                <p className="mt-1.5 text-xs text-[#EF4444]">
+                <p className="mt-1.5 text-xs text-dash-error">
                   Passwords do not match.
                 </p>
               )}
@@ -1254,14 +1254,14 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={onClose}
-              className="h-10 rounded-lg border border-[#26262B] px-5 text-sm font-medium text-[#A1A1AA] transition-colors hover:bg-[#1C1C1F] hover:text-[#FAFAFA]"
+              className="h-10 rounded-lg border border-dash-border px-5 text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={changePassword.isPending}
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-60"
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-dash-accent px-5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover disabled:opacity-60"
             >
               {changePassword.isPending ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -1311,13 +1311,13 @@ function TeamTab() {
         <button
           type="button"
           onClick={() => setInviteOpen(true)}
-          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-lg bg-[#FAFAFA] px-4 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white"
+          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-dash-accent-hover"
         >
           <UserPlus size={15} /> Invite Member
         </button>
       </div>
 
-      <div className="mt-8 flex gap-8 border-b border-[#1C1C1F]">
+      <div className="mt-8 flex gap-8 border-b border-dash-border">
         <TeamViewTab
           icon={<Users size={15} />}
           label="Members"
@@ -1335,22 +1335,22 @@ function TeamTab() {
       {view === "members" ? (
         membersLoading ? (
           <div className="flex justify-center py-24">
-            <Loader2 size={24} className="animate-spin text-[#52525B]" />
+            <Loader2 size={24} className="animate-spin text-dash-faint" />
           </div>
         ) : members.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-5 py-24">
-            <User size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
-            <p className="text-sm text-[#A1A1AA]">No team members yet.</p>
+            <User size={44} strokeWidth={1.25} className="text-dash-faint" />
+            <p className="text-sm text-dash-muted">No team members yet.</p>
             <button
               type="button"
               onClick={() => setInviteOpen(true)}
-              className="inline-flex h-11 items-center rounded-lg bg-[#FAFAFA] px-5 text-sm font-semibold text-[#09090B] transition-colors hover:bg-white"
+              className="inline-flex h-11 items-center rounded-lg bg-dash-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-dash-accent-hover"
             >
               Invite your first member
             </button>
           </div>
         ) : (
-          <div className="mt-4 divide-y divide-[#17171A]">
+          <div className="mt-4 divide-y divide-dash-border">
             {members.map((m) => {
               const name =
                 [m.first_name, m.last_name].filter(Boolean).join(" ") ||
@@ -1368,14 +1368,14 @@ function TeamTab() {
                   className="flex items-center justify-between gap-4 py-4"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#162038] text-xs font-semibold text-[#3B82F6]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-dash-accent-soft text-xs font-semibold text-dash-accent">
                       {initials}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                      <p className="truncate text-sm font-medium text-dash-foreground">
                         {name}
                       </p>
-                      <p className="truncate text-xs text-[#52525B]">
+                      <p className="truncate text-xs text-dash-faint">
                         {m.email}
                       </p>
                     </div>
@@ -1387,7 +1387,7 @@ function TeamTab() {
                         type="button"
                         onClick={() => remove.mutate(m.id)}
                         disabled={remove.isPending}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] transition-colors hover:bg-[#1C1C1F] hover:text-[#EF4444] disabled:opacity-40"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-error disabled:opacity-40"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -1400,25 +1400,25 @@ function TeamTab() {
         )
       ) : invitationsLoading ? (
         <div className="flex justify-center py-24">
-          <Loader2 size={24} className="animate-spin text-[#52525B]" />
+          <Loader2 size={24} className="animate-spin text-dash-faint" />
         </div>
       ) : invitations.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-5 py-24">
-          <Clock size={44} strokeWidth={1.25} className="text-[#3F3F46]" />
-          <p className="text-sm text-[#A1A1AA]">No pending invitations.</p>
+          <Clock size={44} strokeWidth={1.25} className="text-dash-faint" />
+          <p className="text-sm text-dash-muted">No pending invitations.</p>
         </div>
       ) : (
-        <div className="mt-4 divide-y divide-[#17171A]">
+        <div className="mt-4 divide-y divide-dash-border">
           {invitations.map((inv) => (
             <div
               key={inv.id}
               className="flex items-center justify-between gap-4 py-4"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-[#FAFAFA]">
+                <p className="truncate text-sm font-medium text-dash-foreground">
                   {inv.email}
                 </p>
-                <p className="mt-0.5 text-xs text-[#52525B]">
+                <p className="mt-0.5 text-xs text-dash-faint">
                   Invited ·{" "}
                   {inv.invite_expires_at
                     ? `Expires ${new Date(inv.invite_expires_at).toLocaleDateString()}`
@@ -1442,9 +1442,9 @@ function TeamTab() {
 
 function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, string> = {
-    owner: "bg-[#2D1654] text-[#A855F7]",
-    admin: "bg-[#0F2640] text-[#3B82F6]",
-    staff: "bg-[#1A1A1D] text-[#A1A1AA]",
+    owner: "bg-dash-purple-bg text-dash-purple",
+    admin: "bg-dash-accent-soft text-dash-accent",
+    staff: "bg-dash-hover text-dash-muted",
   };
   return (
     <span
@@ -1476,8 +1476,8 @@ function TeamViewTab({
       className={cn(
         "-mb-px inline-flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors",
         active
-          ? "border-[#2563EB] text-[#2563EB]"
-          : "border-transparent text-[#A1A1AA] hover:text-[#FAFAFA]",
+          ? "border-dash-accent text-dash-accent"
+          : "border-transparent text-dash-muted hover:text-dash-foreground",
       )}
     >
       {icon}
@@ -1497,16 +1497,16 @@ function SectionHeading({
 }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-[#FAFAFA]">{title}</h2>
+      <h2 className="text-xl font-semibold text-dash-foreground">{title}</h2>
       {description && (
-        <p className="mt-2 text-[15px] text-[#71717A]">{description}</p>
+        <p className="mt-2 text-[15px] text-dash-muted">{description}</p>
       )}
     </div>
   );
 }
 
 function Divider() {
-  return <div className="my-12 border-t border-[#17171A]" />;
+  return <div className="my-12 border-t border-dash-border" />;
 }
 
 function Field({
@@ -1528,7 +1528,7 @@ function Field({
           !inlineBadge && "justify-between",
         )}
       >
-        <label className="text-sm font-semibold text-[#FAFAFA]">{label}</label>
+        <label className="text-sm font-semibold text-dash-foreground">{label}</label>
         {badge}
       </div>
       {children}
@@ -1538,7 +1538,7 @@ function Field({
 
 function VerifiedBadge() {
   return (
-    <span className="rounded-md bg-[#052E16] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#22C55E]">
+    <span className="rounded-md bg-dash-success-bg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-dash-success">
       Verified
     </span>
   );
@@ -1565,8 +1565,8 @@ function Input({
       placeholder={placeholder}
       readOnly={readOnly}
       className={cn(
-        "h-12 w-full rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 text-sm text-[#FAFAFA] transition-colors placeholder:text-[#3F3F46] focus:border-[#2563EB] focus:outline-none",
-        readOnly && "cursor-default text-[#A1A1AA]",
+        "h-12 w-full rounded-lg border border-dash-border bg-dash-card px-4 text-sm text-dash-foreground transition-colors placeholder:text-dash-faint focus:border-dash-accent focus:outline-none",
+        readOnly && "cursor-default text-dash-muted",
       )}
     />
   );
@@ -1586,7 +1586,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-12 w-full cursor-pointer appearance-none rounded-lg border border-[#1C1C1F] bg-[#0A0B0E] px-4 pr-10 text-sm font-medium text-[#FAFAFA] transition-colors focus:border-[#2563EB] focus:outline-none"
+        className="h-12 w-full cursor-pointer appearance-none rounded-lg border border-dash-border bg-dash-card px-4 pr-10 text-sm font-medium text-dash-foreground transition-colors focus:border-dash-accent focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -1596,7 +1596,7 @@ function Select({
       </select>
       <ChevronDown
         size={15}
-        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#71717A]"
+        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-dash-muted"
       />
     </div>
   );
@@ -1632,10 +1632,10 @@ function ToggleRow({
         )}
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <p className="text-[15px] font-semibold text-[#FAFAFA]">{title}</p>
-            {info && <Info size={12} className="text-[#52525B]" />}
+            <p className="text-[15px] font-semibold text-dash-foreground">{title}</p>
+            {info && <Info size={12} className="text-dash-faint" />}
           </div>
-          <p className="mt-0.5 text-sm text-[#71717A]">{description}</p>
+          <p className="mt-0.5 text-sm text-dash-muted">{description}</p>
         </div>
       </div>
       <Toggle checked={checked} onChange={onChange} color="blue" />
@@ -1645,7 +1645,7 @@ function ToggleRow({
 
 function IconTile({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#10151F]">
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-dash-hover">
       {children}
     </div>
   );
@@ -1655,7 +1655,7 @@ function Chip({ label, color }: { label: string; color: string }) {
   return (
     <button
       type="button"
-      className="inline-flex h-9 items-center gap-2 rounded-full border border-[#1C1C1F] bg-[#0A0B0E] px-3.5 text-xs font-medium text-[#A1A1AA] transition-colors hover:border-[#2563EB]/40"
+      className="inline-flex h-9 items-center gap-2 rounded-full border border-dash-border bg-dash-card px-3.5 text-xs font-medium text-dash-muted transition-colors hover:border-dash-accent"
     >
       <span
         className="inline-block h-2 w-2 rounded-full"

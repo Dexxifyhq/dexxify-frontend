@@ -9,7 +9,7 @@ import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import {
   AuthAlert, AuthCard, AuthField, AuthInput,
-  PasswordInput, PasswordStrength, AuthButton,
+  PasswordInput, PasswordStrength, AuthButton, AuthLogo,
 } from "@/components/ui/auth";
 
 export default function RegisterPage() {
@@ -52,8 +52,9 @@ export default function RegisterPage() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#FAFAFA] tracking-tight mb-2">Create your account</h1>
-        <p className="text-sm text-[#71717A]">Accept crypto. Receive Naira. Start in minutes.</p>
+        <AuthLogo />
+        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">Create your account</h1>
+        <p className="text-sm text-dash-muted">Accept crypto. Receive Naira. Start in minutes.</p>
       </div>
 
       <AuthCard>
@@ -90,10 +91,10 @@ export default function RegisterPage() {
             <PasswordStrength password={form.password} />
           </AuthField>
 
-          <p className="text-xs text-[#71717A] leading-relaxed">
+          <p className="text-xs text-dash-muted leading-relaxed">
             By creating an account you agree to our{" "}
-            <a href="#" className="text-[#2563EB] hover:underline">Terms of Service</a>{" "}and{" "}
-            <a href="#" className="text-[#2563EB] hover:underline">Privacy Policy</a>.
+            <a href="#" className="text-dash-accent hover:underline">Terms of Service</a>{" "}and{" "}
+            <a href="#" className="text-dash-accent hover:underline">Privacy Policy</a>.
           </p>
 
           <AuthButton loading={isPending}>
@@ -102,9 +103,9 @@ export default function RegisterPage() {
         </form>
       </AuthCard>
 
-      <p className="text-center text-sm text-[#71717A] mt-6">
+      <p className="text-center text-sm text-dash-muted mt-6">
         Already have an account?{" "}
-        <Link href="/login" className="text-[#2563EB] hover:underline font-medium">Sign in</Link>
+        <Link href="/login" className="text-dash-accent hover:underline font-medium">Sign in</Link>
       </p>
     </div>
   );
