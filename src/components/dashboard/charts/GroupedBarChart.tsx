@@ -24,7 +24,11 @@ export default function GroupedBarChart({
   const isEmpty = !loading && (!data || data.length === 0);
 
   const rows =
-    data?.map((d) => ({ point: d, ngn: d.ngn, stable: d.usdt + d.usdc })) ?? [];
+    data?.map((d) => ({
+      point: d,
+      ngn: d.credit_ngn,
+      stable: d.credit_usdt + d.credit_usdc,
+    })) ?? [];
   const max = Math.max(...rows.map((r) => Math.max(r.ngn, r.stable)), 1);
   const labelEvery = Math.max(1, Math.ceil(rows.length / 8));
 
