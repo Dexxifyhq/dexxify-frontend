@@ -81,9 +81,12 @@ export const dashboardApi = {
     const raw = await safeGet<
       Array<{
         date: string;
-        ngn: number;
-        usdt: number;
-        usdc: number;
+        credit_ngn: number;
+        credit_usdt: number;
+        credit_usdc: number;
+        debit_ngn: number;
+        debit_usdt: number;
+        debit_usdc: number;
         tx_count: number;
       }>
     >("/dashboard/revenue-chart", { days: rangeToDays(params.range) });
@@ -94,10 +97,12 @@ export const dashboardApi = {
       range: params.range,
       data: raw.map((d) => ({
         date: d.date,
-        revenue: num(d.ngn),
-        ngn: num(d.ngn),
-        usdt: num(d.usdt),
-        usdc: num(d.usdc),
+        credit_ngn: num(d.credit_ngn),
+        credit_usdt: num(d.credit_usdt),
+        credit_usdc: num(d.credit_usdc),
+        debit_ngn: num(d.debit_ngn),
+        debit_usdt: num(d.debit_usdt),
+        debit_usdc: num(d.debit_usdc),
         tx_count: num(d.tx_count),
       })),
     };
@@ -159,7 +164,7 @@ export const dashboardApi = {
     if (!raw || raw.length === 0) return null;
 
     const mapType = (t: string): ActivityItem["type"] => {
-      if (t === "deposit" || t === "onramp") return "deposit";
+      if (t === "deposit") return "deposit";
       if (t === "withdrawal" || t === "offramp") return "withdrawal";
       if (t === "swap") return "swap";
       if (t === "refund") return "refund";

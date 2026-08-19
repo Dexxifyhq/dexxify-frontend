@@ -32,7 +32,7 @@ export default function AreaLineChart({
   const [hovered, setHovered] = useState<number | null>(null);
   const isEmpty = !loading && (!data || data.length === 0);
 
-  const values = data?.map((d) => d.revenue) ?? [];
+  const values = data?.map((d) => d.credit_ngn) ?? [];
   const max = Math.max(...values, 0);
   const min = Math.min(...values, 0);
   const range = max - min || 1;
@@ -41,7 +41,7 @@ export default function AreaLineChart({
     data?.map((d, i) => {
       const x = data.length === 1 ? WIDTH / 2 : PAD_X + (i / (data.length - 1)) * (WIDTH - PAD_X * 2);
       const y =
-        PAD_TOP + (1 - (d.revenue - min) / range) * (HEIGHT - PAD_TOP - PAD_BOTTOM);
+        PAD_TOP + (1 - (d.credit_ngn - min) / range) * (HEIGHT - PAD_TOP - PAD_BOTTOM);
       return { x, y, point: d };
     }) ?? [];
 
@@ -139,7 +139,7 @@ export default function AreaLineChart({
           >
             <p className="font-medium text-dash-foreground">{formatDateShort(hoveredPoint.point.date)}</p>
             <p className="text-dash-muted">
-              {valueLabel}: <span className="font-medium text-dash-foreground">{formatValue(hoveredPoint.point.revenue)}</span>
+              {valueLabel}: <span className="font-medium text-dash-foreground">{formatValue(hoveredPoint.point.credit_ngn)}</span>
             </p>
           </div>
         )}

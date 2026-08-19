@@ -68,7 +68,6 @@ const NAV_TOP: NavEntry[] = [
     label: "Operations",
     icon: LayoutGrid,
     children: [
-      { label: "Workflows", href: "/workflows", icon: Workflow },
       { label: "Bank Accounts", href: "/bank-accounts", icon: Landmark },
       { label: "Crypto Wallets", href: "/crypto-wallets", icon: Coins },
       { label: "POS Terminals", href: "/pos-terminals", icon: Monitor },

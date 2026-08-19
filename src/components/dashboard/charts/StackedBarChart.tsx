@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Layers } from "lucide-react";
+import { Layers, ChevronDown } from "lucide-react";
 import { cn } from "@/utils/utils";
 import ChartCard from "./ChartCard";
 import { formatCompactNumber, formatDateShort } from "./chart-utils";
@@ -25,6 +25,16 @@ const RANGE_OPTIONS: { label: string; value: DateRange }[] = [
   { label: "All", value: "all" },
 ];
 
+type Currency = "ngn" | "usdt" | "usdc";
+
+const CURRENCY_META: Record<Currency, { label: string; symbol: string }> = {
+  ngn: { label: "NGN", symbol: "₦" },
+  usdt: { label: "USDT", symbol: "$" },
+  usdc: { label: "USDC", symbol: "$" },
+};
+
+const CURRENCY_OPTIONS: Currency[] = ["ngn", "usdt", "usdc"];
+
 export default function StackedBarChart({
   title,
   description,
@@ -34,11 +44,18 @@ export default function StackedBarChart({
   onRangeChange,
 }: StackedBarChartProps) {
   const [hovered, setHovered] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<Currency>("ngn");
   const isEmpty = !loading && (!data || data.length === 0);
 
+  const symbol = CURRENCY_META[currency].symbol;
+
   const rows =
-    data?.map((d) => ({ point: d, ngn: d.ngn, stable: d.usdt + d.usdc })) ?? [];
-  const maxVal = Math.max(...rows.flatMap((r) => [r.ngn, r.stable]), 1);
+    data?.map((d) => ({
+      point: d,
+      credit: d[`credit_${currency}`],
+      debit: d[`debit_${currency}`],
+    })) ?? [];
+  const maxVal = Math.max(...rows.flatMap((r) => [r.credit, r.debit]), 1);
   const labelEvery = Math.max(1, Math.ceil(rows.length / 8));
 
   return (
@@ -50,30 +67,55 @@ export default function StackedBarChart({
       emptyIcon={<Layers size={28} strokeWidth={1.5} />}
       emptyDescription="No revenue data for the selected period."
       actions={
-        <div className="flex items-center gap-0.5 rounded-lg border border-dash-border p-0.5">
-          {RANGE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => onRangeChange(opt.value)}
-              className={cn(
-                "rounded-md px-2 py-1 text-[11px] font-medium transition-colors",
-                range === opt.value
-                  ? "bg-dash-accent-soft text-dash-accent"
-                  : "text-dash-muted hover:text-dash-foreground",
-              )}
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as Currency)}
+              className="h-7 appearance-none rounded-md border border-dash-border bg-dash-card pl-2 pr-6 text-[11px] font-medium text-dash-muted hover:border-dash-accent focus:border-dash-accent focus:outline-none transition-colors cursor-pointer"
             >
-              {opt.label}
-            </button>
-          ))}
+              {CURRENCY_OPTIONS.map((c) => (
+                <option key={c} value={c}>
+                  {CURRENCY_META[c].label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={11}
+              className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-dash-faint"
+            />
+          </div>
+          <div className="flex items-center gap-0.5 rounded-lg border border-dash-border p-0.5">
+            {RANGE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => onRangeChange(opt.value)}
+                className={cn(
+                  "rounded-md px-2 py-1 text-[11px] font-medium transition-colors",
+                  range === opt.value
+                    ? "bg-dash-accent-soft text-dash-accent"
+                    : "text-dash-muted hover:text-dash-foreground",
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       }
     >
       <div className="mx-auto flex w-full max-w-xl gap-2">
         {/* Axis labels */}
         <div className="flex h-56 flex-col justify-between py-0.5 text-[9px] text-dash-faint">
-          <span>{formatCompactNumber(maxVal)}</span>
+          <span>
+            {symbol}
+            {formatCompactNumber(maxVal)}
+          </span>
           <span>0</span>
-          <span>{formatCompactNumber(maxVal)}</span>
+          <span>
+            {symbol}
+            {formatCompactNumber(maxVal)}
+          </span>
         </div>
 
         <div className="relative flex h-56 flex-1 items-stretch gap-1">
@@ -84,15 +126,15 @@ export default function StackedBarChart({
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
             >
-              {/* NGN — grows up from center */}
+              {/* Credit — grows up from center */}
               <div className="flex h-1/2 w-full items-end justify-center">
                 <div
                   className={cn(
-                    "w-full rounded-2xl bg-chart-1 transition-opacity",
+                    "w-full rounded-2xl bg-dash-success transition-opacity",
                     hovered !== null && hovered !== i && "opacity-30",
                   )}
                   style={{
-                    height: `${Math.max((row.ngn / maxVal) * 100, row.ngn > 0 ? 4 : 0)}%`,
+                    height: `${Math.max((row.credit / maxVal) * 100, row.credit > 0 ? 4 : 0)}%`,
                   }}
                 />
               </div>
@@ -100,15 +142,15 @@ export default function StackedBarChart({
               {/* Center baseline */}
               <div className="h-px w-full shrink-0 bg-dash-border" />
 
-              {/* Stablecoin — grows down from center */}
+              {/* Debit — grows down from center */}
               <div className="flex h-1/2 w-full items-start justify-center">
                 <div
                   className={cn(
-                    "w-full rounded-2xl bg-chart-2 transition-opacity",
+                    "w-full rounded-2xl bg-dash-error transition-opacity",
                     hovered !== null && hovered !== i && "opacity-30",
                   )}
                   style={{
-                    height: `${Math.max((row.stable / maxVal) * 100, row.stable > 0 ? 4 : 0)}%`,
+                    height: `${Math.max((row.debit / maxVal) * 100, row.debit > 0 ? 4 : 0)}%`,
                   }}
                 />
               </div>
@@ -119,17 +161,19 @@ export default function StackedBarChart({
                     {formatDateShort(row.point.date)}
                   </p>
                   <p className="flex items-center gap-1.5 text-dash-muted">
-                    <span className="h-1.5 w-1.5 rounded-full bg-chart-1" />
-                    NGN:{" "}
+                    <span className="h-1.5 w-1.5 rounded-full bg-dash-success" />
+                    Credit:{" "}
                     <span className="font-medium text-dash-foreground">
-                      ₦{row.ngn.toLocaleString()}
+                      {symbol}
+                      {row.credit.toLocaleString()}
                     </span>
                   </p>
                   <p className="flex items-center gap-1.5 text-dash-muted">
-                    <span className="h-1.5 w-1.5 rounded-full bg-chart-2" />
-                    Stablecoin:{" "}
+                    <span className="h-1.5 w-1.5 rounded-full bg-dash-error" />
+                    Debit:{" "}
                     <span className="font-medium text-dash-foreground">
-                      ${row.stable.toLocaleString()}
+                      {symbol}
+                      {row.debit.toLocaleString()}
                     </span>
                   </p>
                 </div>
@@ -158,10 +202,10 @@ export default function StackedBarChart({
 
       <div className="flex items-center justify-center gap-3 text-xs text-dash-muted">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-chart-1" /> NGN
+          <span className="h-2 w-2 rounded-full bg-dash-success" /> Credit
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-chart-2" /> Stablecoin
+          <span className="h-2 w-2 rounded-full bg-dash-error" /> Debit
         </span>
       </div>
     </ChartCard>

@@ -44,11 +44,13 @@ export interface DashboardOverviewResponse {
 
 export interface RevenueDataPoint {
   date: string;
-  revenue: number; // mapped from ngn for chart bar height
-  ngn: number;
-  usdt: number;
-  usdc: number;
   tx_count: number;
+  credit_ngn: number;
+  credit_usdt: number;
+  credit_usdc: number;
+  debit_ngn: number;
+  debit_usdt: number;
+  debit_usdc: number;
 }
 
 export interface RevenueChartData {
@@ -78,7 +80,7 @@ export interface AssetDistributionData {
 
 export interface ActivityItem {
   id: string;
-  type: "payment" | "withdrawal" | "swap" | "deposit" | "refund";
+  type: "payment" | "withdrawal" | "swap" | "deposit" | "refund" | "offramp";
   direction?: "credit" | "debit";
   description: string | null;
   amount: number;

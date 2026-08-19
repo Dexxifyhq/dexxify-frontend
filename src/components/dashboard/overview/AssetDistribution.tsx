@@ -29,7 +29,7 @@ export default function AssetDistribution({
       <div>
         <p className="text-sm font-semibold text-dash-foreground">Asset Mix</p>
         <p className="text-xs text-dash-muted">
-          Revenue breakdown by cryptocurrency (Pending & Completed)
+          Revenue breakdown by cryptocurrency
         </p>
       </div>
 
