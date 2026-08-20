@@ -72,7 +72,7 @@ export default function Topbar({
         <div className="fixed inset-0 z-40" onClick={closeAll} />
       )}
 
-      <header className="sticky top-0 z-30 flex h-18 items-center justify-between border-b border-dash-border bg-dash-card/95 backdrop-blur-sm px-4 sm:px-6">
+      <header className="sticky top-0 z-30 mx-4 mt-4 flex h-18 items-center justify-between rounded-2xl border border-dash-border bg-dash-card/95 px-4 backdrop-blur-sm shadow-xs sm:mx-6 sm:mt-6 sm:px-4">
         {/* Left: sidebar toggle + verification banner */}
         <div className="flex items-center gap-3">
           {/* Mobile: open drawer */}
