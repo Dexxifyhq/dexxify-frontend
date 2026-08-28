@@ -42,7 +42,7 @@ export default function Hero() {
           <div className="flex items-center gap-3 mt-10 flex-wrap">
             <a
               href="/register"
-              className="inline-flex h-12 px-6 items-center text-[15px] font-medium text-foreground bg-accent-mint rounded-lg hover:brightness-95 transition-[filter] duration-200"
+              className="inline-flex h-12 px-6 items-center text-[15px] font-medium text-background bg-accent-mint rounded-lg hover:brightness-95 transition-[filter] duration-200"
             >
               Get Started
             </a>
