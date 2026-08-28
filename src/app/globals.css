@@ -21,6 +21,14 @@
 
   --success: #22C55E;
   --error: #EF4444;
+
+  /* Functional-minimalism monochrome system — hero + future sections.
+     Deliberately separate from the brand tokens above: no accent color,
+     warm cream instead of pure white, near-black instead of navy. */
+  --mono-bg: #FAFAF7;
+  --mono-fg: #0A0A0A;
+  --mono-muted: #71717A;
+  --mono-border: #D4D4D4;
   --code-blue: #93C5FD;
   --code-green: #86EFAC;
   --code-comment: #52525B;
@@ -91,6 +99,11 @@
   --color-nav: var(--nav-bg);
   --color-success: var(--success);
   --color-error: var(--error);
+
+  --color-mono-bg: var(--mono-bg);
+  --color-mono-fg: var(--mono-fg);
+  --color-mono-muted: var(--mono-muted);
+  --color-mono-border: var(--mono-border);
   --font-sans: var(--font-tt-sans);
   --font-mono: var(--font-tt-mono);
 
