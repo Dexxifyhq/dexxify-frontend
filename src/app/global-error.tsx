@@ -16,12 +16,12 @@ export default function GlobalError({
 
   return (
     <html>
-      <body className="bg-[#09090B] text-[#FAFAFA] min-h-screen flex items-center justify-center">
+      <body className="bg-[#212529] text-[#F8F9FA] min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-[#71717A] text-sm">Something went wrong.</p>
+          <p className="text-[#ADB5BD] text-sm">Something went wrong.</p>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-[#2563EB] text-white text-sm rounded-md hover:bg-[#1D4ED8] transition-colors"
+            className="px-4 py-2 bg-[#E9ECEF] text-[#212529] text-sm rounded-md hover:bg-[#F8F9FA] transition-colors"
           >
             Try again
           </button>

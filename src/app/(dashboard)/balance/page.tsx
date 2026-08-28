@@ -272,7 +272,9 @@ function ModalShell({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
-          <h2 className="text-sm font-semibold text-dash-foreground">{title}</h2>
+          <h2 className="text-sm font-semibold text-dash-foreground">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
@@ -329,6 +331,15 @@ function Select({
         className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-dash-faint"
       />
     </div>
+  );
+}
+
+function FeeNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-center gap-1.5 text-xs text-dash-muted">
+      <AlertCircle size={12} className="shrink-0 text-dash-faint" />
+      {children}
+    </p>
   );
 }
 
@@ -783,6 +794,7 @@ function WithdrawModal({
                   onChange={(e) => setScAmount(e.target.value)}
                 />
               </div>
+              <FeeNote>Fee: $1.00 (Deducted from balance)</FeeNote>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Network</Label>
@@ -868,6 +880,7 @@ function WithdrawModal({
                   onChange={(e) => setFiatAmount(e.target.value)}
                 />
               </div>
+              <FeeNote>Fee: ₦200.00 (Deducted from balance)</FeeNote>
               <div>
                 <Label>Narration (optional)</Label>
                 <Input
@@ -980,7 +993,9 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
         <CheckCircle2 size={40} className="text-dash-success" />
-        <p className="text-sm font-semibold text-dash-foreground">Swap Executed!</p>
+        <p className="text-sm font-semibold text-dash-foreground">
+          Swap Executed!
+        </p>
         <p className="text-xs text-dash-muted">
           Your swap has been successfully executed.
         </p>
@@ -1355,8 +1370,14 @@ function HistoryTab({
 
       {!isLoading && isError && (
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-          <AlertCircle size={24} className="text-dash-faint" strokeWidth={1.5} />
-          <p className="text-sm text-dash-muted">Failed to load transactions.</p>
+          <AlertCircle
+            size={24}
+            className="text-dash-faint"
+            strokeWidth={1.5}
+          />
+          <p className="text-sm text-dash-muted">
+            Failed to load transactions.
+          </p>
         </div>
       )}
 
@@ -1422,7 +1443,9 @@ function HistoryTab({
                         <span
                           className={cn(
                             "font-mono text-sm font-medium",
-                            positive ? "text-dash-success" : "text-dash-foreground",
+                            positive
+                              ? "text-dash-success"
+                              : "text-dash-foreground",
                           )}
                         >
                           {amtValue}
@@ -1500,7 +1523,9 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
             className="text-dash-faint"
             strokeWidth={1.5}
           />
-          <p className="text-sm font-semibold text-dash-foreground">No swaps yet.</p>
+          <p className="text-sm font-semibold text-dash-foreground">
+            No swaps yet.
+          </p>
           <button
             type="button"
             onClick={onNewSwap}
@@ -1516,7 +1541,7 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-dash-border">
-                {["From", "To", "Rate", "Status", "Date"].map((h) => (
+                {["From", "To", "Status", "Date"].map((h) => (
                   <th
                     key={h}
                     className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint"
@@ -1529,11 +1554,10 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
             <tbody>
               {rawList.map((swap, idx) => {
                 const s = swap as Record<string, unknown>;
-                const fromAmt = s.sourceAmount;
-                const fromCur = s.fromCurrency;
-                const toAmt = s.targetAmount;
-                const toCur = s.toCurrency;
-                const rate = s.rate;
+                const fromAmt = s.source_amount;
+                const fromCur = s.from_currency;
+                const toAmt = s.target_amount;
+                const toCur = s.to_currency;
                 const status = String(s.status ?? "—");
                 const createdAt = String(s.created_at ?? s.createdAt ?? "");
                 return (
@@ -1552,9 +1576,6 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
                       <span className="text-dash-muted">
                         {String(toCur ?? "")}
                       </span>
-                    </td>
-                    <td className="px-5 py-3.5 font-mono text-xs text-dash-muted">
-                      {rate != null ? String(rate) : "—"}
                     </td>
                     <td className="px-5 py-3.5">
                       <StatusBadge status={status} />

@@ -1,17 +1,10 @@
-import { Nunito } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import FloatingLines from "./FloatingLines";
 
-const nunito = Nunito({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  display: "swap",
-});
-
 export default function Hero() {
   return (
-    <section className={`relative overflow-hidden bg-mono-bg ${nunito.className}`}>
+    <section className="relative overflow-hidden bg-mono-bg">
       {/* Ambient background texture — behind everything, never interactive-feeling */}
       <div className="absolute inset-0 z-0">
         <FloatingLines color="#71717A" opacity={0.08} density={6} speed={0.6} />

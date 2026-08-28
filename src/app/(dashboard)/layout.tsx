@@ -64,7 +64,7 @@ export default function DashboardLayout({
       <div
         className={cn(
           "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
-          collapsed ? "lg:pl-16" : "lg:pl-60",
+          collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
         )}
       >
         <Topbar

@@ -1,23 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* Base — light */
-  --background: #FFFFFF;
-  --foreground: #1A2B3B;
-  --card: #F7F9FA;
-  --deeper: #F1F4F6;
-  --border: #E3E8EC;
-  --muted: #657482;
-  --nav-bg: #FFFFFF;
+  /* ── Neutral ramp ─────────────────────────────────────────────────────────
+     The single source of truth for every colour in the product. Eight steps,
+     no hue. Every semantic token below resolves to one of these and nothing
+     else — if a colour is needed that isn't here, the ramp is what changes.
 
-  /* Brand — navy primary action, blue + mint accents */
-  --primary: #1A2B3B;
-  --primary-hover: #1D2A36;
-  --slate: #334352;
-  --slate-light: #687887;
-  --accent: #34BCFF;
-  --accent-mint: #31F2BF;
-  --accent-lime: #E8FC4B;
+     --n-0 (white) is not in the source palette; it's added as the ramp head
+     because the light surfaces need five steps above the midpoint (page
+     ground, raised card, well, border, strong border) and the palette
+     supplies four. Cards would otherwise be indistinguishable from the page. */
+  --n-0:   #FFFFFF; /* White          — ramp head, added */
+  --n-50:  #F8F9FA; /* Bright Snow    */
+  --n-100: #E9ECEF; /* Platinum       */
+  --n-200: #DEE2E6; /* Alabaster Grey */
+  --n-300: #CED4DA; /* Pale Slate     */
+  --n-400: #ADB5BD; /* Pale Slate     */
+  --n-500: #6C757D; /* Slate Grey     */
+  --n-700: #343A40; /* Gunmetal       */
+  --n-900: #212529; /* Carbon Black   */
+
+  /* Base — light */
+  --background: var(--n-0);
+  --foreground: var(--n-900);
+  --card: var(--n-50);
+  --deeper: var(--n-100);
+  --border: var(--n-200);
+  --muted: var(--n-500);
+  --nav-bg: var(--n-0);
+
+  /* Brand — monochrome. The navy/cyan/mint/lime identity is retired; weight
+     and surface do the work that hue used to. --accent-lime stays light
+     because it backs dark text (the Hero announcement pill); --accent-mint
+     goes dark because it backs the primary CTA, whose label is now inverted. */
+  --primary: var(--n-900);
+  --primary-hover: var(--n-700);
+  --slate: var(--n-700);
+  --slate-light: var(--n-500);
+  --accent: var(--n-700);
+  --accent-mint: var(--n-900);
+  --accent-lime: var(--n-100);
 
   --success: #22C55E;
   --error: #EF4444;
@@ -36,50 +58,57 @@
   --code-purple: #C4B5FD;
 
   /* Dashboard (protected app) — light theme.
-     Kept distinct from the marketing tokens above: the dashboard's existing
-     blue accent (#2563EB) is a different brand blue than the marketing site's
-     cyan --accent, so this is its own token set rather than a shared one. */
-  --dash-bg: #F5F7FA;
-  --dash-card: #FFFFFF;
-  --dash-border: #E5E7EB;
-  --dash-border-strong: #D1D5DB;
-  --dash-foreground: #111827;
-  --dash-muted: #6B7280;
-  --dash-faint: #9CA3AF;
-  --dash-hover: #F3F4F6;
-  --dash-accent: #2563EB;
-  --dash-accent-hover: #1D4ED8;
-  --dash-accent-soft: #EFF6FF;
-  --dash-success: #16A34A;
-  --dash-success-bg: #ECFDF5;
-  --dash-success-border: #BBF7D0;
-  --dash-error: #DC2626;
-  --dash-error-bg: #FEF2F2;
-  --dash-error-border: #FECACA;
-  --dash-warning: #D97706;
-  --dash-warning-bg: #FFFBEB;
-  --dash-warning-border: #FDE68A;
-  --dash-purple: #9333EA;
-  --dash-purple-bg: #F5F3FF;
-  --dash-purple-border: #DDD6FE;
-  --dash-orange: #EA580C;
-  --dash-orange-bg: #FFF7ED;
-  --dash-orange-border: #FED7AA;
+     Formerly a separate token set because its blue (#2563EB) was a different
+     brand blue than the marketing cyan. With both surfaces monochrome that
+     distinction is gone; the set is kept only so the two can diverge again
+     later without a rename, and now draws from the same ramp. */
+  --dash-bg: var(--n-50);
+  --dash-card: var(--n-0);
+  --dash-border: var(--n-200);
+  --dash-border-strong: var(--n-300);
+  --dash-foreground: var(--n-900);
+  --dash-muted: var(--n-500);
+  --dash-faint: var(--n-400);
+  --dash-hover: var(--n-100);
+  --dash-accent: var(--n-900);
+  --dash-accent-hover: var(--n-700);
+  --dash-accent-soft: var(--n-100);
 
-  /* Categorical chart palette — 6 series, shared across dashboard charts */
-  --chart-1: #2563EB;
-  --chart-2: #10B981;
-  --chart-3: #F59E0B;
-  --chart-4: #A855F7;
-  --chart-5: #EC4899;
-  --chart-6: #06B6D4;
+  /* Status. Only three ramp steps read as text on a light surface (500/700/
+     900), so five statuses cannot all be told apart by colour — success and
+     purple collide, as do warning and orange. Badge text and icons are what
+     distinguish them now; the bg/border pairs add a weak second axis. */
+  --dash-success: var(--n-700);
+  --dash-success-bg: var(--n-50);
+  --dash-success-border: var(--n-300);
+  --dash-error: var(--n-900);
+  --dash-error-bg: var(--n-100);
+  --dash-error-border: var(--n-400);
+  --dash-warning: var(--n-500);
+  --dash-warning-bg: var(--n-50);
+  --dash-warning-border: var(--n-200);
+  --dash-purple: var(--n-700);
+  --dash-purple-bg: var(--n-100);
+  --dash-purple-border: var(--n-300);
+  --dash-orange: var(--n-500);
+  --dash-orange-bg: var(--n-50);
+  --dash-orange-border: var(--n-400);
 
-  /* Typography — TT Interphases Pro, loaded in layout.tsx via next/font/local.
-     Font loading is currently commented out in src/fonts/index.ts (no licensed
-     binary available), so these fall back to the system stack via the var()
-     default until it's restored. */
-  --font-tt-sans: var(--font-tt-interphases, ui-sans-serif), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-tt-mono: var(--font-tt-interphases-mono, ui-monospace), SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Chart series — a sequential ramp doing categorical work. Ordered darkest
+     to lightest so adjacent series stay separable; chart-6 is close to the
+     card surface, so it wants a stroke rather than fill alone. */
+  --chart-1: var(--n-900);
+  --chart-2: var(--n-700);
+  --chart-3: var(--n-500);
+  --chart-4: var(--n-400);
+  --chart-5: var(--n-300);
+  --chart-6: var(--n-200);
+
+  /* Typography — Onest, loaded in layout.tsx via next/font/google and exposed
+     as --font-onest on the <html> element. TT Interphases Pro (the previous
+     plan) never shipped a licensed binary; Onest replaces it site-wide. */
+  --font-tt-sans: var(--font-onest, ui-sans-serif), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-tt-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @theme inline {
@@ -178,7 +207,7 @@ body {
   background-color: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 1px 3px rgb(26 43 59 / 0.06);
+  box-shadow: 0 1px 3px rgb(33 37 41 / 0.06);
 }
 
 /* Code block syntax highlighting */

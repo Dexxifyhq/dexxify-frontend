@@ -8,6 +8,7 @@ const TYPE_LABELS: Record<ActivityItem["type"], string> = {
   swap: "Swap",
   deposit: "Deposit",
   refund: "Refund",
+  offramp: "Offramp",
 };
 
 const STATUS_STYLES: Record<ActivityItem["status"], string> = {
@@ -40,10 +41,15 @@ interface RecentActivityProps {
   loading?: boolean;
 }
 
-export default function RecentActivity({ items, loading }: RecentActivityProps) {
+export default function RecentActivity({
+  items,
+  loading,
+}: RecentActivityProps) {
   return (
     <div className="rounded-xl border border-dash-border bg-dash-card p-5">
-      <p className="mb-4 text-sm font-semibold text-dash-foreground">Recent Activity</p>
+      <p className="mb-4 text-sm font-semibold text-dash-foreground">
+        Recent Activity
+      </p>
 
       {loading && <Skeleton />}
 
@@ -54,25 +60,45 @@ export default function RecentActivity({ items, loading }: RecentActivityProps) 
       {!loading && items && items.length > 0 && (
         <div className="divide-y divide-dash-border">
           {items.map((item) => (
-            <div key={item.id} className="flex items-center justify-between py-3.5 gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted text-xs font-medium">
-                  {TYPE_LABELS[item.type][0]}
+            <div
+              key={item.id}
+              className="flex items-center justify-between py-3.5 gap-4"
+            >
+              <div className="flex items-center gap-6 min-w-0">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted text-xs font-medium">
+                  {TYPE_LABELS[item.type]}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-dash-foreground">{item.description ?? item.type}</p>
+                  <p className="truncate text-sm text-dash-foreground">
+                    {item.description ?? item.type}
+                  </p>
                   <p className="text-xs text-dash-faint">
                     {new Date(item.created_at).toLocaleDateString("en", {
-                      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
               </div>
               <div className="shrink-0 flex flex-col items-end gap-1">
-                <p className={`text-sm font-medium ${item.direction === "credit" ? "text-dash-success" : item.direction === "debit" ? "text-dash-error" : "text-dash-foreground"}`}>
-                  {item.direction === "credit" ? "+" : item.direction === "debit" ? "-" : ""}{item.amount.toLocaleString()} {item.currency}
+                <p
+                  className={`text-sm font-medium ${item.direction === "credit" ? "text-dash-success" : item.direction === "debit" ? "text-dash-error" : "text-dash-foreground"}`}
+                >
+                  {item.direction === "credit"
+                    ? "+"
+                    : item.direction === "debit"
+                      ? "-"
+                      : ""}
+                  {item.amount.toLocaleString()} {item.currency}
                 </p>
-                <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", STATUS_STYLES[item.status])}>
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                    STATUS_STYLES[item.status],
+                  )}
+                >
                   {item.status}
                 </span>
               </div>

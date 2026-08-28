@@ -68,7 +68,6 @@ const NAV_TOP: NavEntry[] = [
     label: "Operations",
     icon: LayoutGrid,
     children: [
-      { label: "Workflows", href: "/workflows", icon: Workflow },
       { label: "Bank Accounts", href: "/bank-accounts", icon: Landmark },
       { label: "Crypto Wallets", href: "/crypto-wallets", icon: Coins },
       { label: "POS Terminals", href: "/pos-terminals", icon: Monitor },
@@ -292,9 +291,9 @@ export default function Sidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-dash-border bg-dash-card transition-[width,transform] duration-200",
-          // Desktop: collapse rail
-          "lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex flex-col border border-dash-border bg-dash-card transition-[width,transform] duration-200",
+          // Desktop: collapse rail, floating with space around it
+          "lg:inset-y-32 lg:left-4 lg:translate-x-0 lg:overflow-hidden lg:rounded-2xl lg:shadow-lg",
           collapsed ? "lg:w-16" : "lg:w-60",
           // Mobile: full-width drawer, hidden unless open
           "w-72",
@@ -403,7 +402,10 @@ export default function Sidebar({
                     </p>
                   )}
                 </div>
-                <ChevronsUpDown size={14} className="shrink-0 text-dash-faint" />
+                <ChevronsUpDown
+                  size={14}
+                  className="shrink-0 text-dash-faint"
+                />
               </>
             )}
           </button>
@@ -500,7 +502,10 @@ export default function Sidebar({
                     </p>
                   )}
                 </div>
-                <ChevronsUpDown size={14} className="shrink-0 text-dash-faint" />
+                <ChevronsUpDown
+                  size={14}
+                  className="shrink-0 text-dash-faint"
+                />
               </>
             )}
           </button>
