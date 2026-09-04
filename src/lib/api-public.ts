@@ -34,7 +34,10 @@ function toError(err: unknown): PublicApiError {
   return new PublicApiError(message, e.response?.status ?? null);
 }
 
-export async function publicGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
+export async function publicGet<T>(
+  url: string,
+  params?: Record<string, unknown>,
+): Promise<T> {
   try {
     const res = await publicClient.get(url, { params });
     return unwrap<T>(res.data);
