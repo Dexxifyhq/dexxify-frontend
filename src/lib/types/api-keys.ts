@@ -25,33 +25,3 @@ export interface UpdateApiKeyDto {
   label?: string;
   ip_whitelist?: string[];
 }
-
-// ── Dashboard meta ─────────────────────────────────────────────────────────
-
-export interface DashboardOverview {
-  total_wallets: number;
-  total_payouts: number;
-  total_payout_volume: number;
-  total_onramp_volume: number;
-  total_offramp_volume: number;
-  currency: string;
-  // shape is a guess — adjust once backend response is available
-  [key: string]: unknown;
-}
-
-export interface DashboardUsageDay {
-  date: string;
-  requests: number;
-  errors?: number;
-}
-
-export interface DashboardUsage {
-  total_requests: number;
-  total_errors?: number;
-  rate_limit?: number;
-  days: DashboardUsageDay[];
-}
-
-export interface DashboardUsageFilters {
-  days?: number;
-}
