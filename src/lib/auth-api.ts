@@ -9,6 +9,8 @@ export interface RegisterPayload {
   first_name: string;
   last_name: string;
   phone?: string;
+  /** Honeypot — must stay empty. Bots that blindly fill every field trip it. */
+  website?: string;
 }
 
 export interface SelectBusinessPayload {
