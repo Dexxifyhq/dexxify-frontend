@@ -77,7 +77,7 @@ const NAV_TOP: NavEntry[] = [
 ];
 
 const NAV_BOTTOM: NavEntry[] = [
-  { kind: "link", label: "Developers", href: "/api-webhooks", icon: Code2 },
+  { kind: "link", label: "Developers", href: "/developers", icon: Code2 },
   { kind: "link", label: "Settings", href: "/settings", icon: Settings },
 ];
 
