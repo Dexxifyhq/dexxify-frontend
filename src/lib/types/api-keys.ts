@@ -18,7 +18,6 @@ export interface ApiKey {
 
 export interface CreateApiKeyDto {
   label?: string;
-  environment: ApiKeyEnvironment;
 }
 
 export interface UpdateApiKeyDto {

@@ -83,7 +83,7 @@ export function useProfileDisplay() {
       email: data?.email ?? "",
       mode: data?.mode,
       businessName: data?.business_name ?? "",
-      businessId: data?.id ?? "", // TODO: UPDATE THE BUSINESS TABLE
+      businessId: data?.id ?? "",
     },
   };
 }

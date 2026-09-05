@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Loader2, Check, Copy, AlertTriangle, KeyRound } from "lucide-react";
 import { useCreateApiKey } from "@/lib/hooks/api-keys/useApiKeys";
 import type { ApiKeyEnvironment } from "@/lib/types/api-keys";
+import { useProfile } from "@/lib/hooks/auth/useProfile";
 
 interface Props {
   open: boolean;
@@ -14,14 +15,15 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
   const createApiKey = useCreateApiKey();
 
   const [label, setLabel] = useState("");
-  const [environment, setEnvironment] = useState<ApiKeyEnvironment>("sandbox");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const { data: profile, isLoading, isError } = useProfile();
+  const environment = profile?.mode === "live" ? "live" : "test";
 
   useEffect(() => {
     if (!open) return;
     setLabel("");
-    setEnvironment("sandbox");
     setError(null);
     setCopied(false);
     createApiKey.reset();
@@ -46,8 +48,11 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
     if (createApiKey.isPending) return;
     setError(null);
     createApiKey.mutate(
-      { label: label.trim() || undefined, environment },
-      { onError: (err: any) => setError(err?.message ?? "Failed to create API key.") },
+      { label: label.trim() || undefined },
+      {
+        onError: (err: any) =>
+          setError(err?.message ?? "Failed to create API key."),
+      },
     );
   };
 
@@ -60,7 +65,11 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
   };
 
   return (
-    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={created ? undefined : onClose}
@@ -103,15 +112,22 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
                 className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-dash-muted hover:bg-dash-border hover:text-dash-foreground transition-colors"
                 aria-label="Copy key"
               >
-                {copied ? <Check size={13} className="text-dash-success" /> : <Copy size={13} />}
+                {copied ? (
+                  <Check size={13} className="text-dash-success" />
+                ) : (
+                  <Copy size={13} />
+                )}
               </button>
             </div>
 
             <div className="flex items-start gap-2 rounded-lg border border-dash-warning-border bg-dash-warning-bg px-3 py-2.5">
-              <AlertTriangle size={13} className="mt-0.5 shrink-0 text-dash-warning" />
+              <AlertTriangle
+                size={13}
+                className="mt-0.5 shrink-0 text-dash-warning"
+              />
               <p className="text-xs text-dash-warning">
-                This is the only time the full key is shown. Store it somewhere safe —
-                you'll need to create a new key if you lose it.
+                This is the only time the full key is shown. Store it somewhere
+                safe — you'll need to create a new key if you lose it.
               </p>
             </div>
 
@@ -124,10 +140,14 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 py-5">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4 px-6 py-5"
+          >
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
-                Label <span className="normal-case text-dash-faint">(optional)</span>
+                Label{" "}
+                <span className="normal-case text-dash-faint">(optional)</span>
               </label>
               <input
                 type="text"
@@ -139,25 +159,6 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
-                Environment
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {(["sandbox", "live"] as ApiKeyEnvironment[]).map((env) => (
-                  <button
-                    key={env}
-                    type="button"
-                    onClick={() => setEnvironment(env)}
-                    className={`h-10 rounded-lg border text-sm font-medium capitalize transition-colors ${
-                      environment === env
-                        ? "border-dash-accent bg-dash-accent-soft text-dash-accent"
-                        : "border-dash-border text-dash-muted hover:bg-dash-hover"
-                    }`}
-                  >
-                    {env}
-                  </button>
-                ))}
-              </div>
               {environment === "live" && (
                 <p className="mt-1.5 text-xs text-dash-warning">
                   Live keys can move real funds. Handle with care.
@@ -184,7 +185,9 @@ export default function CreateApiKeyModal({ open, onClose }: Props) {
                 disabled={createApiKey.isPending}
                 className="flex h-9 items-center gap-2 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
               >
-                {createApiKey.isPending && <Loader2 size={13} className="animate-spin" />}
+                {createApiKey.isPending && (
+                  <Loader2 size={13} className="animate-spin" />
+                )}
                 {createApiKey.isPending ? "Creating…" : "Create Key"}
               </button>
             </div>

@@ -79,7 +79,7 @@ function maskKey(key: ApiKey) {
   return `${"•".repeat(12)}${key.last_four ?? ""}`;
 }
 
-export default function ApiWebhooksPage() {
+export default function DevelopersPage() {
   const [tab, setTab] = useState("keys");
   const [revealSecret, setRevealSecret] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
