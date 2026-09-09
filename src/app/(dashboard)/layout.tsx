@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/dashboard/layout/Sidebar";
 import Topbar from "@/components/dashboard/layout/Topbar";
 import { useProfile, useProfileDisplay } from "@/lib/hooks/auth/useProfile";
+import { AuthProvider } from "@/lib/context/AuthContext";
 import { cn } from "@/utils/utils";
 
 const SIDEBAR_KEY = "dexxify:sidebar-collapsed";
@@ -51,29 +52,31 @@ export default function DashboardLayout({
   if (isError) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-dash-bg">
-      <Sidebar
-        user={user}
-        collapsed={collapsed}
-        onExpand={() => setCollapsedPersisted(false)}
-        mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
-        environment={environment}
-      />
-
-      <div
-        className={cn(
-          "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
-          collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
-        )}
-      >
-        <Topbar
+    <AuthProvider>
+      <div className="flex h-screen overflow-hidden bg-dash-bg">
+        <Sidebar
+          user={user}
+          collapsed={collapsed}
+          onExpand={() => setCollapsedPersisted(false)}
+          mobileOpen={mobileOpen}
+          onMobileClose={() => setMobileOpen(false)}
           environment={environment}
-          onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
-          onOpenMobile={() => setMobileOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+
+        <div
+          className={cn(
+            "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
+            collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
+          )}
+        >
+          <Topbar
+            environment={environment}
+            onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
+            onOpenMobile={() => setMobileOpen(true)}
+          />
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }
