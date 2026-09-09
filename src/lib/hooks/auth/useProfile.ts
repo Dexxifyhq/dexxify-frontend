@@ -72,7 +72,7 @@ export function useProfileDisplay() {
     ? `${data.first_name?.at(0) ?? ""}${data.last_name?.at(0) ?? ""}`.toUpperCase()
     : "";
 
-  const role = data?.role ?? "Owner";
+  const role = data?.role ?? "";
 
   return {
     isLoading,

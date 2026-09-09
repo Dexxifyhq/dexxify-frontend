@@ -8,7 +8,6 @@ export interface TeamMember {
   last_name: string;
   role: "owner" | "admin" | "staff";
   status: "active" | "pending" | "suspended";
-  permissions: string[];
   joined_at: string | null;
   created_at: string;
 }
@@ -17,7 +16,6 @@ export interface TeamInvitation {
   id: string;
   email: string;
   role: string;
-  permissions: string[];
   invite_expires_at: string | null;
   created_at: string;
 }
@@ -25,13 +23,11 @@ export interface TeamInvitation {
 export interface InviteMemberDto {
   email: string;
   role: "admin" | "staff";
-  permissions?: string[];
 }
 
 export interface UpdateMemberDto {
   role?: "owner" | "admin" | "staff";
   status?: "active" | "pending" | "suspended";
-  permissions?: string[];
 }
 
 export interface AcceptInviteDto {
@@ -42,13 +38,12 @@ export interface AcceptInviteDto {
 }
 
 export const teamsApi = {
-  getMembers: (): Promise<TeamMember[]> =>
-    get<{ data: TeamMember[] }>("/teams/members").then((r) => r.data ?? []),
+  getMembers: (): Promise<TeamMember[]> => get<TeamMember[]>("/teams/members"),
   getInvitations: (): Promise<TeamInvitation[]> =>
-    get<{ data: TeamInvitation[] }>("/teams/invitations").then((r) => r.data ?? []),
-  invite: (dto: InviteMemberDto) => post<any>("/teams/invite", dto),
+    get<TeamInvitation[]>("/teams/invitations"),
+  invite: (dto: InviteMemberDto) => post("/teams/invite", dto),
   updateMember: (id: string, dto: UpdateMemberDto) =>
-    patch<any>(`/teams/members/${id}`, dto),
+    patch(`/teams/members/${id}`, dto),
   removeMember: (id: string) =>
     del<{ removed: boolean; id: string }>(`/teams/members/${id}`),
   acceptInvite: (dto: AcceptInviteDto) =>

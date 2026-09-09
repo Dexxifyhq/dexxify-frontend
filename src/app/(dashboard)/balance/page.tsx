@@ -880,7 +880,7 @@ function WithdrawModal({
                   onChange={(e) => setFiatAmount(e.target.value)}
                 />
               </div>
-              <FeeNote>Fee: ₦200.00 (Deducted from balance)</FeeNote>
+              <FeeNote>Fee: ₦300.00 (Deducted from balance)</FeeNote>
               <div>
                 <Label>Narration (optional)</Label>
                 <Input
@@ -1148,11 +1148,14 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
   );
 }
 
+const MIN_OFFRAMP_USD = 3;
+
 function OfframpFlow({ onDone }: { onDone: () => void }) {
   const [cryptoAsset, setCryptoAsset] = useState<WalletAsset>("USDT");
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [recipientId, setRecipientId] = useState("");
   const [success, setSuccess] = useState(false);
+  const [belowMinError, setBelowMinError] = useState<string | null>(null);
 
   const { data: savedBanks, isLoading: banksLoading } = useSavedBanks();
   const createOfframp = useCreateOfframp();
@@ -1161,6 +1164,13 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBelowMinError(null);
+    if (Number(cryptoAmount) < MIN_OFFRAMP_USD) {
+      setBelowMinError(
+        `Minimum offramp amount is $${MIN_OFFRAMP_USD.toFixed(2)}.`,
+      );
+      return;
+    }
     try {
       await createOfframp.mutateAsync({
         crypto_asset: cryptoAsset,
@@ -1174,7 +1184,8 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
   };
 
   const offrampError =
-    createOfframp.error instanceof Error ? createOfframp.error.message : null;
+    belowMinError ??
+    (createOfframp.error instanceof Error ? createOfframp.error.message : null);
 
   if (success) {
     return (
@@ -1226,6 +1237,7 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
           />
         </div>
       </div>
+      <FeeNote>Minimum offramp amount: ${MIN_OFFRAMP_USD.toFixed(2)}</FeeNote>
       <div>
         <Label>Recipient</Label>
         {banksLoading ? (

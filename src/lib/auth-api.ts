@@ -41,6 +41,8 @@ export interface ResetPasswordPayload {
   new_password: string;
 }
 
+export type BusinessRole = "owner" | "admin" | "staff";
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -55,8 +57,7 @@ export interface UserProfile {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
-  // Backend does not currently return a role; useProfileDisplay defaults to "Owner".
-  role?: string;
+  role: BusinessRole | null;
 }
 
 // ── API calls ──────────────────────────────────────────────────────────────

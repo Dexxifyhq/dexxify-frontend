@@ -1,8 +1,8 @@
 "use client";
 
 import { Send, X, Info, ChevronDown, Check } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { cn } from "@/utils/utils";
+import { useEffect, useState } from "react";
+import type { BusinessRole } from "@/lib/auth-api";
 
 export interface StaffPermissionDef {
   key: string;
@@ -10,71 +10,160 @@ export interface StaffPermissionDef {
   description: string;
 }
 
-export interface StaffPermissionGroup {
-  key: string;
-  label: string;
-  permissions: StaffPermissionDef[];
-}
-
-const GROUPS: StaffPermissionGroup[] = [
+const OWNER_PERMISSIONS: StaffPermissionDef[] = [
   {
-    key: "account",
-    label: "Account Management",
-    permissions: [
-      {
-        key: "manage_bank_accounts",
-        title: "Manage Bank Accounts",
-        description: "Create, update, and delete bank accounts",
-      },
-      {
-        key: "manage_crypto_addresses",
-        title: "Manage Crypto Addresses",
-        description: "Create, update, and delete crypto addresses",
-      },
-      {
-        key: "manage_payment_pages",
-        title: "Manage Payment Pages",
-        description: "Create and manage payment pages",
-      },
-    ],
+    key: "manage_balance",
+    title: "Manage Balance",
+    description: "View the entire balance",
   },
   {
-    key: "financial",
-    label: "Financial Operations",
-    permissions: [
-      {
-        key: "withdraw_bank",
-        title: "Withdraw to Bank",
-        description: "Initiate fiat withdrawals to bank accounts",
-      },
-      {
-        key: "withdraw_crypto",
-        title: "Withdraw Crypto",
-        description: "Initiate crypto withdrawals",
-      },
-      {
-        key: "swap_balance",
-        title: "Swap Balance",
-        description: "Swap between currencies",
-      },
-      {
-        key: "initiate_refunds",
-        title: "Initiate Refunds",
-        description: "Process refunds payments",
-      },
-    ],
+    key: "manage_bank_accounts",
+    title: "Manage Bank Accounts",
+    description: "Create, update, and delete bank accounts",
+  },
+  {
+    key: "manage_crypto_addresses",
+    title: "Manage Crypto Addresses",
+    description: "Create, update, and delete crypto addresses",
+  },
+  {
+    key: "manage_payment_pages",
+    title: "Manage Payment Pages",
+    description: "Create and manage payment pages",
+  },
+  {
+    key: "withdraw_bank",
+    title: "Withdraw to Bank",
+    description: "Initiate fiat withdrawals to bank accounts",
+  },
+  {
+    key: "withdraw_crypto",
+    title: "Withdraw Crypto",
+    description: "Initiate crypto withdrawals",
+  },
+  {
+    key: "swap_balance",
+    title: "Swap Balance",
+    description: "Swap between currencies",
+  },
+  {
+    key: "initiate_refunds",
+    title: "Initiate Refunds",
+    description: "Process refunds payments",
+  },
+  {
+    key: "manage_invoices",
+    title: "Manage Invoices",
+    description: "Create and manage invoices",
+  },
+  {
+    key: "manage_checkouts",
+    title: "Manage Checkouts",
+    description: "Create and manage checkouts",
+  },
+  {
+    key: "manage_customers",
+    title: "Manage Customers",
+    description: "Create and manage customers",
   },
 ];
 
-const ROLES = [
+const ADMIN_PERMISSIONS: StaffPermissionDef[] = [
+  {
+    key: "manage_balance",
+    title: "Manage Balance",
+    description: "View the entire balance",
+  },
+  {
+    key: "manage_bank_accounts",
+    title: "Manage Bank Accounts",
+    description: "Create, update, and delete bank accounts",
+  },
+  {
+    key: "manage_crypto_addresses",
+    title: "Manage Crypto Addresses",
+    description: "Create, update, and delete crypto addresses",
+  },
+  {
+    key: "manage_payment_pages",
+    title: "Manage Payment Pages",
+    description: "Create and manage payment pages",
+  },
+  {
+    key: "withdraw_bank",
+    title: "Withdraw to Bank",
+    description: "Initiate fiat withdrawals to bank accounts",
+  },
+  {
+    key: "withdraw_crypto",
+    title: "Withdraw Crypto",
+    description: "Initiate crypto withdrawals",
+  },
+  {
+    key: "swap_balance",
+    title: "Swap Balance",
+    description: "Swap between currencies",
+  },
+  {
+    key: "initiate_refunds",
+    title: "Initiate Refunds",
+    description: "Process refunds payments",
+  },
+  {
+    key: "manage_invoices",
+    title: "Manage Invoices",
+    description: "Create and manage invoices",
+  },
+  {
+    key: "manage_checkouts",
+    title: "Manage Checkouts",
+    description: "Create and manage checkouts",
+  },
+  {
+    key: "manage_customers",
+    title: "Manage Customers",
+    description: "Create and manage customers",
+  },
+];
+
+const STAFF_PERMISSIONS: StaffPermissionDef[] = [
+  {
+    key: "manage_payment_pages",
+    title: "Manage Payment Pages",
+    description: "Create and manage payment pages",
+  },
+  {
+    key: "manage_invoices",
+    title: "Manage Invoices",
+    description: "Create and manage invoices",
+  },
+  {
+    key: "manage_checkouts",
+    title: "Manage Checkouts",
+    description: "Create and manage checkouts",
+  },
+  {
+    key: "manage_customers",
+    title: "Manage Customers",
+    description: "Create and manage customers",
+  },
+  {
+    key: "initiate_refunds",
+    title: "Initiate Refunds",
+    description: "Process refunds payments",
+  },
+];
+
+const ROLE_PERMISSIONS: Record<BusinessRole, StaffPermissionDef[]> = {
+  owner: OWNER_PERMISSIONS,
+  admin: ADMIN_PERMISSIONS,
+  staff: STAFF_PERMISSIONS,
+};
+
+const ROLES: { label: string; value: BusinessRole }[] = [
   { label: "Staff", value: "staff" },
   { label: "Admin", value: "admin" },
   { label: "Owner", value: "owner" },
-];
-
-const STATUSES = [
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
 ];
 
 interface InviteStaffModalProps {
@@ -82,9 +171,7 @@ interface InviteStaffModalProps {
   onClose: () => void;
   onSubmit?: (payload: {
     email: string;
-    role: string;
-    status: string;
-    permissions: string[];
+    role: BusinessRole;
   }) => void | Promise<void>;
 }
 
@@ -94,17 +181,13 @@ export default function InviteStaffModal({
   onSubmit,
 }: InviteStaffModalProps) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("staff");
-  const [status, setStatus] = useState("active");
-  const [perms, setPerms] = useState<Record<string, boolean>>({});
+  const [role, setRole] = useState<BusinessRole>("staff");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (open) {
       setEmail("");
       setRole("staff");
-      setStatus("active");
-      setPerms({});
     }
   }, [open]);
 
@@ -117,40 +200,14 @@ export default function InviteStaffModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  const togglePerm = (key: string) =>
-    setPerms((p) => ({ ...p, [key]: !p[key] }));
-
-  const setGroupAll = (group: StaffPermissionGroup, value: boolean) =>
-    setPerms((p) => {
-      const next = { ...p };
-      group.permissions.forEach((perm) => {
-        next[perm.key] = value;
-      });
-      return next;
-    });
-
-  const groupAllChecked = useMemo(
-    () =>
-      Object.fromEntries(
-        GROUPS.map((g) => [
-          g.key,
-          g.permissions.every((perm) => perms[perm.key]),
-        ]),
-      ),
-    [perms],
-  );
-
   const canSubmit = email.trim() !== "" && email.includes("@");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit || submitting) return;
-    const enabled = Object.entries(perms)
-      .filter(([, v]) => v)
-      .map(([k]) => k);
     try {
       setSubmitting(true);
-      await onSubmit?.({ email, role, status, permissions: enabled });
+      await onSubmit?.({ email, role });
       onClose();
     } finally {
       setSubmitting(false);
@@ -158,6 +215,8 @@ export default function InviteStaffModal({
   };
 
   if (!open) return null;
+
+  const permissions = ROLE_PERMISSIONS[role];
 
   return (
     <div
@@ -218,66 +277,43 @@ export default function InviteStaffModal({
                 Role
                 <Info size={13} className="text-dash-muted" />
               </label>
-              <Select value={role} onChange={setRole} options={ROLES} />
+              <Select
+                value={role}
+                onChange={(v) => setRole(v as BusinessRole)}
+                options={ROLES}
+              />
             </div>
 
-            {/* Permissions */}
+            {/* Permissions — read-only preview of what this role grants */}
             <div className="mb-7">
-              <h3 className="mb-4 text-[15px] font-semibold text-dash-foreground">
+              <h3 className="mb-1 text-[15px] font-semibold text-dash-foreground">
                 Permissions
               </h3>
+              <p className="mb-4 text-sm text-dash-muted">
+                Fixed by role and enforced by the server — not something you
+                assign per invite.
+              </p>
 
-              {GROUPS.map((g) => (
-                <div key={g.key} className="mb-6 last:mb-0">
-                  <div className="mb-3 flex items-center justify-between">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-dash-muted">
-                      {g.label}
-                    </p>
-                    <label className="flex cursor-pointer items-center gap-2 text-sm text-dash-foreground">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 cursor-pointer rounded border-dash-border-strong bg-transparent accent-dash-accent"
-                        checked={groupAllChecked[g.key] ?? false}
-                        onChange={(e) => setGroupAll(g, e.target.checked)}
-                      />
-                      Select all
-                    </label>
+              <div className="divide-y divide-dash-border rounded-xl border border-dash-border">
+                {permissions.map((perm) => (
+                  <div
+                    key={perm.key}
+                    className="flex items-center gap-3.5 px-5 py-4"
+                  >
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-dash-success-bg text-dash-success">
+                      <Check size={13} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-semibold text-dash-foreground">
+                        {perm.title}
+                      </p>
+                      <p className="mt-0.5 text-sm text-dash-muted">
+                        {perm.description}
+                      </p>
+                    </div>
                   </div>
-
-                  <div className="divide-y divide-dash-border rounded-xl border border-dash-border">
-                    {g.permissions.map((perm) => {
-                      const on = !!perms[perm.key];
-                      return (
-                        <div
-                          key={perm.key}
-                          className="flex items-center justify-between gap-4 px-5 py-4"
-                        >
-                          <div className="min-w-0">
-                            <p className="text-[15px] font-semibold text-dash-foreground">
-                              {perm.title}
-                            </p>
-                            <p className="mt-0.5 text-sm text-dash-muted">
-                              {perm.description}
-                            </p>
-                          </div>
-                          <PermPill
-                            checked={on}
-                            onChange={() => togglePerm(perm.key)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Account Status */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-dash-foreground">
-                Account Status
-              </label>
-              <Select value={status} onChange={setStatus} options={STATUSES} />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -333,31 +369,5 @@ function Select({
         className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-dash-muted"
       />
     </div>
-  );
-}
-
-function PermPill({
-  checked,
-  onChange,
-}: {
-  checked: boolean;
-  onChange: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={onChange}
-      className={cn(
-        "inline-flex h-9 min-w-[64px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-4 text-[13px] font-semibold transition-colors",
-        checked
-          ? "border-dash-border-strong bg-dash-hover text-dash-foreground"
-          : "border-dash-border bg-transparent text-dash-faint hover:border-dash-border-strong hover:text-dash-muted",
-      )}
-    >
-      {checked && <Check size={13} />}
-      {checked ? "On" : "Off"}
-    </button>
   );
 }
