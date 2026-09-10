@@ -6,6 +6,7 @@ import Sidebar from "@/components/dashboard/layout/Sidebar";
 import Topbar from "@/components/dashboard/layout/Topbar";
 import { useProfile, useProfileDisplay } from "@/lib/hooks/auth/useProfile";
 import { AuthProvider } from "@/lib/context/AuthContext";
+import { RealtimeProvider } from "@/lib/context/RealtimeContext";
 import { cn } from "@/utils/utils";
 
 const SIDEBAR_KEY = "dexxify:sidebar-collapsed";
@@ -32,7 +33,7 @@ export default function DashboardLayout({
   const { data: profile, isLoading, isError } = useProfile();
   const { user } = useProfileDisplay();
 
-  // Derived directly from profile — no useState + useEffect needed.
+  // Derived directly from profile.
   // When useSwitchMode calls qc.setQueryData, profile updates in the same
   // render pass and environment is correct immediately.
   const environment = profile?.mode === "live" ? "live" : "test";
@@ -53,30 +54,34 @@ export default function DashboardLayout({
 
   return (
     <AuthProvider>
-      <div className="flex h-screen overflow-hidden bg-dash-bg">
-        <Sidebar
-          user={user}
-          collapsed={collapsed}
-          onExpand={() => setCollapsedPersisted(false)}
-          mobileOpen={mobileOpen}
-          onMobileClose={() => setMobileOpen(false)}
-          environment={environment}
-        />
-
-        <div
-          className={cn(
-            "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
-            collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
-          )}
-        >
-          <Topbar
+      <RealtimeProvider>
+        <div className="flex h-screen overflow-hidden bg-dash-bg">
+          <Sidebar
+            user={user}
+            collapsed={collapsed}
+            onExpand={() => setCollapsedPersisted(false)}
+            mobileOpen={mobileOpen}
+            onMobileClose={() => setMobileOpen(false)}
             environment={environment}
-            onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
-            onOpenMobile={() => setMobileOpen(true)}
           />
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+
+          <div
+            className={cn(
+              "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
+              collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
+            )}
+          >
+            <Topbar
+              environment={environment}
+              onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
+              onOpenMobile={() => setMobileOpen(true)}
+            />
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
+      </RealtimeProvider>
     </AuthProvider>
   );
 }
