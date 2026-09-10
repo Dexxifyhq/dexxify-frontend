@@ -40,7 +40,7 @@ export function useRegenerateWebhookSecret() {
   return useMutation({
     mutationFn: () => webhooksApi.regenerateSecret(),
     onSuccess: ({ secret }) => {
-      qc.setQueryData(webhookKeys.detail(), (old: any) =>
+      qc.setQueryData(webhookKeys.detail(), (old: unknown) =>
         old ? { ...old, secret } : old,
       );
     },
