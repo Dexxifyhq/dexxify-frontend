@@ -9,6 +9,8 @@ export interface RegisterPayload {
   first_name: string;
   last_name: string;
   phone?: string;
+  /** Honeypot — must stay empty. Bots that blindly fill every field trip it. */
+  website?: string;
 }
 
 export interface SelectBusinessPayload {
@@ -39,6 +41,8 @@ export interface ResetPasswordPayload {
   new_password: string;
 }
 
+export type BusinessRole = "owner" | "admin" | "staff";
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -53,8 +57,7 @@ export interface UserProfile {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
-  // Backend does not currently return a role; useProfileDisplay defaults to "Owner".
-  role?: string;
+  role: BusinessRole | null;
 }
 
 // ── API calls ──────────────────────────────────────────────────────────────

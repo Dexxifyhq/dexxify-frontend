@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/dashboard/layout/Sidebar";
 import Topbar from "@/components/dashboard/layout/Topbar";
 import { useProfile, useProfileDisplay } from "@/lib/hooks/auth/useProfile";
+import { AuthProvider } from "@/lib/context/AuthContext";
+import { RealtimeProvider } from "@/lib/context/RealtimeContext";
 import { cn } from "@/utils/utils";
 
 const SIDEBAR_KEY = "dexxify:sidebar-collapsed";
@@ -31,7 +33,7 @@ export default function DashboardLayout({
   const { data: profile, isLoading, isError } = useProfile();
   const { user } = useProfileDisplay();
 
-  // Derived directly from profile — no useState + useEffect needed.
+  // Derived directly from profile.
   // When useSwitchMode calls qc.setQueryData, profile updates in the same
   // render pass and environment is correct immediately.
   const environment = profile?.mode === "live" ? "live" : "test";
@@ -51,35 +53,40 @@ export default function DashboardLayout({
   if (isError) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-dash-bg">
-      <Sidebar
-        user={user}
-        collapsed={collapsed}
-        onExpand={() => setCollapsedPersisted(false)}
-        mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
-        environment={environment}
-      />
+    <AuthProvider>
+      <RealtimeProvider>
+        <div className="flex h-screen overflow-hidden bg-dash-bg">
+          <Sidebar
+            user={user}
+            collapsed={collapsed}
+            onExpand={() => setCollapsedPersisted(false)}
+            mobileOpen={mobileOpen}
+            onMobileClose={() => setMobileOpen(false)}
+            environment={environment}
+          />
 
-      <div
-        className={cn(
-          "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
-          collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
-        )}
-      >
-        <Topbar
-          environment={environment}
-          onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
-          onOpenMobile={() => setMobileOpen(true)}
-        />
-        {/* Third floating card, matching the Topbar's radius, border and
-            elevation. Margins set the gutter (and the gap under the Topbar);
-            padding is now purely interior. Scrolling stays on this element, so
-            content moves inside the card while the Topbar holds its place. */}
-        <main className="mx-4 mb-4 mt-4 flex-1 overflow-y-auto rounded-2xl border border-dash-border bg-dash-card p-4 shadow-xs [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-6 sm:mb-6 sm:mt-6 sm:p-6 [&::-webkit-scrollbar]:hidden">
-          {children}
-        </main>
-      </div>
-    </div>
+          <div
+            className={cn(
+              "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
+              collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
+            )}
+          >
+            <Topbar
+              environment={environment}
+              onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
+              onOpenMobile={() => setMobileOpen(true)}
+            />
+            {/* Third floating card, matching the Topbar's radius, border and
+                elevation. Margins set the gutter (and the gap under the
+                Topbar); padding is now purely interior. Scrolling stays on this
+                element, so content moves inside the card while the Topbar
+                holds its place. */}
+            <main className="mx-4 mb-4 mt-4 flex-1 overflow-y-auto rounded-2xl border border-dash-border bg-dash-card p-4 shadow-xs [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-6 sm:mb-6 sm:mt-6 sm:p-6 [&::-webkit-scrollbar]:hidden">
+              {children}
+            </main>
+          </div>
+        </div>
+      </RealtimeProvider>
+    </AuthProvider>
   );
 }

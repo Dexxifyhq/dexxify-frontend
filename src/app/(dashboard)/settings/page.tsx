@@ -61,6 +61,7 @@ import {
   useVerifyCac,
 } from "@/lib/hooks/kyc/useKyc";
 import { REGISTRATION_TYPES, type RegistrationType } from "@/lib/api/kyc";
+import type { BusinessRole } from "@/lib/auth-api";
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
@@ -290,7 +291,9 @@ function GeneralTab() {
       </div>
 
       <div className="mt-8">
-        <p className="mb-2 text-sm font-semibold text-dash-foreground">Brand logo</p>
+        <p className="mb-2 text-sm font-semibold text-dash-foreground">
+          Brand logo
+        </p>
         <div className="flex items-center gap-4 rounded-xl border border-dashed border-dash-border bg-dash-card p-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-dash-hover text-dash-faint">
             <ImageIcon size={20} />
@@ -716,7 +719,11 @@ function KycStatusBadge({ status }: { status: string }) {
       cls: "bg-dash-success-bg text-dash-success",
       icon: CheckCircle2,
     },
-    failed: { label: "Failed", cls: "bg-dash-error-bg text-dash-error", icon: X },
+    failed: {
+      label: "Failed",
+      cls: "bg-dash-error-bg text-dash-error",
+      icon: X,
+    },
     pending: {
       label: "Pending",
       cls: "bg-dash-warning-bg text-dash-warning",
@@ -1289,15 +1296,10 @@ function TeamTab() {
   const invite = useInviteTeamMember();
   const remove = useRemoveTeamMember();
 
-  async function handleInvite(payload: {
-    email: string;
-    role: string;
-    permissions: string[];
-  }) {
+  async function handleInvite(payload: { email: string; role: BusinessRole }) {
     await invite.mutateAsync({
       email: payload.email,
       role: payload.role as "admin" | "staff",
-      permissions: payload.permissions,
     });
   }
 
@@ -1528,7 +1530,9 @@ function Field({
           !inlineBadge && "justify-between",
         )}
       >
-        <label className="text-sm font-semibold text-dash-foreground">{label}</label>
+        <label className="text-sm font-semibold text-dash-foreground">
+          {label}
+        </label>
         {badge}
       </div>
       {children}
@@ -1632,7 +1636,9 @@ function ToggleRow({
         )}
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <p className="text-[15px] font-semibold text-dash-foreground">{title}</p>
+            <p className="text-[15px] font-semibold text-dash-foreground">
+              {title}
+            </p>
             {info && <Info size={12} className="text-dash-faint" />}
           </div>
           <p className="mt-0.5 text-sm text-dash-muted">{description}</p>

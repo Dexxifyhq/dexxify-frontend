@@ -36,8 +36,7 @@ export function useInviteTeamMember() {
       qc.invalidateQueries({ queryKey: teamKeys.invitations() });
       toast.success("Invitation sent.");
     },
-    onError: (e: any) =>
-      toast.error(e.message ?? "Failed to send invitation."),
+    onError: (e) => toast.error(e.message ?? "Failed to send invitation."),
   });
 }
 
@@ -49,7 +48,7 @@ export function useRemoveTeamMember() {
       qc.invalidateQueries({ queryKey: teamKeys.members() });
       toast.success("Team member removed.");
     },
-    onError: (e: any) => toast.error(e.message ?? "Failed to remove member."),
+    onError: (e) => toast.error(e.message ?? "Failed to remove member."),
   });
 }
 
@@ -62,6 +61,6 @@ export function useUpdateTeamMember() {
       qc.invalidateQueries({ queryKey: teamKeys.members() });
       toast.success("Member updated.");
     },
-    onError: (e: any) => toast.error(e.message ?? "Failed to update member."),
+    onError: (e) => toast.error(e.message ?? "Failed to update member."),
   });
 }

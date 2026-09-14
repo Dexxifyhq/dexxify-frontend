@@ -72,7 +72,7 @@ export function useProfileDisplay() {
     ? `${data.first_name?.at(0) ?? ""}${data.last_name?.at(0) ?? ""}`.toUpperCase()
     : "";
 
-  const role = data?.role ?? "Owner";
+  const role = data?.role ?? "";
 
   return {
     isLoading,
@@ -83,7 +83,7 @@ export function useProfileDisplay() {
       email: data?.email ?? "",
       mode: data?.mode,
       businessName: data?.business_name ?? "",
-      businessId: data?.id ?? "", // TODO: UPDATE THE BUSINESS TABLE
+      businessId: data?.id ?? "",
     },
   };
 }

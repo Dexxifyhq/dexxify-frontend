@@ -69,7 +69,7 @@ export default function AssetDistribution({
                 const circumference = 2 * Math.PI * r;
                 const dash = (asset.percentage / 100) * circumference;
                 return (
-                  <g key={asset.symbol}>
+                  <g key={`${asset.name}-${i}`}>
                     <circle
                       cx="18"
                       cy="18"
@@ -102,9 +102,9 @@ export default function AssetDistribution({
             </div>
           </div>
           <div className="space-y-2">
-            {data.assets.map((asset) => (
+            {data.assets.map((asset, i) => (
               <div
-                key={asset.symbol}
+                key={`${asset.name}-${i}`}
                 className="flex items-center justify-between text-xs"
               >
                 <div className="flex items-center gap-2">

@@ -7,6 +7,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import PhoneInputBase, { type Value as PhoneValue } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { Eye, EyeOff, ArrowLeft, Loader2, Check } from "lucide-react";
 
 // ── Alert ──────────────────────────────────────────────────────────────────
@@ -80,6 +82,39 @@ export const inputClass =
 
 export function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${inputClass} ${props.className ?? ""}`} />;
+}
+
+// ── Phone input — international format, outputs E.164 (e.g. +2348065924354) ─
+
+interface PhoneFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+export function PhoneField({ value, onChange, placeholder }: PhoneFieldProps) {
+  return (
+    <div
+      className={`
+        flex h-10 w-full items-center gap-2 rounded-lg border border-dash-border bg-dash-card px-3
+        transition-colors focus-within:border-dash-accent
+        [&_.PhoneInputCountry]:gap-1.5
+        [&_.PhoneInputCountrySelectArrow]:opacity-60
+        [&_.PhoneInputInput]:h-full [&_.PhoneInputInput]:w-full [&_.PhoneInputInput]:border-0
+        [&_.PhoneInputInput]:bg-transparent [&_.PhoneInputInput]:text-sm [&_.PhoneInputInput]:text-dash-foreground
+        [&_.PhoneInputInput]:outline-none [&_.PhoneInputInput]:placeholder:text-dash-faint
+      `}
+    >
+      <PhoneInputBase
+        international
+        defaultCountry="NG"
+        value={value as PhoneValue}
+        onChange={(v) => onChange(v ?? "")}
+        placeholder={placeholder ?? "801 234 5678"}
+        className="w-full"
+      />
+    </div>
+  );
 }
 
 // ── Password input with show/hide toggle ───────────────────────────────────

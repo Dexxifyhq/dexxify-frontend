@@ -1,12 +1,5 @@
 import { get, post, patch, del } from "@/lib/api-client";
-import type {
-  ApiKey,
-  CreateApiKeyDto,
-  UpdateApiKeyDto,
-  DashboardOverview,
-  DashboardUsage,
-  DashboardUsageFilters,
-} from "@/lib/types/api-keys";
+import type { ApiKey, CreateApiKeyDto, UpdateApiKeyDto } from "@/lib/types/api-keys";
 
 export const apiKeysApi = {
   // POST /dashboard/api-keys
@@ -22,13 +15,4 @@ export const apiKeysApi = {
 
   // DELETE /dashboard/api-keys/{id}
   delete: (id: string) => del<{ message: string }>(`/dashboard/api-keys/${id}`),
-
-  // GET /dashboard/overview
-  getOverview: () => get<DashboardOverview>("/dashboard/overview"),
-
-  // GET /dashboard/usage
-  getUsage: (filters: DashboardUsageFilters = {}) =>
-    get<DashboardUsage>("/dashboard/usage", {
-      ...(filters.days ? { days: filters.days } : {}),
-    }),
 };
