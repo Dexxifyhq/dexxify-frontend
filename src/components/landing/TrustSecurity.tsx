@@ -25,10 +25,10 @@ const STATUS_ITEMS = [
 
 export default function TrustSecurity() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-16 px-5 sm:py-24 sm:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-success" />
             Security
@@ -36,7 +36,7 @@ export default function TrustSecurity() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mt-4">
             A payment engine you can trust.
           </h2>
-          <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
+          <p className="mt-4 text-muted text-base sm:text-lg max-w-xl mx-auto">
             Enterprise-grade security built into every transaction. AML, fraud detection and compliance — handled.
           </p>
         </div>

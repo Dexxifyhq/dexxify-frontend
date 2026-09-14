@@ -17,10 +17,10 @@ const STEPS: Step[] = [
 
 export default function CheckoutFlow() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-16 px-5 sm:py-24 sm:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             How it works
@@ -28,7 +28,7 @@ export default function CheckoutFlow() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mt-4">
             Get paid in under 2 minutes
           </h2>
-          <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
+          <p className="mt-4 text-muted text-base sm:text-lg max-w-xl mx-auto">
             Four steps from crypto to Naira. Fully automated.
           </p>
         </div>
@@ -57,9 +57,12 @@ export default function CheckoutFlow() {
           ))}
         </div>
 
-        {/* Note */}
-        <p className="text-center text-sm text-muted mt-8 border border-border bg-card rounded-full px-5 py-2 inline-flex items-center gap-2 mx-auto w-full justify-center max-w-fit">
-          <span className="text-success">✓</span>
+        {/* Note — `flex` rather than `inline-flex` so mx-auto actually centres
+            it (margin:auto computes to 0 on an inline-level box). Pill radius
+            only from sm up: below that the text wraps to two lines and
+            rounded-full turns it into a tall blob. */}
+        <p className="mt-8 mx-auto flex w-fit max-w-full items-start gap-2 rounded-xl border border-border bg-card px-4 py-3 text-left text-sm text-muted sm:items-center sm:rounded-full sm:px-5 sm:py-2 sm:text-center">
+          <span className="text-success shrink-0">✓</span>
           Same flow works for Offramp — your users receive Naira instead
         </p>
       </div>

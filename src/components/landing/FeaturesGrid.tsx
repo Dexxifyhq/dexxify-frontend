@@ -18,10 +18,10 @@ const FEATURES: Feature[] = [
 
 export default function FeaturesGrid() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-16 px-5 sm:py-24 sm:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             Platform

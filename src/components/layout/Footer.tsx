@@ -29,7 +29,7 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border py-16 px-6">
+    <footer className="border-t border-border py-12 px-5 sm:py-16 sm:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Top row */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">

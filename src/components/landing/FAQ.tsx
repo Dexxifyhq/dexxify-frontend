@@ -43,7 +43,12 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         aria-expanded={open}
         className="w-full flex items-center justify-between py-5 text-left gap-4 group"
       >
-        <span className="text-foreground text-base font-medium group-hover:text-white transition-colors">{q}</span>
+        {/* Was group-hover:text-white — a dark-theme leftover that turned the
+            question invisible against the near-white card on hover. Foreground
+            is already the darkest ramp step, so the hover cue has to lighten;
+            slate (n-700) is the smallest step that still reads as a change and
+            stays well above AA. slate-light would land at 4.45:1. */}
+        <span className="text-foreground text-base font-medium group-hover:text-slate transition-colors">{q}</span>
         <div className="w-6 h-6 rounded-full border border-border flex items-center justify-center shrink-0 group-hover:border-primary/40 transition-colors duration-200">
           {open ? <Minus size={12} className="text-muted" /> : <Plus size={12} className="text-muted" />}
         </div>
@@ -59,10 +64,10 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 export default function FAQ() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-16 px-5 sm:py-24 sm:px-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             FAQ

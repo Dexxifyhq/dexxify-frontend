@@ -16,14 +16,14 @@ const OFFRAMP_FEATURES = [
 
 export default function TwoProducts() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-16 px-5 sm:py-24 sm:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
             Two products. One integration.
           </h2>
-          <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
+          <p className="mt-4 text-muted text-base sm:text-lg max-w-xl mx-auto">
             Whether you&apos;re collecting payments or paying out users, Dexxify handles both ends.
           </p>
         </div>
@@ -32,7 +32,7 @@ export default function TwoProducts() {
         <div className="grid md:grid-cols-2 gap-6">
 
           {/* Card 1 — Payment Gateway */}
-          <div className="product-card group bg-card border border-border rounded-2xl p-8 flex flex-col gap-6 hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
+          <div className="product-card group bg-card border border-border rounded-2xl p-6 sm:p-8 flex flex-col gap-6 hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="flex items-start justify-between">
@@ -71,7 +71,7 @@ export default function TwoProducts() {
           </div>
 
           {/* Card 2 — Offramp API */}
-          <div className="product-card group bg-card border border-border rounded-2xl p-8 flex flex-col gap-6 hover:border-success/20 transition-all duration-300 relative overflow-hidden">
+          <div className="product-card group bg-card border border-border rounded-2xl p-6 sm:p-8 flex flex-col gap-6 hover:border-success/20 transition-all duration-300 relative overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="flex items-start justify-between">
