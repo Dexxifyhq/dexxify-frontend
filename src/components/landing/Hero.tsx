@@ -1,7 +1,9 @@
 export default function Hero() {
   return (
-    <section className="relative">
-      {/* Vertical rails mark the content container, as in the reference */}
+    <section className="relative border-b border-border">
+      {/* border-b sits on the section above so the horizontal rule runs the
+          full viewport width; these vertical rails stay inset at the
+          container, as in the reference. */}
       <div className="max-w-[1200px] mx-auto border-x border-border">
         <div className="px-6  pt-32 pb-28 lg:pt-32 lg:pb-36">
           {/* Announcement pill */}

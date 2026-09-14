@@ -72,7 +72,13 @@ export default function DashboardLayout({
           onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
           onOpenMobile={() => setMobileOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        {/* Third floating card, matching the Topbar's radius, border and
+            elevation. Margins set the gutter (and the gap under the Topbar);
+            padding is now purely interior. Scrolling stays on this element, so
+            content moves inside the card while the Topbar holds its place. */}
+        <main className="mx-4 mb-4 mt-4 flex-1 overflow-y-auto rounded-2xl border border-dash-border bg-dash-card p-4 shadow-xs [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-6 sm:mb-6 sm:mt-6 sm:p-6 [&::-webkit-scrollbar]:hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

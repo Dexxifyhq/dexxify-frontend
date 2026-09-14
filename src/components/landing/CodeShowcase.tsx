@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { highlight } from "@/lib/utils/highlight";
 
 const GATEWAY_CODE = `import Dexxify from "@dexxify/node";
 
@@ -38,39 +39,14 @@ const payout = await dexxify.offramp.create({
 // payout.rate       → 1,625 NGN/USDT`;
 
 const WEBHOOK_EVENTS = [
-  { event: "payment.created", status: "200", color: "#22C55E" },
-  { event: "deposit.detected", status: "200", color: "#22C55E" },
-  { event: "deposit.confirmed", status: "200", color: "#22C55E" },
-  { event: "conversion.completed", status: "200", color: "#22C55E" },
-  { event: "settlement.success", status: "200", color: "#22C55E" },
+  { event: "payment.created", status: "200" },
+  { event: "deposit.detected", status: "200" },
+  { event: "deposit.confirmed", status: "200" },
+  { event: "conversion.completed", status: "200" },
+  { event: "settlement.success", status: "200" },
 ];
 
 const SDK_LANGS = ["Node.js", "Python", "Go", "PHP", "Ruby", "Java", ".NET", "Rust"];
-
-// Syntax highlight function
-function highlight(code: string): React.ReactNode {
-  return code.split("\n").map((line, i) => {
-    const parts: React.ReactNode[] = [];
-    const tokens = line.split(/(import|from|const|await|process|new|\/\/.+$|"[^"]*"|`[^`]*`|\b\d+\b)/g);
-    tokens.forEach((token, j) => {
-      if (!token) return;
-      if (/^(import|from|const|await|new)$/.test(token)) {
-        parts.push(<span key={j} className="text-[#93C5FD]">{token}</span>);
-      } else if (/^\/\//.test(token)) {
-        parts.push(<span key={j} className="text-[#52525B] italic">{token}</span>);
-      } else if (/^"/.test(token) || /^`/.test(token)) {
-        parts.push(<span key={j} className="text-[#86EFAC]">{token}</span>);
-      } else if (/^\d+$/.test(token)) {
-        parts.push(<span key={j} className="text-[#FCD34D]">{token}</span>);
-      } else if (/^process$/.test(token)) {
-        parts.push(<span key={j} className="text-[#C4B5FD]">{token}</span>);
-      } else {
-        parts.push(<span key={j}>{token}</span>);
-      }
-    });
-    return <div key={i} className="leading-6">{parts}</div>;
-  });
-}
 
 function WebhookLog() {
   return (
@@ -91,9 +67,9 @@ function WebhookLog() {
       <div className="flex-1 p-4 font-mono text-xs space-y-2.5 overflow-hidden">
         {WEBHOOK_EVENTS.map((e) => (
           <div key={e.event} className="webhook-row flex items-center gap-3">
-            <div className="w-5 h-5 rounded bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
+            <div className="w-5 h-5 rounded bg-success/10 border border-success/20 flex items-center justify-center shrink-0 text-success">
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                <path d="M1.5 4L3 5.5L6.5 2" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1.5 4L3 5.5L6.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <span className="text-foreground flex-1">{e.event}</span>
@@ -114,10 +90,10 @@ export default function CodeShowcase() {
   const code = activeTab === "gateway" ? GATEWAY_CODE : OFFRAMP_CODE;
 
   return (
-    <section className="py-24 px-6">
+    <section className="py-16 px-5 sm:py-24 sm:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             Developer API
@@ -125,7 +101,7 @@ export default function CodeShowcase() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mt-4 mb-3">
             Built for developers
           </h2>
-          <p className="text-muted text-lg max-w-xl">
+          <p className="text-muted text-base sm:text-lg max-w-xl">
             SDKs in 8+ languages. Webhooks, sandbox, and API reference included.
           </p>
 
@@ -151,25 +127,25 @@ export default function CodeShowcase() {
         <div className="grid lg:grid-cols-5 gap-4">
 
           {/* Code block — 3 cols */}
-          <div className="lg:col-span-3 bg-deeper border border-border rounded-xl overflow-hidden flex flex-col">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+          <div className="lg:col-span-3 bg-code-bg border border-code-border rounded-xl overflow-hidden flex flex-col">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-code-border">
               <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-error/40" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/40" />
-                <div className="w-2.5 h-2.5 rounded-full bg-success/40" />
+                <div className="w-2.5 h-2.5 rounded-full bg-code-border" />
+                <div className="w-2.5 h-2.5 rounded-full bg-code-border" />
+                <div className="w-2.5 h-2.5 rounded-full bg-code-border" />
               </div>
-              <span className="text-xs text-muted ml-2 font-mono">
+              <span className="text-xs text-code-muted ml-2 font-mono">
                 {activeTab === "gateway" ? "payment.ts" : "payout.ts"}
               </span>
             </div>
 
-            <div className="flex-1 p-5 font-mono text-sm text-foreground overflow-auto">
+            <div className="flex-1 p-5 font-mono text-sm text-code-fg overflow-auto">
               {highlight(code)}
             </div>
 
-            <div className="px-4 py-3 border-t border-border flex gap-2 flex-wrap">
+            <div className="px-4 py-3 border-t border-code-border flex gap-2 flex-wrap">
               {SDK_LANGS.map(lang => (
-                <span key={lang} className="text-[10px] text-muted border border-border bg-card px-2 py-0.5 rounded">
+                <span key={lang} className="text-[10px] text-code-muted border border-code-border bg-code-fg/5 px-2 py-0.5 rounded">
                   {lang}
                 </span>
               ))}

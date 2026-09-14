@@ -49,6 +49,16 @@
   --code-yellow: var(--n-100);
   --code-purple: var(--n-400);
 
+  /* Code surface. The five syntax tokens above are all light ramp steps, so
+     they only read against a dark ground — this is that ground. The code block
+     is the one dark element on the marketing page, which is what makes it the
+     focal point. To flip it back to a light panel, move these four and the
+     five above to the opposite end of the ramp; no component changes. */
+  --code-bg: var(--n-900);
+  --code-fg: var(--n-50);
+  --code-border: var(--n-700);
+  --code-muted: var(--n-400);
+
   /* Dashboard (protected app) — light theme.
      Formerly a separate token set because its blue (#2563EB) was a different
      brand blue than the marketing cyan. With both surfaces monochrome that
@@ -121,6 +131,10 @@
   --color-nav: var(--nav-bg);
   --color-success: var(--success);
   --color-error: var(--error);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
+  --color-code-border: var(--code-border);
+  --color-code-muted: var(--code-muted);
   --font-sans: var(--font-tt-sans);
   --font-mono: var(--font-tt-mono);
 
@@ -207,6 +221,70 @@ body {
 .token-property { color: var(--foreground); }
 .token-punctuation { color: var(--muted); }
 .token-operator { color: var(--code-blue); }
+
+/* Rotating showcase panels — replayed by remounting on a React key change.
+   `both` holds the from-state before the delay elapses, so staggered rows stay
+   hidden until their turn rather than flashing in at full opacity first. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+}
+
+/* Asset marquee. The track holds four identical copies of the list and slides
+   by exactly half its width, so copy 3 lands where copy 1 started and the loop
+   is seamless. Items are spaced with padding, never `gap`: a flex gap adds one
+   fewer gutter than items, which puts the -50% point half a gutter off and
+   makes the loop visibly jump. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Reduced motion: no scrolling. Drop the duplicate copies and lay the single
+   remaining list out as a static, centred, wrapping row. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+  .marquee-track {
+    width: auto;
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .marquee-dup {
+    display: none;
+  }
+}
 
 /* Floating animation for code block */
 @keyframes float {

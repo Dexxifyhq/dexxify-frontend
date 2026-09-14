@@ -1,8 +1,9 @@
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/landing/Hero";
-import CheckoutFlow from "@/components/landing/CheckoutFlow";
-import TwoProducts from "@/components/landing/TwoProducts";
-import FeaturesGrid from "@/components/landing/FeaturesGrid";
+import AssetMarquee from "@/components/landing/AssetMarquee";
+import Announcement from "@/components/landing/Announcement";
+import Infrastructure from "@/components/landing/Infrastructure";
+import UseCases from "@/components/landing/UseCases";
 import CodeShowcase from "@/components/landing/CodeShowcase";
 import TrustSecurity from "@/components/landing/TrustSecurity";
 import FAQ from "@/components/landing/FAQ";
@@ -14,9 +15,10 @@ export default function Home() {
     <main className="bg-background text-foreground min-h-screen">
       <Navbar />
       <Hero />
-      <CheckoutFlow />
-      <TwoProducts />
-      <FeaturesGrid />
+      <AssetMarquee />
+      <Announcement />
+      <Infrastructure />
+      <UseCases />
       <CodeShowcase />
       <TrustSecurity />
       <FAQ />
