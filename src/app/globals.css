@@ -283,6 +283,34 @@ body {
   --dash-warning-border: var(--n-500);
 }
 
+/* Welcome stepper — the active step slides in from the direction of travel.
+   Only the current step is ever rendered, so there's no off-screen strip for
+   focus to scroll into view. */
+@keyframes step-in-next {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes step-in-prev {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.step-in-next {
+  animation: step-in-next 0.28s ease-out both;
+}
+
+.step-in-prev {
+  animation: step-in-prev 0.28s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-in-next,
+  .step-in-prev {
+    animation: none;
+  }
+}
+
 /* Blinking caret for the auth code panel. Held solid under reduced motion. */
 @keyframes caret-blink {
   0%, 50% { opacity: 1; }
