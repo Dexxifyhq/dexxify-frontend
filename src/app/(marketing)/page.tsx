@@ -4,10 +4,8 @@ import AssetMarquee from "@/components/landing/AssetMarquee";
 import Announcement from "@/components/landing/Announcement";
 import Infrastructure from "@/components/landing/Infrastructure";
 import UseCases from "@/components/landing/UseCases";
-import CodeShowcase from "@/components/landing/CodeShowcase";
 import TrustSecurity from "@/components/landing/TrustSecurity";
 import FAQ from "@/components/landing/FAQ";
-import CTA from "@/components/landing/CTA";
 import Footer from "@/components/layout/Footer";
 
 export default function Home() {
@@ -16,13 +14,11 @@ export default function Home() {
       <Navbar />
       <Hero />
       <AssetMarquee />
-      <Announcement />
       <Infrastructure />
       <UseCases />
-      <CodeShowcase />
       <TrustSecurity />
+      <Announcement />
       <FAQ />
-      <CTA />
       <Footer />
     </main>
   );

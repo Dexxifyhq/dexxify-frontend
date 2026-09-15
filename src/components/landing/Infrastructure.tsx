@@ -125,16 +125,6 @@ function CheckoutWidget() {
   );
 }
 
-/**
- * Faint dot grid for dark cards, drawn from the ramp so it stays monochrome.
- * Set via style rather than a Tailwind arbitrary value: the commas and spaces
- * in a radial-gradient make the class form fragile to write and to read.
- */
-const DARK_DOTS: React.CSSProperties = {
-  backgroundImage: "radial-gradient(var(--n-700) 1px, transparent 1px)",
-  backgroundSize: "16px 16px",
-};
-
 /** Shared card frame — title, optional description and link, visual below.
  *  `tone="dark"` swaps to a Carbon Black ground with light type. */
 function Card({
@@ -156,9 +146,10 @@ function Card({
   return (
     <div
       className={`rounded-2xl border p-6 sm:p-8 flex flex-col ${
-        dark ? "bg-foreground border-code-border" : "bg-card border-border"
+        dark
+          ? "bg-foreground bg-dots-dark border-code-border"
+          : "bg-card border-border"
       } ${className}`}
-      style={dark ? DARK_DOTS : undefined}
     >
       <h3
         className={`text-lg sm:text-xl font-semibold tracking-tight ${
