@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import { useCountdown } from "@/lib/hooks/useCountdown";
-import { AuthAlert, AuthCard, AuthField, AuthBackLink, AuthLogo } from "@/components/ui/auth";
+import { AuthAlert, AuthCard, AuthField, AuthBackLink } from "@/components/ui/auth";
 
 function VerifyEmailForm() {
   const router = useRouter();
@@ -62,7 +62,6 @@ function VerifyEmailForm() {
 
   return (
     <div className="w-full max-w-sm">
-      <AuthLogo />
       <AuthBackLink href="/register" label="Back to register" />
 
       <div className="mb-8">
@@ -101,7 +100,7 @@ function VerifyEmailForm() {
           type="button"
           disabled={isLoading || code.length < 6}
           onClick={() => verifyMutation.mutate(code)}
-          className="w-full h-10 flex items-center justify-center gap-2 bg-dash-accent text-white text-sm font-medium rounded-lg hover:bg-dash-accent-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-full h-10 flex items-center justify-center gap-2 bg-dash-accent text-dash-bg text-sm font-medium rounded-lg hover:bg-dash-accent-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
         >
           {isLoading ? <Loader2 size={15} className="animate-spin" /> : "Verify email"}
         </button>

@@ -253,6 +253,52 @@ body {
   background-size: 16px 16px;
 }
 
+/* Auth pages — dark theme by variable override.
+   The auth pages and their shared primitives colour everything through the
+   dash-* tokens, and @theme inline makes those utilities read the variables
+   live (e.g. .text-dash-foreground { color: var(--dash-foreground) }). So
+   redefining the variables on the auth layout's root re-themes every auth page
+   at once, with no per-page class changes, and the dashboard keeps its light
+   values. Every value is still a ramp step. */
+.theme-auth-dark {
+  --dash-bg: var(--n-900);
+  --dash-card: var(--n-900);
+  --dash-border: var(--n-700);
+  --dash-border-strong: var(--n-500);
+  --dash-foreground: var(--n-0);
+  --dash-muted: var(--n-400);
+  --dash-faint: var(--n-500);
+  --dash-hover: var(--n-700);
+  --dash-accent: var(--n-100);
+  --dash-accent-hover: var(--n-0);
+  --dash-accent-soft: var(--n-700);
+  --dash-success: var(--n-200);
+  --dash-success-bg: var(--n-700);
+  --dash-success-border: var(--n-500);
+  --dash-error: var(--n-0);
+  --dash-error-bg: var(--n-700);
+  --dash-error-border: var(--n-400);
+  --dash-warning: var(--n-300);
+  --dash-warning-bg: var(--n-700);
+  --dash-warning-border: var(--n-500);
+}
+
+/* Blinking caret for the auth code panel. Held solid under reduced motion. */
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+.caret-blink {
+  animation: caret-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret-blink {
+    animation: none;
+  }
+}
+
 /* Asset marquee. The track holds four identical copies of the list and slides
    by exactly half its width, so copy 3 lands where copy 1 started and the loop
    is seamless. Items are spaced with padding, never `gap`: a flex gap adds one

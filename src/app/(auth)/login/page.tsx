@@ -8,12 +8,10 @@ import { toast } from 'sonner';
 import { authApi } from '@/lib/auth-api';
 import { ApiError } from '@/lib/api-client';
 import {
-  AuthCard,
   AuthField,
   AuthInput,
   PasswordInput,
   AuthButton,
-  AuthLogo,
 } from '@/components/ui/auth';
 
 export default function LoginPage() {
@@ -40,19 +38,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-8 text-center">
-        <AuthLogo />
-        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">
-          Welcome back
-        </h1>
-        <p className="text-sm text-dash-muted">
-          Sign in to your Dexxify account
-        </p>
-      </div>
+    <div className="w-full max-w-md">
+      <h1 className="text-3xl font-bold tracking-tight text-dash-foreground">
+        Welcome back
+      </h1>
+      <p className="mt-2 text-sm text-dash-muted">
+        Sign in to your Dexxify account
+      </p>
 
-      <AuthCard>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <AuthField label="Email address">
             <AuthInput
               type="email"
@@ -67,12 +61,7 @@ export default function LoginPage() {
             />
           </AuthField>
 
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-dash-muted">
-                Password
-              </span>
-            </div>
+          <AuthField label="Password">
             <PasswordInput
               value={password}
               onChange={(e) => {
@@ -83,25 +72,26 @@ export default function LoginPage() {
               autoComplete="current-password"
               placeholder="••••••••"
             />
-              <Link
-                href="/forgot-password"
-                className="text-xs text-dash-accent hover:underline"
-              >
-                Forgot password?
-              </Link>
+          </AuthField>
+          <Link
+            href="/forgot-password"
+            className="-mt-2 inline-block text-sm text-dash-muted underline decoration-dotted underline-offset-4 hover:text-dash-foreground transition-colors"
+          >
+            Forgot password?
+          </Link>
+
+          <div className="pt-2">
+            <AuthButton loading={isPending}>
+              Sign in <ArrowRight size={14} />
+            </AuthButton>
           </div>
+      </form>
 
-          <AuthButton loading={isPending}>
-            Sign in <ArrowRight size={14} />
-          </AuthButton>
-        </form>
-      </AuthCard>
-
-      <p className="text-center text-sm text-dash-muted mt-6">
+      <p className="mt-6 text-center text-sm text-dash-muted">
         Don&apos;t have an account?{' '}
         <Link
           href="/register"
-          className="text-dash-accent hover:underline font-medium"
+          className="font-medium text-dash-foreground hover:underline"
         >
           Create account
         </Link>
