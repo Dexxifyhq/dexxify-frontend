@@ -13,7 +13,6 @@ import {
   AuthField,
   AuthButton,
   AuthBackLink,
-  AuthLogo,
   PasswordInput,
   PasswordStrength,
 } from '@/components/ui/auth';
@@ -74,7 +73,6 @@ function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-sm">
-      <AuthLogo />
       <AuthBackLink href="/forgot-password" label="Back" />
 
       <div className="mb-8">

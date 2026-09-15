@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
-import { AuthAlert, AuthCard, AuthField, AuthInput, AuthButton, AuthBackLink, AuthLogo } from "@/components/ui/auth";
+import { AuthAlert, AuthCard, AuthField, AuthInput, AuthButton, AuthBackLink } from "@/components/ui/auth";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -33,7 +33,6 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="w-full max-w-sm">
-      <AuthLogo />
       <AuthBackLink href="/login" label="Back to login" />
 
       <div className="mb-8">
