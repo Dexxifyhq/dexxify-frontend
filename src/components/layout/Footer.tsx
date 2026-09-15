@@ -91,8 +91,10 @@ export default function Footer() {
 
         {/* Small print */}
         <div className="mt-12 flex flex-col gap-4 border-t border-code-border pt-8 sm:flex-row sm:items-center sm:justify-between">
+          {/* The homepage is prerendered, so this year is fixed at build time
+              and rolls over on the next deploy after New Year. */}
           <p className="text-xs text-background/60">
-            © 2025 Dexxify · Built in Nigeria 🇳🇬
+            © {new Date().getFullYear()} Dexxify
           </p>
           <div className="flex items-center gap-4">
             <a
