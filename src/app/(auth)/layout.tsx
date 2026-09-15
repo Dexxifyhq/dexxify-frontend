@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { AuthCodePanel } from "@/components/ui/auth";
+import { AuthBands } from "@/components/ui/auth-bands";
 
 export const metadata: Metadata = {
   title: {
@@ -10,25 +11,6 @@ export const metadata: Metadata = {
     default: "Dexxify",
   },
 };
-
-/** Diagonal bands behind the code panel, in ramp greys. Fills are set via
- *  style: SVG presentation attributes don't resolve CSS variables. */
-function Bands() {
-  return (
-    <svg
-      viewBox="0 0 600 500"
-      preserveAspectRatio="xMaxYMax slice"
-      className="absolute inset-x-0 bottom-0 h-3/5 w-full"
-    >
-      <polygon points="0,500 60,470 120,500" style={{ fill: "var(--n-500)" }} opacity="0.35" />
-      <polygon points="150,500 240,330 330,500" style={{ fill: "var(--n-700)" }} opacity="0.9" />
-      <polygon points="270,500 330,330 420,390 400,500" style={{ fill: "var(--n-500)" }} opacity="0.35" />
-      <polygon points="390,500 440,330 560,300 520,500" style={{ fill: "var(--n-700)" }} opacity="0.8" />
-      <polygon points="470,500 600,160 600,500" style={{ fill: "var(--n-500)" }} opacity="0.45" />
-      <polygon points="520,260 600,210 600,360" style={{ fill: "var(--n-400)" }} opacity="0.25" />
-    </svg>
-  );
-}
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -90,7 +72,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         aria-hidden="true"
         className="relative hidden overflow-hidden border-l border-dash-border bg-dots-dark lg:flex lg:items-center lg:justify-center lg:px-12"
       >
-        <Bands />
+        <AuthBands />
         <div className="relative z-10 flex w-full justify-center">
           <AuthCodePanel />
         </div>

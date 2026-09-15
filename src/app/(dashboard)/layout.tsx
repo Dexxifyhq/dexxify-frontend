@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/dashboard/layout/Sidebar";
 import Topbar from "@/components/dashboard/layout/Topbar";
 import { useProfile, useProfileDisplay } from "@/lib/hooks/auth/useProfile";
+import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
 import { AuthProvider } from "@/lib/context/AuthContext";
 import { RealtimeProvider } from "@/lib/context/RealtimeContext";
 import { cn } from "@/utils/utils";
@@ -42,7 +43,23 @@ export default function DashboardLayout({
     if (isError) router.replace("/login");
   }, [isError, router]);
 
-  if (isLoading) {
+  // First-run setup. Signup creates a business with no type, so an owner
+  // whose business still has type === null hasn't been through /welcome yet.
+  // Staff aren't redirected — defining the business is the owner's call.
+  const { data: business, isLoading: businessLoading } = useMyBusiness();
+  const needsWelcome =
+    !!profile &&
+    !!business &&
+    business.type === null &&
+    business.owner_user_id === profile.id;
+
+  useEffect(() => {
+    if (needsWelcome) router.replace("/welcome");
+  }, [needsWelcome, router]);
+
+  // Hold on the spinner until the business is known, so a new owner never
+  // sees the dashboard flash before the redirect.
+  if (isLoading || businessLoading || needsWelcome) {
     return (
       <div className="flex h-screen items-center justify-center bg-dash-bg">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-dash-accent border-t-transparent" />
