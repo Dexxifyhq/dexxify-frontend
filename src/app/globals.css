@@ -246,6 +246,13 @@ body {
   }
 }
 
+/* Faint dot grid for dark surfaces, drawn from the ramp so it stays
+   monochrome. Shared by the dark bento cards and the use-case band. */
+.bg-dots-dark {
+  background-image: radial-gradient(var(--n-700) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
 /* Asset marquee. The track holds four identical copies of the list and slides
    by exactly half its width, so copy 3 lands where copy 1 started and the loop
    is seamless. Items are spaced with padding, never `gap`: a flex gap adds one

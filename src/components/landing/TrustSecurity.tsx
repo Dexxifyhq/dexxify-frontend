@@ -1,80 +1,104 @@
-import { Shield, Lock, Link2, FileSearch, AlertTriangle, Activity } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import {
+  KeyRound,
+  Webhook,
+  LockKeyhole,
+  Gauge,
+  Users,
+  Link2,
+  type LucideIcon,
+} from "lucide-react";
 
-interface SecurityFeature {
+interface Control {
   icon: LucideIcon;
   title: string;
   desc: string;
 }
 
-const SECURITY_FEATURES: SecurityFeature[] = [
-  { icon: Shield, title: "Data Privacy First", desc: "All user data processed following global privacy standards including GDPR and Nigerian NDPR." },
-  { icon: Lock, title: "Secure by Default", desc: "AES-256 encryption, TLS 1.3 and OAuth 2.0 on every endpoint. No exceptions." },
-  { icon: Link2, title: "On-Chain Proof", desc: "Every settlement is verifiable directly on the blockchain. Full transparency, no trust required." },
-  { icon: FileSearch, title: "Compliance", desc: "Built-in AML screening on every transaction. We handle the compliance burden so you don't have to." },
-  { icon: AlertTriangle, title: "Fraud Detection", desc: "Real-time anomaly detection and transaction monitoring flags suspicious activity before it causes damage." },
-  { icon: Activity, title: "Continuous Monitoring", desc: "24/7 automated threat detection with full audit logs and incident response procedures." },
-];
-
-const STATUS_ITEMS = [
-  { label: "API Gateway", status: "Active" },
-  { label: "Webhook Delivery", status: "Active" },
-  { label: "Transaction Screen", status: "Active" },
-  { label: "Fraud Engine", status: "Active" },
+/**
+ * Every control below was checked against dexxify-backend/src:
+ * - API keys: hashApiKey() stores SHA-256 hashes (common/utils).
+ * - Webhooks: signWebhookPayload() HMAC-SHA256 with the endpoint's own secret
+ *   (webhooks.service.ts).
+ * - Passwords: bcrypt, cost 12 (auth.service.ts); email verification and
+ *   password reset both take a one-time code.
+ * - Rate limiting: ThrottlerModule on Redis (app.module.ts); helmet() headers
+ *   and a CORS origin allowlist (main.ts).
+ * - Roles: Owner / Admin / Staff, with @Roles guards on team management.
+ * - On-chain hashes: tx_hash on the crypto transaction entity.
+ *
+ * Removed from the previous version because nothing in the backend backs
+ * them: AES-256, TLS 1.3, OAuth 2.0, GDPR / NDPR, AML screening on every
+ * transaction, fraud and anomaly detection, 24/7 monitoring, audit logs, and a
+ * hardcoded "All systems operational" status widget that looked live but
+ * wasn't. Compliance statements like GDPR / NDPR can come back once legal
+ * confirms them — they aren't provable from code either way.
+ */
+const CONTROLS: Control[] = [
+  {
+    icon: KeyRound,
+    title: "Hashed API keys",
+    desc: "API keys are stored only as SHA-256 hashes, never in plain text.",
+  },
+  {
+    icon: Webhook,
+    title: "Signed webhooks",
+    desc: "Webhooks are signed with HMAC-SHA256 using your endpoint's own secret, so you can verify every event came from Dexxify.",
+  },
+  {
+    icon: LockKeyhole,
+    title: "Protected accounts",
+    desc: "Passwords are hashed with bcrypt, and email verification and password resets use one-time codes.",
+  },
+  {
+    icon: Gauge,
+    title: "Rate-limited API",
+    desc: "Requests are rate limited, responses carry hardened security headers, and only approved origins are accepted.",
+  },
+  {
+    icon: Users,
+    title: "Team roles",
+    desc: "Owner, admin and staff roles control who can invite people and manage your team.",
+  },
+  {
+    icon: Link2,
+    title: "On-chain records",
+    desc: "On-chain transaction hashes are recorded, so crypto movements can be checked on a block explorer.",
+  },
 ];
 
 export default function TrustSecurity() {
   return (
-    <section className="py-16 px-5 sm:py-24 sm:px-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 border border-border bg-card text-xs text-muted px-3 py-1.5 rounded-full mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-success" />
-            Security
-          </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mt-4">
-            A payment engine you can trust.
+    <section className="relative border-b border-border">
+      <div className="max-w-[1200px] mx-auto border-x border-border">
+        <div className="px-6 py-16 sm:py-24">
+          {/* Two-tone heading, same construction as the sections above */}
+          <h2 className="max-w-3xl text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.2]">
+            <span className="font-bold text-foreground">
+              Security built into the stack.
+            </span>{" "}
+            <span className="font-normal text-slate-light">
+              Keys, passwords and webhooks are protected by default, from your
+              first request.
+            </span>
           </h2>
-          <p className="mt-4 text-muted text-base sm:text-lg max-w-xl mx-auto">
-            Enterprise-grade security built into every transaction. AML, fraud detection and compliance — handled.
-          </p>
-        </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {SECURITY_FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="security-card bg-card border border-border rounded-xl p-6 hover:border-success/15 transition-colors duration-300 group"
-            >
-              <div className="w-9 h-9 rounded-lg bg-deeper border border-border flex items-center justify-center mb-4 group-hover:border-success/20 transition-colors duration-300">
-                <f.icon size={16} className="text-success" />
-              </div>
-              <h3 className="text-foreground font-semibold text-base mb-2">{f.title}</h3>
-              <p className="text-muted text-sm leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Status widget */}
-        <div className="max-w-lg mx-auto">
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <span className="text-xs font-medium text-muted">System Status</span>
-              <span className="text-xs text-success">All systems operational</span>
-            </div>
-            <div className="p-4 space-y-3">
-              {STATUS_ITEMS.map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-sm text-muted">{item.label}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-success pulse-dot" />
-                    <span className="text-xs text-success">{item.status}</span>
-                  </div>
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {CONTROLS.map((c) => (
+              <div
+                key={c.title}
+                className="rounded-2xl border border-border bg-card p-6"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background">
+                  <c.icon size={16} className="text-foreground" />
                 </div>
-              ))}
-            </div>
+                <h3 className="mt-4 text-base font-semibold text-foreground">
+                  {c.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {c.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
