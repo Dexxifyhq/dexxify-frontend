@@ -20,6 +20,8 @@ import {
   useRecentActivity,
 } from "@/lib/hooks/dashboard/useDashboardStats";
 import type { DateRange } from "@/lib/types/common";
+import { useHasPermission } from "@/lib/context/AuthContext";
+import { PERMISSIONS } from "@/lib/permissions";
 
 // ── Controls ───────────────────────────────────────────────────────────────
 
@@ -77,6 +79,7 @@ export default function DashboardPage() {
   });
   const { data: assetDist, isLoading: assetLoading } = useAssetDistribution();
   const { data: activity, isLoading: activityLoading } = useRecentActivity(5);
+  const canSeeBalance = useHasPermission(PERMISSIONS.MANAGE_BALANCE);
 
   const fmtNgn = (v: number) =>
     `₦${v.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -250,10 +253,12 @@ export default function DashboardPage() {
           />
         </div>
         <div className="flex flex-col gap-4">
-          <BalanceCarousel
-            balances={overview?.balances}
-            loading={overviewLoading}
-          />
+          {canSeeBalance && (
+            <BalanceCarousel
+              balances={overview?.balances}
+              loading={overviewLoading}
+            />
+          )}
           <RecentActivity
             items={activity || undefined}
             loading={activityLoading}
