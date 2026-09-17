@@ -79,7 +79,7 @@ export type WalletTransactionsResponse = WalletTransaction[];
 
 // ── DTOs ───────────────────────────────────────────────────────────────────
 
-export interface CreateWalletDto {
+export interface CreateDepositAccountDto {
   customer_id?: string;
 }
 
@@ -116,8 +116,7 @@ export interface UpdateWalletAutoSettlementDto {
 // ── Filters ────────────────────────────────────────────────────────────────
 
 export interface WalletListFilters {
-  wallet_id?: string;
-  asset_id?: string;
+  deposit_account_id?: string;
   page?: number;
   limit?: number;
 }
@@ -171,24 +170,11 @@ export interface InitiateFiatWithdrawalDto {
   pin?: string;
 }
 
-/** Withdrawal / mock-trade results aren't typed in the spec — kept permissive. */
+/** Withdrawal */
 export interface WithdrawalResult {
   id?: string;
   reference?: string;
   status?: string;
   tx_hash?: string;
   [key: string]: unknown;
-}
-
-// ── Mock trade (sandbox testing only) ────────────────────────────────────────
-
-export interface MockTradeDto {
-  walletAddress: string;
-  asset: string;
-  amountInUSD: number;
-  cryptoReceived: number;
-  reference?: string;
-  txHash?: string;
-  sourceAddress?: string;
-  confirmations?: number;
 }

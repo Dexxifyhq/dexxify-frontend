@@ -31,14 +31,13 @@ import {
 } from "@/lib/hooks/ledger/useLedger";
 import {
   useWallets,
-  useWalletAddress,
-  useCreateWallet,
   useIssueIdentity,
   useSavedWithdrawalAddresses,
   useWithdrawStableCoin,
   useWithdrawFiat,
-} from "@/lib/hooks/wallet/useWallets";
-import { walletsApi } from "@/lib/api/wallet";
+  useCreateDepositAccount,
+} from "@/lib/hooks/deposit-accounts/useDepositAccounts";
+import { depositAccountsApi } from "@/lib/api/deposit-accounts";
 import { useSavedBanks } from "@/lib/hooks/misc/useMisc";
 import {
   useSwapEstimate,
@@ -52,7 +51,7 @@ import type {
   LedgerTxType,
   LedgerEntryStatus,
 } from "@/lib/types/ledger";
-import type { WithdrawalAddress } from "@/lib/types/wallet";
+import type { WithdrawalAddress } from "@/lib/types/deposit-accounts";
 import type { SavedBank } from "@/lib/types/misc";
 import type { WalletAsset } from "@/lib/api/offramp";
 import type { SwapQuotation } from "@/lib/api/swaps";
@@ -424,7 +423,7 @@ function DepositModal({
     staleTime: 5 * 60_000,
   });
 
-  const createWallet = useCreateWallet();
+  const createDepositAccount = useCreateDepositAccount();
   const issueIdentity = useIssueIdentity();
 
   const assets: FlatAsset[] = flattenAssets(
@@ -437,21 +436,23 @@ function DepositModal({
     if (!selectedAsset) return;
     try {
       // 1. Create the deposit account
-      const wallet = await createWallet.mutateAsync({ customer_id: undefined });
-      const walletId: string = wallet.id;
+      const depositAccount = await createDepositAccount.mutateAsync({
+        customer_id: undefined,
+      });
+      const depositAccountId: string = depositAccount.id;
 
       // 2. Issue a deposit identity for the selected chain
       await issueIdentity.mutateAsync({
-        walletId,
+        walletId: depositAccountId,
         dto: {
           type: "static_deposit_address",
           chain:
-            selectedAsset.chainKey as import("@/lib/types/wallet").DepositIdentityChain,
+            selectedAsset.chainKey as import("@/lib/types/deposit-accounts").DepositIdentityChain,
         },
       });
 
       // 3. Re-fetch wallet to get the updated deposit_addresses
-      const updated = await walletsApi.getById(walletId);
+      const updated = await depositAccountsApi.getById(depositAccountId);
       setWalletResult(updated as unknown as WalletResult);
       setStep("address");
     } catch {
@@ -463,7 +464,7 @@ function DepositModal({
     setStep("select");
     setSelectedKey("");
     setWalletResult(null);
-    createWallet.reset();
+    createDepositAccount.reset();
     issueIdentity.reset();
     onClose();
   };
@@ -481,13 +482,13 @@ function DepositModal({
     : null;
 
   const createError =
-    createWallet.error instanceof Error
-      ? createWallet.error.message
+    createDepositAccount.error instanceof Error
+      ? createDepositAccount.error.message
       : issueIdentity.error instanceof Error
         ? issueIdentity.error.message
         : null;
 
-  const isCreating = createWallet.isPending || issueIdentity.isPending;
+  const isCreating = createDepositAccount.isPending || issueIdentity.isPending;
 
   return (
     <ModalShell open={open} onClose={handleClose} title="Deposit Funds">
@@ -533,7 +534,7 @@ function DepositModal({
             onClick={handleCreate}
             className="mt-1"
           >
-            {createWallet.isPending
+            {createDepositAccount.isPending
               ? "Creating wallet…"
               : issueIdentity.isPending
                 ? "Issuing address…"

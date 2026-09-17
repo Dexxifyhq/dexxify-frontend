@@ -2,8 +2,11 @@
 
 import { X, Wallet, Tag, AlertCircle, Loader2, Star } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useAddWithdrawalAddress } from "@/lib/hooks/wallet/useWallets";
-import type { WithdrawalNetwork, WithdrawalToken } from "@/lib/types/wallet";
+import { useAddWithdrawalAddress } from "@/lib/hooks/deposit-accounts/useDepositAccounts";
+import type {
+  WithdrawalNetwork,
+  WithdrawalToken,
+} from "@/lib/types/deposit-accounts";
 import { cn } from "@/utils/utils";
 
 // ── Network / token config ─────────────────────────────────────────────────
@@ -285,7 +288,9 @@ export default function AddAddressModal({
             <Star
               size={14}
               className={
-                isDefault ? "fill-dash-success text-dash-success" : "text-dash-faint"
+                isDefault
+                  ? "fill-dash-success text-dash-success"
+                  : "text-dash-faint"
               }
             />
             <div className="flex-1">

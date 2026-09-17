@@ -1,7 +1,6 @@
 import { get, post, ApiError } from "@/lib/api-client";
 import type {
   AccountBalance,
-  BalanceOverview,
   BalanceHistoryResponse,
   BalanceHistoryItem,
   BalanceTxType,
@@ -15,18 +14,6 @@ import type {
   TxStatus,
 } from "@/lib/types/common";
 import type { LedgerTransaction } from "@/lib/types/ledger";
-
-/**
- * The backend does not expose dedicated /balance/* endpoints. This file is an
- * adapter layer that powers the existing Balance page by mapping the UI's
- * expected shapes (BalanceOverview / BalanceHistory / Swaps / Payouts) onto
- * the real backend endpoints under /wallets, /transactions and /payouts.
- *
- * UI hook names and types are preserved deliberately — no UI change is needed.
- *
- * When the backend ships a real wallet/balance summary endpoint with the
- * expected shape, swap the implementation here and leave hooks/UI untouched.
- */
 
 // ── Safe wrappers ──────────────────────────────────────────────────────────
 
@@ -151,42 +138,10 @@ function emptyPage<T>(): PaginatedResponse<T> {
 
 export const balanceApi = {
   /**
-   * GET /balance — raw account-level balance (api-key realm). Returned as-is
-   * (permissive shape); use getOverview() for the UI-shaped BalanceOverview.
+   * GET /balance — raw account-level balance. Returned as-is
+   * (permissive shape).
    */
   getAccountBalance: () => get<AccountBalance>("/balance"),
-
-  /**
-   * Maps to POST /wallets/balance. Backend response shape is unknown — we
-   * coerce whatever comes back into the UI's BalanceOverview shape. Adjust
-   * field reads here once the real shape is verified.
-   */
-  getOverview: async (
-    currency: CryptoCurrency = "USDT",
-  ): Promise<BalanceOverview> => {
-    const raw = await safePost<Record<string, unknown>>("/wallets/balance");
-    if (!raw) {
-      return { total_paid_out: 0, processing: 0, available: 0, currency };
-    }
-    const num = (v: unknown) => (typeof v === "number" ? v : Number(v) || 0);
-    return {
-      total_paid_out: num(
-        (raw as { total_paid_out?: unknown }).total_paid_out ??
-          (raw as { totalPaidOut?: unknown }).totalPaidOut ??
-          (raw as { paid_out?: unknown }).paid_out,
-      ),
-      processing: num(
-        (raw as { processing?: unknown }).processing ??
-          (raw as { pending?: unknown }).pending,
-      ),
-      available: num(
-        (raw as { available?: unknown }).available ??
-          (raw as { available_balance?: unknown }).available_balance ??
-          (raw as { balance?: unknown }).balance,
-      ),
-      currency,
-    };
-  },
 
   /**
    * Maps to GET /transactions (Ledger) with optional filters. Currency / type /
