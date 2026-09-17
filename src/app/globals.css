@@ -49,6 +49,16 @@
   --code-yellow: var(--n-100);
   --code-purple: var(--n-400);
 
+  /* Code surface. The five syntax tokens above are all light ramp steps, so
+     they only read against a dark ground — this is that ground. The code block
+     is the one dark element on the marketing page, which is what makes it the
+     focal point. To flip it back to a light panel, move these four and the
+     five above to the opposite end of the ramp; no component changes. */
+  --code-bg: var(--n-900);
+  --code-fg: var(--n-50);
+  --code-border: var(--n-700);
+  --code-muted: var(--n-400);
+
   /* Dashboard (protected app) — light theme.
      Formerly a separate token set because its blue (#2563EB) was a different
      brand blue than the marketing cyan. With both surfaces monochrome that
@@ -121,6 +131,10 @@
   --color-nav: var(--nav-bg);
   --color-success: var(--success);
   --color-error: var(--error);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
+  --color-code-border: var(--code-border);
+  --color-code-muted: var(--code-muted);
   --font-sans: var(--font-tt-sans);
   --font-mono: var(--font-tt-mono);
 
@@ -207,6 +221,151 @@ body {
 .token-property { color: var(--foreground); }
 .token-punctuation { color: var(--muted); }
 .token-operator { color: var(--code-blue); }
+
+/* Rotating showcase panels — replayed by remounting on a React key change.
+   `both` holds the from-state before the delay elapses, so staggered rows stay
+   hidden until their turn rather than flashing in at full opacity first. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+}
+
+/* Faint dot grid for dark surfaces, drawn from the ramp so it stays
+   monochrome. Shared by the dark bento cards and the use-case band. */
+.bg-dots-dark {
+  background-image: radial-gradient(var(--n-700) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Auth pages — dark theme by variable override.
+   The auth pages and their shared primitives colour everything through the
+   dash-* tokens, and @theme inline makes those utilities read the variables
+   live (e.g. .text-dash-foreground { color: var(--dash-foreground) }). So
+   redefining the variables on the auth layout's root re-themes every auth page
+   at once, with no per-page class changes, and the dashboard keeps its light
+   values. Every value is still a ramp step. */
+.theme-auth-dark {
+  --dash-bg: var(--n-900);
+  --dash-card: var(--n-900);
+  --dash-border: var(--n-700);
+  --dash-border-strong: var(--n-500);
+  --dash-foreground: var(--n-0);
+  --dash-muted: var(--n-400);
+  --dash-faint: var(--n-500);
+  --dash-hover: var(--n-700);
+  --dash-accent: var(--n-100);
+  --dash-accent-hover: var(--n-0);
+  --dash-accent-soft: var(--n-700);
+  --dash-success: var(--n-200);
+  --dash-success-bg: var(--n-700);
+  --dash-success-border: var(--n-500);
+  --dash-error: var(--n-0);
+  --dash-error-bg: var(--n-700);
+  --dash-error-border: var(--n-400);
+  --dash-warning: var(--n-300);
+  --dash-warning-bg: var(--n-700);
+  --dash-warning-border: var(--n-500);
+}
+
+/* Welcome stepper — the active step slides in from the direction of travel.
+   Only the current step is ever rendered, so there's no off-screen strip for
+   focus to scroll into view. */
+@keyframes step-in-next {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes step-in-prev {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.step-in-next {
+  animation: step-in-next 0.28s ease-out both;
+}
+
+.step-in-prev {
+  animation: step-in-prev 0.28s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-in-next,
+  .step-in-prev {
+    animation: none;
+  }
+}
+
+/* Blinking caret for the auth code panel. Held solid under reduced motion. */
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+.caret-blink {
+  animation: caret-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret-blink {
+    animation: none;
+  }
+}
+
+/* Asset marquee. The track holds four identical copies of the list and slides
+   by exactly half its width, so copy 3 lands where copy 1 started and the loop
+   is seamless. Items are spaced with padding, never `gap`: a flex gap adds one
+   fewer gutter than items, which puts the -50% point half a gutter off and
+   makes the loop visibly jump. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Reduced motion: no scrolling. Drop the duplicate copies and lay the single
+   remaining list out as a static, centred, wrapping row. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+  .marquee-track {
+    width: auto;
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .marquee-dup {
+    display: none;
+  }
+}
 
 /* Floating animation for code block */
 @keyframes float {

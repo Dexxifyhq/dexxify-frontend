@@ -13,6 +13,7 @@ import {
 import { useCreatePaymentSession } from "@/lib/hooks/payment-sessions/usePaymentSessions";
 import { toast } from "sonner";
 import { cn } from "@/utils/utils";
+import WalletQRCode from "@/components/ui/WalletQRCode";
 
 interface CreatePaymentModalProps {
   open: boolean;
@@ -296,6 +297,17 @@ export default function CreatePaymentModal({
               <p className="max-w-xs text-xs text-dash-muted">
                 Share this link with your customer — they&apos;ll choose their
                 token and complete payment.
+              </p>
+            </div>
+
+            {/* The same link, scannable. Encodes payLink verbatim, which is
+                already absolute (window.location.origin + /pay/:id), so a
+                customer scanning off the merchant's screen lands on the
+                payment page directly. */}
+            <div className="flex flex-col items-center gap-2">
+              <WalletQRCode address={payLink} size={160} />
+              <p className="text-[11px] text-dash-faint">
+                Or scan to pay on a phone
               </p>
             </div>
 

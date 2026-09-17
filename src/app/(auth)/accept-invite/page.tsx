@@ -9,7 +9,6 @@ import {
   AuthField,
   AuthAlert,
   AuthButton,
-  AuthLogo,
   PasswordInput,
   PasswordStrength,
   AuthInput,
@@ -58,7 +57,6 @@ function AcceptInviteForm() {
   if (!token) {
     return (
       <div className="w-full max-w-md flex flex-col items-center">
-        <AuthLogo />
         <AuthCard className="w-full">
           <div className="flex flex-col items-center gap-4 py-4 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dash-warning-border bg-dash-warning-bg">
@@ -89,7 +87,6 @@ function AcceptInviteForm() {
   if (done) {
     return (
       <div className="w-full max-w-md flex flex-col items-center">
-        <AuthLogo />
         <AuthCard className="w-full">
           <div className="flex flex-col items-center gap-4 py-4 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dash-success-border bg-dash-success-bg">
@@ -118,7 +115,6 @@ function AcceptInviteForm() {
 
   return (
     <div className="w-full max-w-md flex flex-col items-center">
-      <AuthLogo />
       <AuthCard className="w-full">
       {/* Header */}
       <div className="mb-7 flex flex-col items-center text-center">

@@ -1,7 +1,8 @@
 'use client';
 import { useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowRight, Loader2, RotateCcw } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/auth-api';
@@ -9,13 +10,11 @@ import { ApiError } from '@/lib/api-client';
 import { useCountdown } from '@/lib/hooks/useCountdown';
 import {
   AuthAlert,
-  AuthCard,
   AuthField,
   AuthButton,
-  AuthBackLink,
-  AuthLogo,
   PasswordInput,
   PasswordStrength,
+  inputClass,
 } from '@/components/ui/auth';
 
 function ResetPasswordForm() {
@@ -73,108 +72,104 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <AuthLogo />
-      <AuthBackLink href="/forgot-password" label="Back" />
+    <div className="w-full max-w-md">
+      <h1 className="text-3xl font-bold tracking-tight text-dash-foreground">
+        Reset your password
+      </h1>
+      <p className="mt-2 text-sm leading-relaxed text-dash-muted">
+        We emailed a reset code to{' '}
+        {email ? (
+          <span className="text-dash-foreground">{email}</span>
+        ) : (
+          'your email address'
+        )}
+        . Enter it below and choose a new password.
+      </p>
 
-      <div className="mb-8">
-        <div className="w-10 h-10 rounded-xl bg-dash-accent-soft border border-dash-accent/20 flex items-center justify-center mb-4">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect
-              x="3"
-              y="8"
-              width="12"
-              height="9"
-              rx="1.5"
-              stroke="var(--dash-accent)"
-              strokeWidth="1.5"
-            />
-            <path
-              d="M6 8V5.5a3 3 0 016 0V8"
-              stroke="var(--dash-accent)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">
-          Reset your password
-        </h1>
-        <p className="text-sm text-dash-muted">
-          Enter the 6-digit code sent to{' '}
-          {email ? (
-            <span className="text-dash-foreground font-medium">{email}</span>
-          ) : (
-            'your email'
-          )}{' '}
-          and choose a new password.
-        </p>
-      </div>
+      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+        {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
 
-      <AuthCard>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
+        <AuthField label="Reset code">
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            required
+            autoFocus
+            autoComplete="one-time-code"
+            placeholder="6-digit code"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+              resetMutation.reset();
+            }}
+            className={inputClass}
+          />
+        </AuthField>
 
-          <AuthField label="Reset code">
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={6}
-              required
-              autoFocus
-              placeholder="000000"
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
-                resetMutation.reset();
-              }}
-              className="w-full h-12 px-4 bg-dash-card border border-dash-border rounded-lg text-lg font-mono text-center text-dash-foreground placeholder:text-dash-faint tracking-[0.4em] focus:outline-none focus:border-dash-accent transition-colors"
-            />
-          </AuthField>
+        <AuthField label="New password">
+          <PasswordInput
+            value={newPassword}
+            onChange={(e) => {
+              setNewPassword(e.target.value);
+              resetMutation.reset();
+            }}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            placeholder="Min. 8 characters"
+          />
+          <PasswordStrength password={newPassword} />
+        </AuthField>
 
-          <AuthField label="New password">
-            <PasswordInput
-              value={newPassword}
-              onChange={(e) => {
-                setNewPassword(e.target.value);
-                resetMutation.reset();
-              }}
-              required
-              minLength={8}
-              autoComplete="new-password"
-              placeholder="Min. 8 characters"
-            />
-            <PasswordStrength password={newPassword} />
-          </AuthField>
-
+        <div className="pt-1">
           <AuthButton
             loading={resetMutation.isPending}
             disabled={code.length < 6}
           >
             Reset password <ArrowRight size={14} />
           </AuthButton>
+        </div>
+      </form>
 
-          <div className="pt-1 border-t border-dash-border text-center">
-            <p className="text-xs text-dash-muted mb-2">
-              Didn&apos;t receive a code?
-            </p>
-            <button
-              type="button"
-              disabled={resendMutation.isPending || count > 0}
-              onClick={handleResend}
-              className="inline-flex items-center gap-1.5 text-sm text-dash-accent hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
-            >
-              {resendMutation.isPending ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <RotateCcw size={13} />
-              )}
-              {count > 0 ? `Resend in ${count}s` : 'Resend code'}
-            </button>
-          </div>
-        </form>
-      </AuthCard>
+      <p className="mt-6 text-center text-sm text-dash-muted">
+        Didn&apos;t receive a code?{' '}
+        <button
+          type="button"
+          disabled={resendMutation.isPending || count > 0}
+          onClick={handleResend}
+          className="font-medium text-dash-foreground hover:underline disabled:cursor-not-allowed disabled:text-dash-muted disabled:no-underline"
+        >
+          {resendMutation.isPending ? (
+            <Loader2 size={13} className="inline animate-spin" />
+          ) : count > 0 ? (
+            `Resend in ${count}s`
+          ) : (
+            'Resend code'
+          )}
+        </button>
+      </p>
+
+      {/* The old "Back" link went to /forgot-password; that's where a
+          mistyped email gets fixed, so it stays reachable here. */}
+      <p className="mt-4 flex items-center justify-center gap-4 text-sm font-medium">
+        <Link
+          href="/forgot-password"
+          className="text-dash-muted hover:text-dash-foreground transition-colors"
+        >
+          Use a different email
+        </Link>
+        <span aria-hidden="true" className="text-dash-border">
+          ·
+        </span>
+        <Link
+          href="/login"
+          className="text-dash-muted hover:text-dash-foreground transition-colors"
+        >
+          Return to sign in
+        </Link>
+      </p>
     </div>
   );
 }

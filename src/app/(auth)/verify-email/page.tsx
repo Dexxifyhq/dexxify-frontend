@@ -1,13 +1,14 @@
 "use client";
 import { useState, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, RotateCcw } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import { useCountdown } from "@/lib/hooks/useCountdown";
-import { AuthAlert, AuthCard, AuthField, AuthBackLink, AuthLogo } from "@/components/ui/auth";
+import { AuthAlert, AuthButton, inputClass } from "@/components/ui/auth";
 
 function VerifyEmailForm() {
   const router = useRouter();
@@ -19,9 +20,13 @@ function VerifyEmailForm() {
 
   const verifyMutation = useMutation({
     mutationFn: (otp: string) => authApi.verifyOtp({ email, code: otp }),
+    // Verifying signs the user in — the backend's verifyOtp sets the session
+    // cookies — so a new account goes straight to first-run setup instead of
+    // being made to sign in again. /welcome forwards to the dashboard if the
+    // business is already set up.
     onSuccess: () => {
-      toast.success("Email verified! Redirecting to login…");
-      setTimeout(() => router.push("/login"), 1500);
+      toast.success("Email verified!");
+      router.replace("/welcome");
     },
     onError: (err) => {
       toast.error((err as ApiError).message ?? "Verification failed. Please try again.");
@@ -61,64 +66,82 @@ function VerifyEmailForm() {
   const isResending = resendMutation.isPending;
 
   return (
-    <div className="w-full max-w-sm">
-      <AuthLogo />
-      <AuthBackLink href="/register" label="Back to register" />
+    <div className="w-full max-w-md">
+      <h1 className="text-3xl font-bold tracking-tight text-dash-foreground">
+        Verify your email
+      </h1>
+      <p className="mt-2 text-sm leading-relaxed text-dash-muted">
+        We emailed a verification code to{" "}
+        {email ? (
+          <span className="text-dash-foreground">{email}</span>
+        ) : (
+          "your email address"
+        )}
+        . Enter it below to continue.
+      </p>
 
-      <div className="mb-8">
-        <div className="w-10 h-10 rounded-xl bg-dash-accent-soft border border-dash-accent/20 flex items-center justify-center mb-4">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M2 5l7 5 7-5M2 5h14v10H2V5z" stroke="var(--dash-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">Check your email</h1>
-        <p className="text-sm text-dash-muted">
-          We sent a 6-digit code to{" "}
-          {email ? <span className="text-dash-foreground font-medium">{email}</span> : "your email address"}
-        </p>
-      </div>
-
-      <AuthCard className="space-y-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          // Six digits already auto-submit, so guard against Enter re-sending.
+          if (code.length === 6 && !verifyMutation.isPending) {
+            verifyMutation.mutate(code);
+          }
+        }}
+        className="mt-8 space-y-5"
+      >
         {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
 
-        <AuthField label="Verification code">
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            value={code}
-            onChange={handleCodeChange}
-            placeholder="000000"
-            disabled={isLoading}
-            autoFocus
-            className="w-full h-12 px-4 bg-dash-card border border-dash-border rounded-lg text-lg font-mono text-center text-dash-foreground placeholder:text-dash-faint tracking-[0.4em] focus:outline-none focus:border-dash-accent disabled:opacity-50 transition-colors"
-          />
-          <p className="text-xs text-dash-muted mt-1">Enter the 6-digit code — it expires in 10 minutes</p>
-        </AuthField>
+        {/* No visible label, as in the reference, so it's named for assistive
+            tech instead. Still auto-submits once six digits are in. */}
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={6}
+          autoComplete="one-time-code"
+          aria-label="Verification code"
+          value={code}
+          onChange={handleCodeChange}
+          placeholder="Verification code"
+          disabled={isLoading}
+          autoFocus
+          className={`${inputClass} disabled:opacity-50`}
+        />
 
+        <AuthButton loading={isLoading} disabled={code.length < 6}>
+          Verify <Check size={15} />
+        </AuthButton>
+      </form>
+
+      {/* Not in the reference, kept on purpose: without it a user whose code
+          never arrived or expired has no way forward. */}
+      <p className="mt-6 text-center text-sm text-dash-muted">
+        Didn&apos;t receive a code?{" "}
         <button
           type="button"
-          disabled={isLoading || code.length < 6}
-          onClick={() => verifyMutation.mutate(code)}
-          className="w-full h-10 flex items-center justify-center gap-2 bg-dash-accent text-white text-sm font-medium rounded-lg hover:bg-dash-accent-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+          disabled={isResending || count > 0}
+          onClick={handleResend}
+          className="font-medium text-dash-foreground hover:underline disabled:cursor-not-allowed disabled:text-dash-muted disabled:no-underline"
         >
-          {isLoading ? <Loader2 size={15} className="animate-spin" /> : "Verify email"}
+          {isResending ? (
+            <Loader2 size={13} className="inline animate-spin" />
+          ) : count > 0 ? (
+            `Resend in ${count}s`
+          ) : (
+            "Resend code"
+          )}
         </button>
+      </p>
 
-        <div className="pt-1 border-t border-dash-border text-center">
-          <p className="text-xs text-dash-muted mb-2">Didn&apos;t receive a code?</p>
-          <button
-            type="button"
-            disabled={isResending || count > 0}
-            onClick={handleResend}
-            className="inline-flex items-center gap-1.5 text-sm text-dash-accent hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
-          >
-            {isResending ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
-            {count > 0 ? `Resend in ${count}s` : "Resend code"}
-          </button>
-        </div>
-      </AuthCard>
+      <p className="mt-4 text-center">
+        <Link
+          href="/login"
+          className="text-sm font-medium text-dash-muted hover:text-dash-foreground transition-colors"
+        >
+          Return to sign in
+        </Link>
+      </p>
     </div>
   );
 }

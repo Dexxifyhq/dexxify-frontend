@@ -9,13 +9,11 @@ import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
 import {
   AuthAlert,
-  AuthCard,
   AuthField,
   AuthInput,
   PasswordInput,
   PasswordStrength,
   AuthButton,
-  AuthLogo,
   PhoneField,
 } from "@/components/ui/auth";
 
@@ -68,18 +66,14 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="mb-8 text-center">
-        <AuthLogo />
-        <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">
-          Create your account
-        </h1>
-        <p className="text-sm text-dash-muted">
-          Accept crypto. Receive Naira. Start in minutes.
-        </p>
-      </div>
+      <h1 className="text-3xl font-bold tracking-tight text-dash-foreground">
+        Create your account
+      </h1>
+      <p className="mt-2 text-sm text-dash-muted">
+        Accept crypto. Receive Naira. Start in minutes.
+      </p>
 
-      <AuthCard>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           {errorMessage && <AuthAlert message={errorMessage} variant="error" />}
 
           {/* Honeypot — off-screen (not display:none, some bots skip that). 
@@ -168,11 +162,17 @@ export default function RegisterPage() {
 
           <p className="text-xs text-dash-muted leading-relaxed">
             By creating an account you agree to our{" "}
-            <a href="#" className="text-dash-accent hover:underline">
+            <a
+              href="#"
+              className="text-dash-foreground underline decoration-dotted underline-offset-4"
+            >
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-dash-accent hover:underline">
+            <a
+              href="#"
+              className="text-dash-foreground underline decoration-dotted underline-offset-4"
+            >
               Privacy Policy
             </a>
             .
@@ -181,14 +181,13 @@ export default function RegisterPage() {
           <AuthButton loading={isPending}>
             Create account <ArrowRight size={14} />
           </AuthButton>
-        </form>
-      </AuthCard>
+      </form>
 
-      <p className="text-center text-sm text-dash-muted mt-6">
+      <p className="mt-6 text-center text-sm text-dash-muted">
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-dash-accent hover:underline font-medium"
+          className="font-medium text-dash-foreground hover:underline"
         >
           Sign in
         </Link>
