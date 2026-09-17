@@ -45,14 +45,14 @@ function rangeToDays(range: DateRange): number {
 }
 
 const ASSET_COLORS: Record<string, string> = {
-  BTC: "#F7931A",
-  ETH: "#627EEA",
-  USDT: "#26A17B",
-  USDC: "#2775CA",
-  BNB: "#F3BA2F",
-  SOL: "#9945FF",
-  TRX: "#E84040",
-  TON: "#0088CC",
+  BTC: "#8d4f04",
+  ETH: "#541903",
+  USDT: "#075e42",
+  USDC: "#063970",
+  BNB: "#a8801a",
+  SOL: "#6c06e9",
+  TRX: "#950f0f",
+  TON: "#04618f",
 };
 
 function assetColor(symbol: string): string {
@@ -108,10 +108,6 @@ export const dashboardApi = {
     };
   },
 
-  /**
-   * GET /dashboard/asset-distribution
-   * Payment sessions grouped by crypto asset — builds donut chart slices.
-   */
   getAssetDistribution: async (): Promise<AssetDistributionData | null> => {
     const raw = await safeGet<
       Array<{

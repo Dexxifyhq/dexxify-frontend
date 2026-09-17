@@ -10,9 +10,24 @@ interface BalanceCarouselProps {
 }
 
 const SLIDES = [
-  { key: "ngn" as const, label: "NGN Balance", prefix: "₦", gradient: "from-[#2563EB] to-[#1D4ED8]" },
-  { key: "usdt" as const, label: "USDT Balance", prefix: "$", gradient: "from-[#10B981] to-[#059669]" },
-  { key: "usdc" as const, label: "USDC Balance", prefix: "$", gradient: "from-[#2775CA] to-[#1A5FA8]" },
+  {
+    key: "ngn" as const,
+    label: "NGN Balance",
+    prefix: "₦",
+    gradient: "from-[#0f055c] to-[#1D4ED8]",
+  },
+  {
+    key: "usdt" as const,
+    label: "USDT Balance",
+    prefix: "$",
+    gradient: "from-[#082b21] to-[#059669]",
+  },
+  {
+    key: "usdc" as const,
+    label: "USDC Balance",
+    prefix: "$",
+    gradient: "from-[#331105] to-[#cf3d07]",
+  },
 ];
 
 function Skeleton() {
@@ -23,7 +38,10 @@ function Skeleton() {
   );
 }
 
-export default function BalanceCarousel({ balances, loading }: BalanceCarouselProps) {
+export default function BalanceCarousel({
+  balances,
+  loading,
+}: BalanceCarouselProps) {
   const [index, setIndex] = useState(0);
 
   if (loading) return <Skeleton />;
@@ -37,7 +55,9 @@ export default function BalanceCarousel({ balances, loading }: BalanceCarouselPr
         <p className="text-sm font-semibold text-dash-foreground">Balances</p>
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)}
+            onClick={() =>
+              setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
+            }
             aria-label="Previous balance"
             className="flex h-6 w-6 items-center justify-center rounded-md text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
           >
@@ -53,14 +73,24 @@ export default function BalanceCarousel({ balances, loading }: BalanceCarouselPr
         </div>
       </div>
 
-      <div className={cn("rounded-xl bg-linear-to-br p-5 text-white", slide.gradient)}>
+      <div
+        className={cn(
+          "rounded-xl bg-linear-to-br p-5 text-white",
+          slide.gradient,
+        )}
+      >
         <div className="mb-6 flex items-center justify-between">
-          <span className="text-xs font-medium uppercase tracking-wider text-white/70">{slide.label}</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-white/70">
+            {slide.label}
+          </span>
           <Wallet size={16} className="text-white/70" />
         </div>
         <p className="text-2xl font-bold tracking-tight">
           {slide.prefix}
-          {value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {value.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </p>
       </div>
 
@@ -70,7 +100,10 @@ export default function BalanceCarousel({ balances, loading }: BalanceCarouselPr
             key={s.key}
             onClick={() => setIndex(i)}
             aria-label={`Show ${s.label}`}
-            className={cn("h-1.5 rounded-full transition-all", i === index ? "w-4 bg-dash-accent" : "w-1.5 bg-dash-border")}
+            className={cn(
+              "h-1.5 rounded-full transition-all",
+              i === index ? "w-4 bg-dash-accent" : "w-1.5 bg-dash-border",
+            )}
           />
         ))}
       </div>

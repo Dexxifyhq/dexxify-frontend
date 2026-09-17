@@ -17,11 +17,14 @@ import {
   TrendingUp,
   TrendingDown,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import StatCard from "@/components/dashboard/shared/StatCard";
 import { FilterSelect } from "@/components/dashboard/shared/FilterBar";
 import { cn } from "@/utils/utils";
+import { useAuth } from "@/lib/context/AuthContext";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import {
   useLedgerBalance,
   useLedgerTransactions,
@@ -1604,6 +1607,38 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BalancePage() {
+  const { role, isLoading: roleLoading } = useAuth();
+
+  if (roleLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 size={20} className="animate-spin text-dash-muted" />
+      </div>
+    );
+  }
+
+  if (!hasPermission(role, PERMISSIONS.MANAGE_BALANCE)) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+          <Lock size={20} />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-dash-foreground">
+            Access restricted
+          </p>
+          <p className="mt-1 text-xs text-dash-muted">
+            Your role doesn&apos;t have permission to view the business balance.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <BalancePageContent />;
+}
+
+function BalancePageContent() {
   const [currency, setCurrency] = useState<Currency>("NGN");
   const [activeTab, setActiveTab] = useState<ActiveTab>("history");
   const [depositOpen, setDepositOpen] = useState(false);
