@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Server-side BFF proxy for the Dexxify business API.
  *
  * Why this exists:
- * Every data endpoint (/wallets, /transactions, /balance, /payouts, /kyc, …)
+ * Every data endpoint (/deposit-accounts, /transactions, /balance, /payouts, /kyc, …)
  * is guarded by `Authorization: Bearer <api_key>`. That key authorizes money
  * movement (payouts, withdrawals), so it must NEVER reach browser JavaScript,
  * where any XSS or extension could lift it. This handler runs only on the

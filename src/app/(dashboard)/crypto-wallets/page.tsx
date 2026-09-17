@@ -15,8 +15,8 @@ import AddAddressModal from "@/components/dashboard/crypto-wallets/AddAddressMod
 import {
   useSavedWithdrawalAddresses,
   useDeleteWithdrawalAddress,
-} from "@/lib/hooks/wallet/useWallets";
-import type { WithdrawalAddress } from "@/lib/types/wallet";
+} from "@/lib/hooks/deposit-accounts/useDepositAccounts";
+import type { WithdrawalAddress } from "@/lib/types/deposit-accounts";
 import { toast } from "sonner";
 import { cn } from "@/utils/utils";
 
@@ -239,7 +239,11 @@ export default function CryptoWalletsPage() {
         </div>
       ) : isError ? (
         <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
-          <AlertCircle size={24} className="text-dash-faint" strokeWidth={1.5} />
+          <AlertCircle
+            size={24}
+            className="text-dash-faint"
+            strokeWidth={1.5}
+          />
           <p className="text-sm text-dash-muted">Failed to load addresses.</p>
         </div>
       ) : filtered.length === 0 ? (
