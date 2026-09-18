@@ -14,15 +14,6 @@ export const balanceKeys = {
   payouts: (page: number) => [...balanceKeys.all, "payouts", page] as const,
 };
 
-export function useAccountBalance() {
-  return useQuery({
-    queryKey: balanceKeys.account(),
-    queryFn: balanceApi.getAccountBalance,
-    staleTime: 20_000,
-    refetchInterval: 60_000,
-  });
-}
-
 export function useBalanceHistory(filters: BalanceHistoryFilters = {}) {
   return useQuery({
     queryKey: balanceKeys.history(filters),

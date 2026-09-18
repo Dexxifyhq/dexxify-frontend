@@ -1,7 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-const NAV_LINKS = ["Products", "Developers", "Company"];
+const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
+  { label: "Products", href: "#" },
+  { label: "Developers", href: "https://docs.dexxify.com", external: true },
+  { label: "Company", href: "#" },
+];
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
@@ -65,11 +69,14 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
+                {...(link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="text-[15px] font-medium text-slate-light hover:text-foreground transition-colors duration-200"
               >
-                {link}
+                {link.label}
               </a>
             ))}
           </nav>
@@ -131,12 +138,15 @@ export default function Navbar() {
           <div className="flex flex-col px-5 py-2">
             {NAV_LINKS.map((link) => (
               <a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
+                {...(link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 onClick={() => setOpen(false)}
                 className="py-4 text-[15px] font-medium text-foreground"
               >
-                {link}
+                {link.label}
               </a>
             ))}
           </div>

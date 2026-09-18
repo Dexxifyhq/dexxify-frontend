@@ -138,12 +138,6 @@ function emptyPage<T>(): PaginatedResponse<T> {
 
 export const balanceApi = {
   /**
-   * GET /balance — raw account-level balance. Returned as-is
-   * (permissive shape).
-   */
-  getAccountBalance: () => get<AccountBalance>("/balance"),
-
-  /**
    * Maps to GET /transactions (Ledger) with optional filters. Currency / type /
    * status filters from the UI are forwarded; "all" sentinels are dropped.
    */
