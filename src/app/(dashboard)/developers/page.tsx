@@ -495,12 +495,14 @@ export default function DevelopersPage() {
                 iconBg="rgba(167,139,250,0.12)"
                 title="API Reference"
                 description="Endpoints, parameters, and code examples."
+                href="https://docs.dexxify.com/api-reference"
               />
               <DocCard
                 icon={<Rocket size={16} className="text-dash-success" />}
                 iconBg="rgba(34,197,94,0.12)"
                 title="Quick Start Guide"
                 description="Get up and running in minutes."
+                href="https://docs.dexxify.com/quickstart"
               />
             </div>
           </section>
@@ -762,15 +764,19 @@ function DocCard({
   iconBg,
   title,
   description,
+  href,
 }: {
   icon: React.ReactNode;
   iconBg: string;
   title: string;
   description: string;
+  href: string;
 }) {
   return (
     <a
-      href="#"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       className="flex items-center gap-3 rounded-xl border border-dash-border bg-dash-card p-4 hover:border-dash-accent transition-colors"
     >
       <div
