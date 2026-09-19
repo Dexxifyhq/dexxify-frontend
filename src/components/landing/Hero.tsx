@@ -1,3 +1,5 @@
+import { DOCS_URL } from "@/lib/constants/links";
+
 export default function Hero() {
   return (
     <section className="relative border-b border-border">
@@ -49,7 +51,7 @@ export default function Hero() {
               Get Started
             </a>
             <a
-              href="#"
+              href={DOCS_URL}
               className="inline-flex h-12 px-6 items-center text-[15px] font-medium text-foreground bg-background border border-border rounded-lg hover:border-slate-light transition-colors duration-200"
             >
               View Docs

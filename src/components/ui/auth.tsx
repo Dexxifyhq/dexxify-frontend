@@ -3,9 +3,9 @@
  * Shared primitives for all auth pages.
  * Import from here — never duplicate in individual page files.
  *
- * Colours come from the dash-* tokens. On auth routes those are redefined dark
- * by `.theme-auth-dark` on the (auth) layout, so nothing here hardcodes a
- * light or dark value.
+ * Colours come from the dash-* tokens, so nothing here hardcodes a light or
+ * dark value. The (auth) layout's `.theme-auth-light` sets the page ground to
+ * white; re-theming these pages is a change to that class alone.
  */
 
 import { useEffect, useState } from "react";

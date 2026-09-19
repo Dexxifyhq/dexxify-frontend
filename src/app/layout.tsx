@@ -23,7 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // data-scroll-behavior tells the App Router that the `scroll-behavior:
+    // smooth` in globals.css is deliberate. It then disables smooth scrolling
+    // for route transitions only, so navigation doesn't animate a scroll up
+    // the outgoing page, while in-page anchor links keep gliding.
+    <html lang="en" data-scroll-behavior="smooth">
       <body className="min-h-screen antialiased bg-background text-foreground">
         <QueryProvider>{children}</QueryProvider>
         <Toaster
