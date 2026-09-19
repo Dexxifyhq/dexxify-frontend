@@ -7,7 +7,7 @@ export default function Hero() {
           full viewport width; these vertical rails stay inset at the
           container, as in the reference. */}
       <div className="max-w-[1200px] mx-auto border-x border-border">
-        <div className="px-6  pt-32 pb-28 lg:pt-32 lg:pb-36">
+        <div className="px-4 sm:px-6 pt-32 pb-28 lg:pt-32 lg:pb-36">
           {/* Announcement pill */}
           <a
             href="#"

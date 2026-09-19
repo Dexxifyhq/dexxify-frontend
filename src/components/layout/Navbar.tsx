@@ -63,19 +63,21 @@ export default function Navbar() {
       ref={navRef}
       className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border transition-[background-color,box-shadow] duration-300"
     >
-      <div className="max-w-[1300px] mx-auto px-6 sm:px-10 h-16 flex items-center justify-between">
+      <div className="max-w-[1300px] mx-auto px-4 sm:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-12">
-          {/* Black lockup on transparency — suits the white nav and its
-              translucent scrolled state. The dark auth pages use the white
-              version instead. */}
+          {/* dexxify-tight.png is dexxify.png with its transparent margin
+              cropped off — the original carries ~340px of empty space on the
+              left, which pushed the mark inward no matter what padding the bar
+              had. Cropped, the artwork fills the box, so h-6 here renders the
+              wordmark at the same visual size h-12 did before. */}
           <Link href="/" aria-label="Dexxify home" className="inline-flex">
             <Image
-              src="/logo-set/dexxify.png"
+              src="/logo-set/dexxify-tight.png"
               alt="Dexxify"
-              width={2103}
-              height={748}
+              width={1424}
+              height={347}
               priority
-              className="h-12 w-auto"
+              className="h-6 w-auto"
             />
           </Link>
           <nav className="hidden md:flex items-center gap-8">

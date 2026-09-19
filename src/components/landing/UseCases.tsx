@@ -171,7 +171,7 @@ function Row({
   diagram: React.ReactNode;
 }) {
   return (
-    <div className="grid gap-10 border-t border-code-border px-6 py-12 sm:py-16 lg:grid-cols-2 lg:gap-12">
+    <div className="grid gap-10 border-t border-code-border px-4 sm:px-6 py-12 sm:py-16 lg:grid-cols-2 lg:gap-12">
       <div className="flex flex-col">
         <h3 className="max-w-md text-lg sm:text-xl leading-snug tracking-tight">
           <span className="font-semibold text-background">{lead}</span>{" "}
@@ -211,7 +211,7 @@ export default function UseCases() {
     <section className="relative border-b border-code-border bg-foreground bg-dots-dark">
       <div className="max-w-[1200px] mx-auto border-x border-code-border">
         {/* Intro */}
-        <div className="px-6 py-16 sm:py-24">
+        <div className="px-4 sm:px-6 py-16 sm:py-24">
           <h2 className="max-w-2xl text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.2]">
             <span className="font-bold text-background">
               Built for every Nigerian business.

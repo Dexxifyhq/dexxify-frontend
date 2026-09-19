@@ -70,7 +70,7 @@ export default function TrustSecurity() {
   return (
     <section className="relative border-b border-border">
       <div className="max-w-[1200px] mx-auto border-x border-border">
-        <div className="px-6 py-16 sm:py-24">
+        <div className="px-4 sm:px-6 py-16 sm:py-24">
           {/* Two-tone heading, same construction as the sections above */}
           <h2 className="max-w-3xl text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.2]">
             <span className="font-bold text-foreground">
