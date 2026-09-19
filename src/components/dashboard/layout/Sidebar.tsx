@@ -35,12 +35,24 @@ import {
 } from "@/lib/hooks/businesses/useBusinesses";
 import type { Environment } from "@/lib/types/common";
 import { useSwitchMode } from "@/lib/hooks/auth/useProfile";
+import { useAuth } from "@/lib/context/AuthContext";
+import {
+  hasPermission,
+  PERMISSIONS,
+  type PermissionKey,
+} from "@/lib/permissions";
 
 // ── Nav config ───────────────────────────────────────────────────────────────
 
 type NavLeaf = { label: string; href: string; icon: React.ElementType };
 type NavEntry =
-  | { kind: "link"; label: string; href: string; icon: React.ElementType }
+  | {
+      kind: "link";
+      label: string;
+      href: string;
+      icon: React.ElementType;
+      permission?: PermissionKey;
+    }
   | {
       kind: "group";
       label: string;
@@ -50,7 +62,13 @@ type NavEntry =
 
 const NAV_TOP: NavEntry[] = [
   { kind: "link", label: "Analytics", href: "/dashboard", icon: BarChart3 },
-  { kind: "link", label: "Balance", href: "/balance", icon: Wallet },
+  {
+    kind: "link",
+    label: "Balance",
+    href: "/balance",
+    icon: Wallet,
+    permission: PERMISSIONS.MANAGE_BALANCE,
+  },
   {
     kind: "group",
     label: "Payments",
@@ -111,8 +129,16 @@ export default function Sidebar({
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + "/");
 
+  const { role } = useAuth();
+  const canSee = (entry: NavEntry) =>
+    entry.kind !== "link" ||
+    !entry.permission ||
+    hasPermission(role, entry.permission);
+  const visibleNavTop = NAV_TOP.filter(canSee);
+  const visibleNavBottom = NAV_BOTTOM.filter(canSee);
+
   // Which collapsible group (if any) contains the current route.
-  const activeGroup = [...NAV_TOP, ...NAV_BOTTOM].find(
+  const activeGroup = [...visibleNavTop, ...visibleNavBottom].find(
     (e): e is Extract<NavEntry, { kind: "group" }> =>
       e.kind === "group" && e.children.some((c) => isActive(c.href)),
   )?.label;
@@ -418,9 +444,9 @@ export default function Sidebar({
             collapsed ? "px-2" : "px-3",
           )}
         >
-          <div className="space-y-0.5">{NAV_TOP.map(renderEntry)}</div>
+          <div className="space-y-0.5">{visibleNavTop.map(renderEntry)}</div>
           <div className="my-3 border-t border-dash-border" />
-          <div className="space-y-0.5">{NAV_BOTTOM.map(renderEntry)}</div>
+          <div className="space-y-0.5">{visibleNavBottom.map(renderEntry)}</div>
         </nav>
 
         {/* Profile footer */}

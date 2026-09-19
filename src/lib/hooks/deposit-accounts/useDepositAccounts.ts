@@ -1,17 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { walletsApi } from "@/lib/api/wallet";
+import { depositAccountsApi } from "@/lib/api/deposit-accounts";
 import type {
   AddWithdrawalAddressDto,
-  CreateWalletDto,
+  CreateDepositAccountDto,
   IssueDepositIdentityDto,
   InitiateFiatWithdrawalDto,
   InitiateStableCoinWithdrawalDto,
-  MockTradeDto,
-  UpdateWalletAutoSettlementDto,
-  UpdateWalletBankDetailsDto,
   WalletListFilters,
   WalletTransactionFilters,
-} from "@/lib/types/wallet";
+} from "@/lib/types/deposit-accounts";
 
 export const walletKeys = {
   all: ["wallets"] as const,
@@ -38,7 +35,7 @@ export const walletKeys = {
 export function useWallets(filters: WalletListFilters = {}) {
   return useQuery({
     queryKey: walletKeys.list(filters),
-    queryFn: () => walletsApi.getAll(filters),
+    queryFn: () => depositAccountsApi.getAll(filters),
     staleTime: 30_000,
   });
 }
@@ -46,7 +43,7 @@ export function useWallets(filters: WalletListFilters = {}) {
 export function useWallet(walletId: string) {
   return useQuery({
     queryKey: walletKeys.detail(walletId),
-    queryFn: () => walletsApi.getById(walletId),
+    queryFn: () => depositAccountsApi.getById(walletId),
     enabled: !!walletId,
     staleTime: 30_000,
   });
@@ -55,7 +52,7 @@ export function useWallet(walletId: string) {
 export function useWalletDetails(walletId: string) {
   return useQuery({
     queryKey: walletKeys.details(walletId),
-    queryFn: () => walletsApi.getDetails(walletId),
+    queryFn: () => depositAccountsApi.getDetails(walletId),
     enabled: !!walletId,
     staleTime: 30_000,
   });
@@ -64,34 +61,18 @@ export function useWalletDetails(walletId: string) {
 export function useAllWalletDetails() {
   return useQuery({
     queryKey: walletKeys.allDetails(),
-    queryFn: walletsApi.getAllDetails,
+    queryFn: depositAccountsApi.getAllDetails,
     staleTime: 30_000,
-  });
-}
-
-export function useWalletAddress(walletId: string) {
-  return useQuery({
-    queryKey: walletKeys.address(walletId),
-    queryFn: () => walletsApi.getAddress(walletId),
-    enabled: !!walletId,
-    staleTime: 5 * 60 * 1000, // addresses are stable
-  });
-}
-
-export function useWalletTransactions(filters: WalletTransactionFilters = {}) {
-  return useQuery({
-    queryKey: walletKeys.transactions(filters),
-    queryFn: () => walletsApi.getAllTransactions(filters),
-    staleTime: 15_000,
   });
 }
 
 // ── Mutations ──────────────────────────────────────────────────────────────
 
-export function useCreateWallet() {
+export function useCreateDepositAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateWalletDto) => walletsApi.create(payload),
+    mutationFn: (payload: CreateDepositAccountDto) =>
+      depositAccountsApi.create(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.all });
     },
@@ -106,47 +87,7 @@ export function useIssueIdentity() {
     }: {
       walletId: string;
       dto: IssueDepositIdentityDto;
-    }) => walletsApi.issueIdentity(walletId, dto),
-  });
-}
-
-export function useUpdateWalletBank(walletId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: UpdateWalletBankDetailsDto) =>
-      walletsApi.updateBank(walletId, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: walletKeys.detail(walletId) });
-      qc.invalidateQueries({ queryKey: walletKeys.details(walletId) });
-      qc.invalidateQueries({ queryKey: walletKeys.all });
-    },
-  });
-}
-
-export function useUpdateWalletAutoSettlement(walletId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: UpdateWalletAutoSettlementDto) =>
-      walletsApi.updateAutoSettlement(walletId, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: walletKeys.detail(walletId) });
-      qc.invalidateQueries({ queryKey: walletKeys.details(walletId) });
-      qc.invalidateQueries({ queryKey: walletKeys.all });
-    },
-  });
-}
-
-// ── Per-wallet transactions ──────────────────────────────────────────────────
-
-export function useWalletTransactionsById(
-  walletId: string,
-  filters: WalletTransactionFilters = {},
-) {
-  return useQuery({
-    queryKey: walletKeys.walletTransactions(walletId, filters),
-    queryFn: () => walletsApi.getWalletTransactions(walletId, filters),
-    enabled: !!walletId,
-    staleTime: 15_000,
+    }) => depositAccountsApi.issueIdentity(walletId, dto),
   });
 }
 
@@ -155,7 +96,7 @@ export function useWalletTransactionsById(
 export function useSavedWithdrawalAddresses() {
   return useQuery({
     queryKey: walletKeys.savedAddresses(),
-    queryFn: walletsApi.getSavedWithdrawalAddresses,
+    queryFn: depositAccountsApi.getSavedWithdrawalAddresses,
     staleTime: 60_000,
   });
 }
@@ -164,7 +105,7 @@ export function useAddWithdrawalAddress() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: AddWithdrawalAddressDto) =>
-      walletsApi.addWithdrawalAddress(payload),
+      depositAccountsApi.addWithdrawalAddress(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.savedAddresses() });
     },
@@ -175,7 +116,7 @@ export function useDeleteWithdrawalAddress() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (withdrawalAddressId: string) =>
-      walletsApi.deleteWithdrawalAddress(withdrawalAddressId),
+      depositAccountsApi.deleteWithdrawalAddress(withdrawalAddressId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.savedAddresses() });
     },
@@ -188,7 +129,7 @@ export function useWithdrawStableCoin() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: InitiateStableCoinWithdrawalDto) =>
-      walletsApi.withdrawStableCoin(payload),
+      depositAccountsApi.withdrawStableCoin(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.balance() });
       qc.invalidateQueries({ queryKey: walletKeys.all });
@@ -200,20 +141,7 @@ export function useWithdrawFiat() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: InitiateFiatWithdrawalDto) =>
-      walletsApi.withdrawFiat(payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: walletKeys.balance() });
-      qc.invalidateQueries({ queryKey: walletKeys.all });
-    },
-  });
-}
-
-// ── Sandbox testing ──────────────────────────────────────────────────────────
-
-export function useMockTrade() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: MockTradeDto) => walletsApi.mockTrade(payload),
+      depositAccountsApi.withdrawFiat(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: walletKeys.balance() });
       qc.invalidateQueries({ queryKey: walletKeys.all });

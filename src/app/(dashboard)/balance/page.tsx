@@ -17,25 +17,27 @@ import {
   TrendingUp,
   TrendingDown,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import StatCard from "@/components/dashboard/shared/StatCard";
 import { FilterSelect } from "@/components/dashboard/shared/FilterBar";
 import { cn } from "@/utils/utils";
+import { useAuth } from "@/lib/context/AuthContext";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import {
   useLedgerBalance,
   useLedgerTransactions,
 } from "@/lib/hooks/ledger/useLedger";
 import {
   useWallets,
-  useWalletAddress,
-  useCreateWallet,
   useIssueIdentity,
   useSavedWithdrawalAddresses,
   useWithdrawStableCoin,
   useWithdrawFiat,
-} from "@/lib/hooks/wallet/useWallets";
-import { walletsApi } from "@/lib/api/wallet";
+  useCreateDepositAccount,
+} from "@/lib/hooks/deposit-accounts/useDepositAccounts";
+import { depositAccountsApi } from "@/lib/api/deposit-accounts";
 import { useSavedBanks } from "@/lib/hooks/misc/useMisc";
 import {
   useSwapEstimate,
@@ -49,7 +51,7 @@ import type {
   LedgerTxType,
   LedgerEntryStatus,
 } from "@/lib/types/ledger";
-import type { WithdrawalAddress } from "@/lib/types/wallet";
+import type { WithdrawalAddress } from "@/lib/types/deposit-accounts";
 import type { SavedBank } from "@/lib/types/misc";
 import type { WalletAsset } from "@/lib/api/offramp";
 import type { SwapQuotation } from "@/lib/api/swaps";
@@ -421,7 +423,7 @@ function DepositModal({
     staleTime: 5 * 60_000,
   });
 
-  const createWallet = useCreateWallet();
+  const createDepositAccount = useCreateDepositAccount();
   const issueIdentity = useIssueIdentity();
 
   const assets: FlatAsset[] = flattenAssets(
@@ -434,21 +436,23 @@ function DepositModal({
     if (!selectedAsset) return;
     try {
       // 1. Create the deposit account
-      const wallet = await createWallet.mutateAsync({ customer_id: undefined });
-      const walletId: string = wallet.id;
+      const depositAccount = await createDepositAccount.mutateAsync({
+        customer_id: undefined,
+      });
+      const depositAccountId: string = depositAccount.id;
 
       // 2. Issue a deposit identity for the selected chain
       await issueIdentity.mutateAsync({
-        walletId,
+        walletId: depositAccountId,
         dto: {
           type: "static_deposit_address",
           chain:
-            selectedAsset.chainKey as import("@/lib/types/wallet").DepositIdentityChain,
+            selectedAsset.chainKey as import("@/lib/types/deposit-accounts").DepositIdentityChain,
         },
       });
 
       // 3. Re-fetch wallet to get the updated deposit_addresses
-      const updated = await walletsApi.getById(walletId);
+      const updated = await depositAccountsApi.getById(depositAccountId);
       setWalletResult(updated as unknown as WalletResult);
       setStep("address");
     } catch {
@@ -460,7 +464,7 @@ function DepositModal({
     setStep("select");
     setSelectedKey("");
     setWalletResult(null);
-    createWallet.reset();
+    createDepositAccount.reset();
     issueIdentity.reset();
     onClose();
   };
@@ -478,13 +482,13 @@ function DepositModal({
     : null;
 
   const createError =
-    createWallet.error instanceof Error
-      ? createWallet.error.message
+    createDepositAccount.error instanceof Error
+      ? createDepositAccount.error.message
       : issueIdentity.error instanceof Error
         ? issueIdentity.error.message
         : null;
 
-  const isCreating = createWallet.isPending || issueIdentity.isPending;
+  const isCreating = createDepositAccount.isPending || issueIdentity.isPending;
 
   return (
     <ModalShell open={open} onClose={handleClose} title="Deposit Funds">
@@ -530,7 +534,7 @@ function DepositModal({
             onClick={handleCreate}
             className="mt-1"
           >
-            {createWallet.isPending
+            {createDepositAccount.isPending
               ? "Creating wallet…"
               : issueIdentity.isPending
                 ? "Issuing address…"
@@ -1604,6 +1608,38 @@ function SwapsTab({ onNewSwap }: { onNewSwap: () => void }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BalancePage() {
+  const { role, isLoading: roleLoading } = useAuth();
+
+  if (roleLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 size={20} className="animate-spin text-dash-muted" />
+      </div>
+    );
+  }
+
+  if (!hasPermission(role, PERMISSIONS.MANAGE_BALANCE)) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+          <Lock size={20} />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-dash-foreground">
+            Access restricted
+          </p>
+          <p className="mt-1 text-xs text-dash-muted">
+            Your role doesn&apos;t have permission to view the business balance.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <BalancePageContent />;
+}
+
+function BalancePageContent() {
   const [currency, setCurrency] = useState<Currency>("NGN");
   const [activeTab, setActiveTab] = useState<ActiveTab>("history");
   const [depositOpen, setDepositOpen] = useState(false);
