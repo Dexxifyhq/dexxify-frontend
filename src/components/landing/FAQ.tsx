@@ -101,7 +101,7 @@ export default function FAQ() {
   return (
     <section className="relative border-b border-border">
       <div className="max-w-[1200px] mx-auto border-x border-border">
-        <div className="grid gap-10 px-6 py-16 sm:py-24 lg:grid-cols-3 lg:gap-12">
+        <div className="grid gap-10 px-4 sm:px-6 py-16 sm:py-24 lg:grid-cols-3 lg:gap-12">
           {/* Two-tone heading, same construction as the sections above */}
           <h2 className="text-2xl sm:text-3xl tracking-tight leading-[1.2]">
             <span className="font-bold text-foreground">Common questions.</span>{" "}

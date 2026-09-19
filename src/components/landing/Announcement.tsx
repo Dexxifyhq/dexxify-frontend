@@ -53,7 +53,7 @@ export default function Announcement() {
           continuous down the page, so this width must track Hero's. The
           horizontal rule lives on the section so it spans the full viewport. */}
       <div className="max-w-[1200px] mx-auto border-x border-border">
-        <div className="px-6 py-6 shadow-sm">
+        <div className="px-4 sm:px-6 py-6 shadow-sm">
           <div className="flex flex-col overflow-hidden rounded-xl bg-foreground md:flex-row">
             {/* Copy */}
             <div className="flex-1 p-8 sm:p-10">

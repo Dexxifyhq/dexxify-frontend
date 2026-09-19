@@ -41,7 +41,7 @@ const FOOTER_LINKS = {
 export default function Footer() {
   return (
     <footer className="bg-foreground bg-dots-dark">
-      <div className="max-w-[1200px] mx-auto px-6 py-16 sm:py-20">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-16 sm:py-20">
         {/* Wordmark, tagline and quick links */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
