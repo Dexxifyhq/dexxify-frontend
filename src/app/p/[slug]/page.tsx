@@ -57,45 +57,45 @@ function AssetPicker({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 text-sm transition-colors hover:border-white/20"
+        className="flex h-11 w-full items-center gap-3 rounded-xl border border-dash-border bg-dash-hover px-3 text-sm transition-colors hover:border-dash-border-strong"
       >
         {selected ? (
           <>
-            <span className="flex-1 text-left font-medium text-white">
+            <span className="flex-1 text-left font-medium text-dash-foreground">
               {selected.symbol}
-              <span className="ml-1.5 text-xs font-normal text-white/40">
+              <span className="ml-1.5 text-xs font-normal text-dash-muted">
                 {selected.name}
               </span>
             </span>
-            <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">
+            <span className="shrink-0 rounded bg-dash-hover px-1.5 py-0.5 text-[10px] text-dash-muted">
               {selected.networkDisplay}
             </span>
           </>
         ) : (
-          <span className="flex-1 text-left text-white/30">Choose token…</span>
+          <span className="flex-1 text-left text-dash-muted">Choose token…</span>
         )}
         <ChevronDown
           size={14}
-          className={`shrink-0 text-white/30 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-dash-muted transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="absolute z-20 mt-1.5 w-full rounded-xl border border-white/10 bg-[#111113] shadow-2xl">
-          <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2.5">
-            <Search size={13} className="shrink-0 text-white/30" />
+        <div className="absolute z-20 mt-1.5 w-full rounded-xl border border-dash-border bg-dash-card shadow-2xl">
+          <div className="flex items-center gap-2 border-b border-dash-border px-3 py-2.5">
+            <Search size={13} className="shrink-0 text-dash-muted" />
             <input
               autoFocus
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tokens…"
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
+              className="flex-1 bg-transparent text-sm text-dash-foreground placeholder:text-dash-faint focus:outline-none"
             />
           </div>
           <ul className="max-h-52 overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-xs text-white/30">
+              <li className="px-3 py-2 text-xs text-dash-muted">
                 No tokens found
               </li>
             ) : (
@@ -108,15 +108,15 @@ function AssetPicker({
                       setOpen(false);
                       setSearch("");
                     }}
-                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-white/5 ${selected?.key === a.key ? "text-white" : "text-white/70"}`}
+                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-dash-hover ${selected?.key === a.key ? "text-dash-foreground" : "text-dash-muted"}`}
                   >
                     <span className="flex-1 truncate font-medium">
                       {a.symbol}
-                      <span className="ml-1.5 text-xs font-normal text-white/40">
+                      <span className="ml-1.5 text-xs font-normal text-dash-muted">
                         {a.name}
                       </span>
                     </span>
-                    <span className="shrink-0 rounded bg-white/6 px-1.5 py-0.5 text-[10px] text-white/30">
+                    <span className="shrink-0 rounded bg-dash-hover px-1.5 py-0.5 text-[10px] text-dash-muted">
                       {a.networkDisplay}
                     </span>
                   </button>
@@ -262,18 +262,18 @@ export default function PublicPaymentPage() {
 
   if (pageLoading || restoring) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#09090B]">
-        <Loader2 size={24} className="animate-spin text-white/30" />
+      <div className="flex min-h-screen items-center justify-center bg-dash-bg">
+        <Loader2 size={24} className="animate-spin text-dash-muted" />
       </div>
     );
   }
 
   if (pageError || !page || page.status === "inactive") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#09090B] p-6 text-center">
-        <AlertTriangle size={32} className="text-[#F59E0B]" strokeWidth={1.5} />
-        <p className="text-base font-semibold text-white">Page not available</p>
-        <p className="max-w-xs text-sm text-white/40">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-dash-bg p-6 text-center">
+        <AlertTriangle size={32} className="text-dash-warning" strokeWidth={1.5} />
+        <p className="text-base font-semibold text-dash-foreground">Page not available</p>
+        <p className="max-w-xs text-sm text-dash-muted">
           This payment page doesn&apos;t exist or has been deactivated.
         </p>
       </div>
@@ -281,22 +281,22 @@ export default function PublicPaymentPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#09090B] p-4">
-      <p className="mb-8 text-sm font-semibold uppercase tracking-widest text-white/20">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-dash-bg p-4">
+      <p className="mb-8 text-sm font-semibold uppercase tracking-widest text-dash-muted">
         Dexxify
       </p>
 
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0D0D0F] shadow-2xl">
+      <div className="w-full max-w-sm rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
         {/* Header */}
-        <div className="border-b border-white/10 px-6 py-5 text-center">
-          <p className="text-base font-semibold text-white">{page.title}</p>
+        <div className="border-b border-dash-border px-6 py-5 text-center">
+          <p className="text-base font-semibold text-dash-foreground">{page.title}</p>
           {page.description && (
-            <p className="mt-1 text-xs text-white/40">{page.description}</p>
+            <p className="mt-1 text-xs text-dash-muted">{page.description}</p>
           )}
           <div className="mt-3">
-            <p className="text-3xl font-bold text-white">
+            <p className="text-3xl font-bold text-dash-foreground">
               {Number(fixedAmount).toFixed(2)}
-              <span className="ml-1 text-base font-normal text-white/40">
+              <span className="ml-1 text-base font-normal text-dash-muted">
                 {page.currency?.toUpperCase() ?? "USD"}
               </span>
             </p>
@@ -308,7 +308,7 @@ export default function PublicPaymentPage() {
           <form onSubmit={handlePay} className="flex flex-col gap-4 px-6 py-6">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   First Name
                 </label>
                 <input
@@ -317,11 +317,11 @@ export default function PublicPaymentPage() {
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="James"
                   required
-                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
+                  className="h-11 w-full rounded-xl border border-dash-border bg-dash-hover px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Last Name
                 </label>
                 <input
@@ -330,13 +330,13 @@ export default function PublicPaymentPage() {
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Wilson"
                   required
-                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
+                  className="h-11 w-full rounded-xl border border-dash-border bg-dash-hover px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 Email
               </label>
               <input
@@ -345,16 +345,16 @@ export default function PublicPaymentPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none transition-colors"
+                className="h-11 w-full rounded-xl border border-dash-border bg-dash-hover px-3 text-sm text-dash-foreground placeholder:text-dash-faint focus:border-dash-accent focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 Pay With
               </label>
               {assetsLoading ? (
-                <div className="flex h-11 items-center gap-2 px-3 text-xs text-white/30">
+                <div className="flex h-11 items-center gap-2 px-3 text-xs text-dash-muted">
                   <Loader2 size={13} className="animate-spin" /> Loading tokens…
                 </div>
               ) : (
@@ -367,7 +367,7 @@ export default function PublicPaymentPage() {
             </div>
 
             {payMutation.isError && (
-              <p className="rounded-xl border border-red-900/40 bg-red-950/40 px-3 py-2.5 text-xs text-red-400">
+              <p className="rounded-xl border border-dash-error-border bg-dash-error-bg px-3 py-2.5 text-xs text-dash-error">
                 {(payMutation.error as any)?.message ?? "Something went wrong."}
               </p>
             )}
@@ -375,7 +375,7 @@ export default function PublicPaymentPage() {
             <button
               type="submit"
               disabled={!canPay}
-              className="mt-2 flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white text-sm font-semibold text-[#09090B] hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+              className="mt-2 flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-dash-accent text-sm font-semibold text-dash-bg hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
             >
               {payMutation.isPending && (
                 <Loader2 size={15} className="animate-spin" />
@@ -389,8 +389,8 @@ export default function PublicPaymentPage() {
         {step === "deposit" && depositInfo && (
           <div className="flex flex-col gap-5 px-6 py-6">
             <div className="text-center">
-              <p className="text-sm font-semibold text-white">Send Payment</p>
-              <p className="mt-0.5 text-xs text-white/40">
+              <p className="text-sm font-semibold text-dash-foreground">Send Payment</p>
+              <p className="mt-0.5 text-xs text-dash-muted">
                 Send the exact crypto amount shown to the address below.
               </p>
             </div>
@@ -400,30 +400,30 @@ export default function PublicPaymentPage() {
               <div
                 className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 ${
                   expired
-                    ? "border-red-900/40 bg-red-950/30"
+                    ? "border-dash-error-border bg-dash-error-bg"
                     : count <= 120
-                      ? "border-yellow-900/40 bg-yellow-950/30"
-                      : "border-white/10 bg-white/5"
+                      ? "border-dash-warning-border bg-dash-warning-bg"
+                      : "border-dash-border bg-dash-hover"
                 }`}
               >
                 <Clock
                   size={13}
                   className={
                     expired
-                      ? "text-red-400"
+                      ? "text-dash-error"
                       : count <= 120
-                        ? "text-yellow-400"
-                        : "text-white/40"
+                        ? "text-dash-warning"
+                        : "text-dash-muted"
                   }
                 />
                 {expired ? (
-                  <span className="text-xs font-semibold text-red-400">
+                  <span className="text-xs font-semibold text-dash-error">
                     Session expired — please go back and try again
                   </span>
                 ) : (
                   <span
                     className={`font-mono text-sm font-semibold tabular-nums ${
-                      count <= 120 ? "text-yellow-400" : "text-white/70"
+                      count <= 120 ? "text-dash-warning" : "text-dash-muted"
                     }`}
                   >
                     {timerDisplay}
@@ -434,15 +434,15 @@ export default function PublicPaymentPage() {
 
             {/* Total amount to send */}
             {depositInfo.session?.metadata?.payment?.amount && (
-              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/30">
+              <div className="rounded-xl border border-dash-border bg-dash-hover px-4 py-3 text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Total to Send (incl. fees)
                 </p>
-                <p className="mt-1 text-2xl font-bold text-white">
+                <p className="mt-1 text-2xl font-bold text-dash-foreground">
                   {Number(depositInfo.session.metadata.payment.amount).toFixed(
                     2,
                   )}{" "}
-                  <span className="text-base font-normal text-white/40">
+                  <span className="text-base font-normal text-dash-muted">
                     {cryptoAsset}
                   </span>
                 </p>
@@ -451,20 +451,20 @@ export default function PublicPaymentPage() {
 
             {/* Deposit address */}
             <div>
-              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/30">
+              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                 Deposit Address
               </p>
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
-                <span className="flex-1 break-all font-mono text-xs text-white/70">
+              <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-hover px-3 py-2.5">
+                <span className="flex-1 break-all font-mono text-xs text-dash-muted">
                   {depositAddress}
                 </span>
                 <button
                   type="button"
                   onClick={() => depositAddress && handleCopy(depositAddress)}
-                  className="shrink-0 text-white/30 hover:text-white transition-colors"
+                  className="shrink-0 text-dash-muted hover:text-dash-foreground transition-colors"
                 >
                   {copied ? (
-                    <Check size={14} className="text-green-400" />
+                    <Check size={14} className="text-dash-success" />
                   ) : (
                     <Copy size={14} />
                   )}
@@ -473,12 +473,12 @@ export default function PublicPaymentPage() {
             </div>
 
             {/* Network warning */}
-            <div className="flex items-start gap-2 rounded-xl border border-yellow-900/40 bg-yellow-950/30 px-3 py-2.5">
+            <div className="flex items-start gap-2 rounded-xl border border-dash-warning-border bg-dash-warning-bg px-3 py-2.5">
               <AlertTriangle
                 size={13}
-                className="mt-0.5 shrink-0 text-yellow-500"
+                className="mt-0.5 shrink-0 text-dash-warning"
               />
-              <p className="text-xs text-yellow-500/80">
+              <p className="text-xs text-dash-warning">
                 Only send <span className="font-semibold">{cryptoAsset}</span>{" "}
                 on the <span className="font-semibold">{network}</span> network
                 to this address.
@@ -492,13 +492,13 @@ export default function PublicPaymentPage() {
           <div className="flex flex-col items-center gap-3 px-6 py-8 text-center">
             <AlertTriangle
               size={28}
-              className="text-red-400"
+              className="text-dash-error"
               strokeWidth={1.5}
             />
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-dash-foreground">
               Something went wrong
             </p>
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-dash-muted">
               We couldn&apos;t initiate your payment. Please try again.
             </p>
             <button
@@ -507,7 +507,7 @@ export default function PublicPaymentPage() {
                 setStep("form");
                 payMutation.reset();
               }}
-              className="mt-2 h-9 rounded-xl border border-white/10 px-4 text-sm text-white/60 hover:bg-white/5 transition-colors"
+              className="mt-2 h-9 rounded-xl border border-dash-border px-4 text-sm text-dash-muted hover:bg-dash-hover transition-colors"
             >
               Try again
             </button>
@@ -515,8 +515,8 @@ export default function PublicPaymentPage() {
         )}
       </div>
 
-      <p className="mt-6 text-xs text-white/20">
-        Powered by <span className="font-semibold text-white/30">Dexxify</span>
+      <p className="mt-6 text-xs text-dash-muted">
+        Powered by <span className="font-semibold text-dash-muted">Dexxify</span>
       </p>
     </div>
   );

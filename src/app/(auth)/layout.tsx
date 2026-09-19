@@ -30,15 +30,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="flex min-h-screen flex-col px-6 sm:px-10">
         <header className="py-8">
           {/* Full lockup — the artwork already contains the wordmark, so there
-              is no text beside it. Black version, since the page is white. */}
+              is no text beside it. Black version, since the page is white, and
+              the cropped file (no baked-in margin), so it sits against the
+              page gutter. h-6 matches the navbar. */}
           <Link href="/" aria-label="Dexxify home" className="inline-flex">
             <Image
-              src="/logo-set/dexxify.png"
+              src="/logo-set/dexxify-tight.png"
               alt="Dexxify"
-              width={2103}
-              height={748}
+              width={1424}
+              height={347}
               priority
-              className="h-12 w-auto"
+              className="h-6 w-auto"
             />
           </Link>
         </header>
