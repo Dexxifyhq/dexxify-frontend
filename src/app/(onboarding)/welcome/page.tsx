@@ -182,12 +182,12 @@ export default function WelcomePage() {
           {/* Same black lockup as the auth pages; see the note there. */}
           <Link href="/" aria-label="Dexxify home" className="inline-flex">
             <Image
-              src="/logo-set/dexxify.png"
+              src="/logo-set/dexxify-tight.png"
               alt="Dexxify"
-              width={2103}
-              height={748}
+              width={1424}
+              height={347}
               priority
-              className="h-12 w-auto"
+              className="h-6 w-auto"
             />
           </Link>
         </header>

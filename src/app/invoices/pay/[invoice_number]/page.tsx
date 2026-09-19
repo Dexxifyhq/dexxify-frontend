@@ -58,56 +58,56 @@ function AssetPicker({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 text-sm transition-colors hover:border-white/20"
+        className="flex h-11 w-full items-center gap-3 rounded-xl border border-dash-border bg-dash-hover px-3 text-sm transition-colors hover:border-dash-border-strong"
       >
         {selected ? (
           <>
-            <span className="flex-1 text-left font-medium text-white">
+            <span className="flex-1 text-left font-medium text-dash-foreground">
               {selected.symbol}
-              <span className="ml-1.5 text-xs font-normal text-white/40">{selected.name}</span>
+              <span className="ml-1.5 text-xs font-normal text-dash-muted">{selected.name}</span>
             </span>
-            <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">
+            <span className="shrink-0 rounded bg-dash-hover px-1.5 py-0.5 text-[10px] text-dash-muted">
               {selected.networkDisplay}
             </span>
           </>
         ) : (
-          <span className="flex-1 text-left text-white/30">Choose token…</span>
+          <span className="flex-1 text-left text-dash-muted">Choose token…</span>
         )}
         <ChevronDown
           size={14}
-          className={`shrink-0 text-white/30 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-dash-muted transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="absolute z-20 mt-1.5 w-full rounded-xl border border-white/10 bg-[#111113] shadow-2xl">
-          <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2.5">
-            <Search size={13} className="shrink-0 text-white/30" />
+        <div className="absolute z-20 mt-1.5 w-full rounded-xl border border-dash-border bg-dash-card shadow-2xl">
+          <div className="flex items-center gap-2 border-b border-dash-border px-3 py-2.5">
+            <Search size={13} className="shrink-0 text-dash-muted" />
             <input
               autoFocus
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tokens…"
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
+              className="flex-1 bg-transparent text-sm text-dash-foreground placeholder:text-dash-faint focus:outline-none"
             />
           </div>
           <ul className="max-h-52 overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-xs text-white/30">No tokens found</li>
+              <li className="px-3 py-2 text-xs text-dash-muted">No tokens found</li>
             ) : (
               filtered.map((a) => (
                 <li key={a.key}>
                   <button
                     type="button"
                     onClick={() => { onSelect(a); setOpen(false); setSearch(""); }}
-                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-white/5 ${selected?.key === a.key ? "text-white" : "text-white/70"}`}
+                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-dash-hover ${selected?.key === a.key ? "text-dash-foreground" : "text-dash-muted"}`}
                   >
                     <span className="flex-1 truncate font-medium">
                       {a.symbol}
-                      <span className="ml-1.5 text-xs font-normal text-white/40">{a.name}</span>
+                      <span className="ml-1.5 text-xs font-normal text-dash-muted">{a.name}</span>
                     </span>
-                    <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/30">
+                    <span className="shrink-0 rounded bg-dash-hover px-1.5 py-0.5 text-[10px] text-dash-muted">
                       {a.networkDisplay}
                     </span>
                   </button>
@@ -211,18 +211,18 @@ export default function InvoicePayPage() {
 
   if (invoiceLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#09090B]">
-        <Loader2 size={24} className="animate-spin text-white/30" />
+      <div className="flex min-h-screen items-center justify-center bg-dash-bg">
+        <Loader2 size={24} className="animate-spin text-dash-muted" />
       </div>
     );
   }
 
   if (invoiceError || !invoice) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#09090B] p-6 text-center">
-        <AlertTriangle size={32} className="text-[#F59E0B]" strokeWidth={1.5} />
-        <p className="text-base font-semibold text-white">Invoice not found</p>
-        <p className="max-w-xs text-sm text-white/40">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-dash-bg p-6 text-center">
+        <AlertTriangle size={32} className="text-dash-warning" strokeWidth={1.5} />
+        <p className="text-base font-semibold text-dash-foreground">Invoice not found</p>
+        <p className="max-w-xs text-sm text-dash-muted">
           This invoice link is invalid or has expired.
         </p>
       </div>
@@ -231,12 +231,12 @@ export default function InvoicePayPage() {
 
   if (invoice.status === "paid") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#09090B] p-6 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#052e16]/60 text-[#4ade80]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-dash-bg p-6 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-dash-success-bg text-dash-success">
           <Check size={28} />
         </div>
-        <p className="text-base font-semibold text-white">Invoice Paid</p>
-        <p className="max-w-xs text-sm text-white/40">
+        <p className="text-base font-semibold text-dash-foreground">Invoice Paid</p>
+        <p className="max-w-xs text-sm text-dash-muted">
           This invoice ({invoice.invoice_number}) has already been paid. Thank you!
         </p>
       </div>
@@ -245,10 +245,10 @@ export default function InvoicePayPage() {
 
   if (["cancelled", "void"].includes(invoice.status)) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#09090B] p-6 text-center">
-        <AlertTriangle size={32} className="text-[#52525B]" strokeWidth={1.5} />
-        <p className="text-base font-semibold text-white">Invoice Unavailable</p>
-        <p className="max-w-xs text-sm text-white/40">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-dash-bg p-6 text-center">
+        <AlertTriangle size={32} className="text-dash-muted" strokeWidth={1.5} />
+        <p className="text-base font-semibold text-dash-foreground">Invoice Unavailable</p>
+        <p className="max-w-xs text-sm text-dash-muted">
           This invoice has been {invoice.status} and can no longer be paid.
         </p>
       </div>
@@ -267,38 +267,38 @@ export default function InvoicePayPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[#09090B] px-4 py-12">
-      <p className="mb-8 text-sm font-semibold tracking-widest text-white/20 uppercase">
+    <div className="flex min-h-screen flex-col items-center bg-dash-bg px-4 py-12">
+      <p className="mb-8 text-sm font-semibold tracking-widest text-dash-muted uppercase">
         Dexxify
       </p>
 
       <div className="w-full max-w-sm space-y-3">
         {/* Invoice card */}
-        <div className="rounded-2xl border border-white/10 bg-[#0D0D0F] shadow-2xl">
+        <div className="rounded-2xl border border-dash-border bg-dash-card shadow-2xl">
           {/* Header */}
-          <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/5">
-              <FileText size={16} className="text-white/40" />
+          <div className="flex items-center gap-3 border-b border-dash-border px-5 py-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-dash-hover">
+              <FileText size={16} className="text-dash-muted" />
             </div>
             <div className="min-w-0">
-              <p className="font-mono text-sm font-semibold text-white">{invoice.invoice_number}</p>
+              <p className="font-mono text-sm font-semibold text-dash-foreground">{invoice.invoice_number}</p>
               {customerName && (
-                <p className="truncate text-xs text-white/40">{customerName}</p>
+                <p className="truncate text-xs text-dash-muted">{customerName}</p>
               )}
             </div>
           </div>
 
           {/* Amount */}
-          <div className="flex flex-col items-center gap-1 border-b border-white/10 px-6 py-6 text-center">
-            <p className="text-xs uppercase tracking-wider text-white/40">Amount Due</p>
-            <p className="text-4xl font-bold text-white">
+          <div className="flex flex-col items-center gap-1 border-b border-dash-border px-6 py-6 text-center">
+            <p className="text-xs uppercase tracking-wider text-dash-muted">Amount Due</p>
+            <p className="text-4xl font-bold text-dash-foreground">
               {fmt(total)}
-              <span className="ml-1.5 text-lg font-normal text-white/40">
+              <span className="ml-1.5 text-lg font-normal text-dash-muted">
                 {invoice.currency}
               </span>
             </p>
             {invoice.due_date && (
-              <p className="mt-1 text-xs text-white/30">
+              <p className="mt-1 text-xs text-dash-muted">
                 Due{" "}
                 {new Date(invoice.due_date).toLocaleDateString("en-US", {
                   month: "short",
@@ -310,22 +310,22 @@ export default function InvoicePayPage() {
           </div>
 
           {/* Line items summary */}
-          <div className="border-b border-white/10 px-5 py-4">
-            <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-white/30">
+          <div className="border-b border-dash-border px-5 py-4">
+            <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
               Items
             </p>
             <div className="flex flex-col gap-2">
               {invoice.line_items.map((item, i) => (
                 <div key={i} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="min-w-0 truncate text-white/60">{item.description}</span>
-                  <span className="shrink-0 font-mono text-white/40">
+                  <span className="min-w-0 truncate text-dash-muted">{item.description}</span>
+                  <span className="shrink-0 font-mono text-dash-muted">
                     {invoice.currency} {fmt(Number(item.amount))}
                   </span>
                 </div>
               ))}
             </div>
             {(Number(invoice.tax_amount) > 0 || Number(invoice.discount_amount) > 0) && (
-              <div className="mt-3 border-t border-white/10 pt-3 text-xs text-white/30">
+              <div className="mt-3 border-t border-dash-border pt-3 text-xs text-dash-muted">
                 {Number(invoice.tax_amount) > 0 && (
                   <div className="flex justify-between">
                     <span>Tax</span>
@@ -335,7 +335,7 @@ export default function InvoicePayPage() {
                 {Number(invoice.discount_amount) > 0 && (
                   <div className="flex justify-between">
                     <span>Discount</span>
-                    <span className="font-mono text-red-400/70">−{fmt(Number(invoice.discount_amount))}</span>
+                    <span className="font-mono text-dash-error">−{fmt(Number(invoice.discount_amount))}</span>
                   </div>
                 )}
               </div>
@@ -346,11 +346,11 @@ export default function InvoicePayPage() {
           {step === "form" && (
             <form onSubmit={handlePay} className="flex flex-col gap-4 px-5 py-5">
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Pay With
                 </label>
                 {assetsLoading ? (
-                  <div className="flex h-11 items-center gap-2 px-3 text-xs text-white/30">
+                  <div className="flex h-11 items-center gap-2 px-3 text-xs text-dash-muted">
                     <Loader2 size={13} className="animate-spin" />
                     Loading tokens…
                   </div>
@@ -364,7 +364,7 @@ export default function InvoicePayPage() {
               </div>
 
               {sessionMutation.isError && (
-                <p className="rounded-xl border border-red-900/40 bg-red-950/40 px-3 py-2.5 text-xs text-red-400">
+                <p className="rounded-xl border border-dash-error-border bg-dash-error-bg px-3 py-2.5 text-xs text-dash-error">
                   {(sessionMutation.error as any)?.message ??
                     "Something went wrong. Please try again."}
                 </p>
@@ -373,7 +373,7 @@ export default function InvoicePayPage() {
               <button
                 type="submit"
                 disabled={!selectedAsset || isPending}
-                className="mt-1 flex h-11 items-center justify-center gap-2 rounded-xl bg-white text-sm font-semibold text-[#09090B] hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="mt-1 flex h-11 items-center justify-center gap-2 rounded-xl bg-dash-accent text-sm font-semibold text-dash-bg hover:bg-dash-accent-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
               >
                 {isPending ? <Loader2 size={15} className="animate-spin" /> : null}
                 {isPending ? "Processing…" : "Get Payment Address"}
@@ -388,35 +388,35 @@ export default function InvoicePayPage() {
               {timeLeft !== null && (
                 <div className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 ${
                   timerExpired
-                    ? "border-red-900/40 bg-red-950/30"
+                    ? "border-dash-error-border bg-dash-error-bg"
                     : timeLeft < 120
-                    ? "border-orange-900/40 bg-orange-950/20"
-                    : "border-white/10 bg-white/5"
+                    ? "border-dash-warning-border bg-dash-warning-bg"
+                    : "border-dash-border bg-dash-hover"
                 }`}>
-                  <Clock size={12} className={timerExpired ? "text-red-400" : timeLeft < 120 ? "text-orange-400" : "text-white/30"} />
+                  <Clock size={12} className={timerExpired ? "text-dash-error" : timeLeft < 120 ? "text-dash-warning" : "text-dash-muted"} />
                   <span className={`font-mono text-sm font-semibold tabular-nums ${
-                    timerExpired ? "text-red-400" : timeLeft < 120 ? "text-orange-400" : "text-white/50"
+                    timerExpired ? "text-dash-error" : timeLeft < 120 ? "text-dash-warning" : "text-dash-muted"
                   }`}>
                     {timerExpired ? "Expired" : fmtTime(timeLeft)}
                   </span>
                   {!timerExpired && (
-                    <span className="text-[10px] text-white/30">remaining</span>
+                    <span className="text-[10px] text-dash-muted">remaining</span>
                   )}
                 </div>
               )}
 
               {/* Crypto amount + fee */}
               {payment && (
-                <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                <div className="rounded-xl border border-dash-border bg-dash-hover px-4 py-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-white/30">Send exactly</span>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-dash-muted">Send exactly</span>
                   </div>
-                  <p className="mt-1 font-mono text-lg font-bold text-white">
+                  <p className="mt-1 font-mono text-lg font-bold text-dash-foreground">
                     {payment.amount}
-                    <span className="ml-1.5 text-sm font-normal text-white/40">{payment.asset}</span>
+                    <span className="ml-1.5 text-sm font-normal text-dash-muted">{payment.asset}</span>
                   </p>
                   {(Number(payment.gasFee) > 0 || payment.feePaidBy) && (
-                    <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2 text-[11px] text-white/30">
+                    <div className="mt-2 flex items-center justify-between border-t border-dash-border pt-2 text-[11px] text-dash-muted">
                       <span>Network fee</span>
                       <span className="font-mono">
                         {Number(payment.gasFee) > 0 ? `${payment.gasFee} ${payment.asset}` : "included"}
@@ -429,7 +429,7 @@ export default function InvoicePayPage() {
 
               {/* Address */}
               <div className="flex flex-col gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/30">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Deposit Address
                 </p>
                 {depositAddress && (
@@ -437,33 +437,33 @@ export default function InvoicePayPage() {
                     <WalletQRCode address={depositAddress} size={160} />
                   </div>
                 )}
-                <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
-                  <span className="flex-1 break-all font-mono text-xs text-white/70">
+                <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-hover px-3 py-2.5">
+                  <span className="flex-1 break-all font-mono text-xs text-dash-muted">
                     {depositAddress ?? "—"}
                   </span>
                   {depositAddress && (
                     <button
                       type="button"
                       onClick={() => handleCopy(depositAddress)}
-                      className="shrink-0 text-white/30 hover:text-white transition-colors"
+                      className="shrink-0 text-dash-muted hover:text-dash-foreground transition-colors"
                     >
-                      {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+                      {copied ? <Check size={14} className="text-dash-success" /> : <Copy size={14} />}
                     </button>
                   )}
                 </div>
               </div>
 
               {/* Network warning */}
-              <div className="flex items-start gap-2 rounded-xl border border-yellow-900/40 bg-yellow-950/30 px-3 py-2.5">
-                <AlertTriangle size={13} className="mt-0.5 shrink-0 text-yellow-500" />
-                <p className="text-xs text-yellow-500/80">
+              <div className="flex items-start gap-2 rounded-xl border border-dash-warning-border bg-dash-warning-bg px-3 py-2.5">
+                <AlertTriangle size={13} className="mt-0.5 shrink-0 text-dash-warning" />
+                <p className="text-xs text-dash-warning">
                   Only send <span className="font-semibold">{cryptoAsset}</span> on the{" "}
                   <span className="font-semibold">{network}</span> network to this address.
                   Wrong network = permanent loss.
                 </p>
               </div>
 
-              <p className="text-center text-[11px] text-white/20">
+              <p className="text-center text-[11px] text-dash-muted">
                 Invoice {invoice.invoice_number} · {invoice.currency} {fmt(total)}
               </p>
             </div>
@@ -472,9 +472,9 @@ export default function InvoicePayPage() {
           {/* ── Step: error ── */}
           {step === "error" && (
             <div className="flex flex-col items-center gap-3 px-6 py-8 text-center">
-              <AlertTriangle size={28} className="text-red-400" strokeWidth={1.5} />
-              <p className="text-sm font-semibold text-white">Failed to generate address</p>
-              <p className="text-xs text-white/40">
+              <AlertTriangle size={28} className="text-dash-error" strokeWidth={1.5} />
+              <p className="text-sm font-semibold text-dash-foreground">Failed to generate address</p>
+              <p className="text-xs text-dash-muted">
                 Something went wrong. Please try again.
               </p>
               <button
@@ -483,7 +483,7 @@ export default function InvoicePayPage() {
                   setStep("form");
                   sessionMutation.reset();
                 }}
-                className="mt-2 h-9 rounded-xl border border-white/10 px-4 text-sm text-white/60 hover:bg-white/5 transition-colors"
+                className="mt-2 h-9 rounded-xl border border-dash-border px-4 text-sm text-dash-muted hover:bg-dash-hover transition-colors"
               >
                 Try again
               </button>
@@ -492,11 +492,11 @@ export default function InvoicePayPage() {
         </div>
 
         {invoice.notes && (
-          <p className="px-1 text-center text-xs text-white/30">{invoice.notes}</p>
+          <p className="px-1 text-center text-xs text-dash-muted">{invoice.notes}</p>
         )}
 
-        <p className="text-center text-xs text-white/20">
-          Powered by <span className="font-semibold text-white/30">Dexxify</span>
+        <p className="text-center text-xs text-dash-muted">
+          Powered by <span className="font-semibold text-dash-muted">Dexxify</span>
         </p>
       </div>
     </div>
