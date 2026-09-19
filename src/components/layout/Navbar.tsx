@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 const NAV_LINKS = ["Products", "Developers", "Company"];
 
@@ -59,9 +61,19 @@ export default function Navbar() {
     >
       <div className="max-w-[1300px] mx-auto px-6 sm:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-12">
-          <span className="text-foreground font-extrabold text-xl uppercase tracking-widest">
-            Dexxify
-          </span>
+          {/* Black lockup on transparency — suits the white nav and its
+              translucent scrolled state. The dark auth pages use the white
+              version instead. */}
+          <Link href="/" aria-label="Dexxify home" className="inline-flex">
+            <Image
+              src="/logo-set/dexxify.png"
+              alt="Dexxify"
+              width={2103}
+              height={748}
+              priority
+              className="h-12 w-auto"
+            />
+          </Link>
           <nav className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <a

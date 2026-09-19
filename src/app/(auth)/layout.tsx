@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    // .theme-auth-dark redefines the dash-* tokens for everything below, which
-    // is what turns every auth page dark without touching their classes.
-    <div className="theme-auth-dark relative grid min-h-screen bg-dash-bg text-dash-foreground lg:grid-cols-2">
+    // .theme-auth-light sets the page ground to pure white for everything
+    // below; the rest of the dash-* tokens are already light.
+    <div className="theme-auth-light relative grid min-h-screen bg-dash-bg text-dash-foreground lg:grid-cols-2">
       {/* Close — back to the marketing site */}
       <Link
         href="/"
@@ -29,48 +29,33 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Left — brand, form, small print */}
       <div className="flex min-h-screen flex-col px-6 sm:px-10">
         <header className="py-8">
-          <Link
-            href="/"
-            aria-label="Dexxify home"
-            className="inline-flex items-center gap-2.5"
-          >
+          {/* Full lockup — the artwork already contains the wordmark, so there
+              is no text beside it. Black version, since the page is white. */}
+          <Link href="/" aria-label="Dexxify home" className="inline-flex">
             <Image
-              src="/dexxify_icon.jpg"
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 rounded-lg object-cover"
+              src="/logo-set/dexxify.png"
+              alt="Dexxify"
+              width={2103}
+              height={748}
+              priority
+              className="h-12 w-auto"
             />
-            <span className="text-lg font-bold tracking-tight text-dash-foreground">
-              Dexxify
-            </span>
           </Link>
         </header>
 
-        <main className="flex flex-1 items-center justify-center py-8">
+        {/* pb-8 balances the header's py-8 now that there's no footer below. */}
+        <main className="flex flex-1 items-center justify-center pb-8">
           {children}
         </main>
-
-        {/* Auth routes are prerendered, so the year is fixed at build time and
-            rolls over on the next deploy after New Year. */}
-        <footer className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 py-6 text-xs text-dash-muted">
-          <span>© {new Date().getFullYear()} Dexxify</span>
-          <span aria-hidden="true">·</span>
-          <a href="#" className="hover:text-dash-foreground transition-colors">
-            Privacy Policy
-          </a>
-          <span aria-hidden="true">·</span>
-          <a href="#" className="hover:text-dash-foreground transition-colors">
-            Terms of Service
-          </a>
-        </footer>
       </div>
 
       {/* Right — decorative code panel; hidden below lg where it would push
           the form off-screen. */}
+      {/* Tinted panel so the split still reads on a white page — the form side
+          is pure white, this one is the next ramp step up. */}
       <aside
         aria-hidden="true"
-        className="relative hidden overflow-hidden border-l border-dash-border bg-dots-dark lg:flex lg:items-center lg:justify-center lg:px-12"
+        className="relative hidden overflow-hidden border-l border-dash-border bg-dash-hover bg-dots-light lg:flex lg:items-center lg:justify-center lg:px-12"
       >
         <AuthBands />
         <div className="relative z-10 flex w-full justify-center">

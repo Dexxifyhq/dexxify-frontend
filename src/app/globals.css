@@ -189,6 +189,33 @@ body {
   box-sizing: border-box;
 }
 
+/* Autofilled inputs.
+   Chrome and Safari paint their own pale blue/yellow background on autofilled
+   fields, which overrides any background we set. The colour can't be changed
+   directly, so an inset box-shadow the size of the field covers it, and
+   -webkit-text-fill-color restores the text colour (plain `color` is ignored
+   while autofilled). The long transition delay stops Chrome re-applying its
+   tint on focus. `:autofill` is the standard selector, for Firefox. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--dash-card) inset;
+  box-shadow: 0 0 0 1000px var(--dash-card) inset;
+  -webkit-text-fill-color: var(--dash-foreground);
+  caret-color: var(--dash-foreground);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:autofill,
+textarea:autofill,
+select:autofill {
+  background-color: var(--dash-card);
+  color: var(--dash-foreground);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -253,34 +280,22 @@ body {
   background-size: 16px 16px;
 }
 
-/* Auth pages — dark theme by variable override.
+/* Auth pages — light theme.
    The auth pages and their shared primitives colour everything through the
-   dash-* tokens, and @theme inline makes those utilities read the variables
-   live (e.g. .text-dash-foreground { color: var(--dash-foreground) }). So
-   redefining the variables on the auth layout's root re-themes every auth page
-   at once, with no per-page class changes, and the dashboard keeps its light
-   values. Every value is still a ramp step. */
-.theme-auth-dark {
-  --dash-bg: var(--n-900);
-  --dash-card: var(--n-900);
-  --dash-border: var(--n-700);
-  --dash-border-strong: var(--n-500);
-  --dash-foreground: var(--n-0);
-  --dash-muted: var(--n-400);
-  --dash-faint: var(--n-500);
-  --dash-hover: var(--n-700);
-  --dash-accent: var(--n-100);
-  --dash-accent-hover: var(--n-0);
-  --dash-accent-soft: var(--n-700);
-  --dash-success: var(--n-200);
-  --dash-success-bg: var(--n-700);
-  --dash-success-border: var(--n-500);
-  --dash-error: var(--n-0);
-  --dash-error-bg: var(--n-700);
-  --dash-error-border: var(--n-400);
-  --dash-warning: var(--n-300);
-  --dash-warning-bg: var(--n-700);
-  --dash-warning-border: var(--n-500);
+   dash-* tokens, which already hold light values, so only the page ground
+   changes here: --dash-bg is n-50 for the dashboard, and these pages want pure
+   white. @theme inline makes the utilities read the variables live (e.g.
+   .text-dash-foreground { color: var(--dash-foreground) }), so setting it on
+   the auth root re-themes every auth page at once and the dashboard keeps its
+   own value. */
+.theme-auth-light {
+  --dash-bg: var(--n-0);
+}
+
+/* Dot texture for light surfaces — the pale counterpart of .bg-dots-dark. */
+.bg-dots-light {
+  background-image: radial-gradient(var(--n-200) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 /* Welcome stepper — the active step slides in from the direction of travel.

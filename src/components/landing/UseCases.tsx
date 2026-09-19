@@ -1,3 +1,4 @@
+import { DOCS_URL } from "@/lib/constants/links";
 import {
   ArrowUpRight,
   ShoppingCart,
@@ -177,7 +178,7 @@ function Row({
           <span className="text-background/60">{rest}</span>
         </h3>
         <a
-          href="#"
+          href={DOCS_URL}
           className="mt-4 inline-flex w-fit items-center gap-1 text-xs font-medium text-background hover:gap-2 transition-all duration-200"
         >
           {linkLabel}
@@ -221,7 +222,7 @@ export default function UseCases() {
             </span>
           </h2>
           <a
-            href="#"
+            href={DOCS_URL}
             className="mt-8 inline-flex h-9 items-center rounded-md bg-background px-4 text-sm font-medium text-foreground hover:bg-card transition-colors duration-200"
           >
             Read the docs

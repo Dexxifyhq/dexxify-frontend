@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { DOCS_URL } from "@/lib/constants/links";
 
 const FOOTER_LINKS = {
   Products: [
@@ -8,7 +10,7 @@ const FOOTER_LINKS = {
     { label: "Sandbox", href: "#" },
   ],
   Developers: [
-    { label: "Documentation", href: "#" },
+    { label: "Documentation", href: DOCS_URL },
     { label: "API Reference", href: "#" },
     { label: "SDKs", href: "#" },
     { label: "Status", href: "#" },
@@ -43,21 +45,31 @@ export default function Footer() {
         {/* Wordmark, tagline and quick links */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="text-xl font-bold tracking-tight text-background">
-              Dexxify
-            </div>
+            {/* White lockup — the footer band is dark. The navbar sits on
+                white and uses the black version. */}
+            <Image
+              src="/logo-set/dexxify-transparent.png"
+              alt="Dexxify"
+              width={2103}
+              height={748}
+              className="h-8 w-auto"
+            />
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-background/60">
               Crypto payments and payouts for Nigerian businesses.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {["Docs", "API Reference", "Support"].map((link) => (
+            {[
+              { label: "Docs", href: DOCS_URL },
+              { label: "API Reference", href: "#" },
+              { label: "Support", href: "#" },
+            ].map((link) => (
               <a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
                 className="rounded border border-code-border px-2.5 py-1 text-xs text-background/60 hover:border-background/40 hover:text-background transition-colors duration-200"
               >
-                {link}
+                {link.label}
               </a>
             ))}
           </div>

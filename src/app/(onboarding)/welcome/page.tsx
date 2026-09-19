@@ -53,7 +53,7 @@ function currencyLabel(value: Currency) {
 
 function FullScreenSpinner() {
   return (
-    <div className="theme-auth-dark flex min-h-screen items-center justify-center bg-dash-bg">
+    <div className="theme-auth-light flex min-h-screen items-center justify-center bg-dash-bg">
       <Loader2 size={22} className="animate-spin text-dash-muted" />
     </div>
   );
@@ -166,7 +166,7 @@ export default function WelcomePage() {
   const headingClass = "text-3xl font-bold tracking-tight outline-none";
 
   return (
-    <div className="theme-auth-dark relative grid min-h-screen bg-dash-bg text-dash-foreground lg:grid-cols-2">
+    <div className="theme-auth-light relative grid min-h-screen bg-dash-bg text-dash-foreground lg:grid-cols-2">
       <button
         type="button"
         onClick={handleSignOut}
@@ -179,15 +179,16 @@ export default function WelcomePage() {
       {/* Left — the stepper */}
       <div className="flex min-h-screen flex-col px-6 sm:px-10">
         <header className="py-8">
-          <Link href="/" aria-label="Dexxify home" className="inline-flex items-center gap-2.5">
+          {/* Same black lockup as the auth pages; see the note there. */}
+          <Link href="/" aria-label="Dexxify home" className="inline-flex">
             <Image
-              src="/dexxify_icon.jpg"
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 rounded-lg object-cover"
+              src="/logo-set/dexxify.png"
+              alt="Dexxify"
+              width={2103}
+              height={748}
+              priority
+              className="h-12 w-auto"
             />
-            <span className="text-lg font-bold tracking-tight">Dexxify</span>
           </Link>
         </header>
 
@@ -395,7 +396,7 @@ export default function WelcomePage() {
           hidden from assistive tech. */}
       <aside
         aria-hidden="true"
-        className="relative hidden overflow-hidden border-l border-dash-border bg-dots-dark lg:flex lg:items-center lg:justify-center lg:px-12"
+        className="relative hidden overflow-hidden border-l border-dash-border bg-dash-hover bg-dots-light lg:flex lg:items-center lg:justify-center lg:px-12"
       >
         <AuthBands />
         <div className="relative z-10 w-full max-w-md">
