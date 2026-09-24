@@ -1,11 +1,9 @@
 import { get, post, ApiError } from "@/lib/api-client";
 import type {
-  AccountBalance,
   BalanceHistoryResponse,
   BalanceHistoryItem,
   BalanceTxType,
   SwapItem,
-  PayoutItem,
   BalanceHistoryFilters,
 } from "@/lib/types/balance";
 import type {
@@ -39,8 +37,6 @@ async function safePost<T>(url: string, body?: unknown): Promise<T | null> {
 }
 
 // ── Ledger → UI mappers ────────────────────────────────────────────────────
-
-const STATUS_FALLBACK: TxStatus = "pending";
 
 function mapLedgerToHistory(tx: LedgerTransaction): BalanceHistoryItem {
   const isCredit = ["deposit", "credit", "onramp"].includes(tx.tx_type);
@@ -96,30 +92,6 @@ function mapLedgerToSwap(tx: LedgerTransaction): SwapItem {
   };
 }
 
-function mapLedgerToPayout(tx: LedgerTransaction): PayoutItem {
-  const meta = (tx.metadata ?? {}) as Record<string, unknown>;
-  const amount =
-    Number(
-      tx.credit_usdt ??
-        tx.debit_usdt ??
-        tx.credit_usdc ??
-        tx.debit_usdc ??
-        tx.credit_ngn ??
-        tx.debit_ngn,
-    ) || 0;
-  return {
-    id: tx.id,
-    reference: tx.reference_id,
-    amount,
-    currency: (tx.asset ?? "USDT") as CryptoCurrency,
-    destination: String(
-      meta.destination ?? meta.account_number ?? tx.description ?? "—",
-    ),
-    status: tx.status as unknown as TxStatus,
-    created_at: tx.created_at,
-  };
-}
-
 function emptyPage<T>(): PaginatedResponse<T> {
   return {
     data: [],
@@ -137,10 +109,6 @@ function emptyPage<T>(): PaginatedResponse<T> {
 // ── Public API ─────────────────────────────────────────────────────────────
 
 export const balanceApi = {
-  /**
-   * Maps to GET /transactions (Ledger) with optional filters. Currency / type /
-   * status filters from the UI are forwarded; "all" sentinels are dropped.
-   */
   getHistory: async (
     filters: BalanceHistoryFilters = {},
   ): Promise<BalanceHistoryResponse> => {
@@ -177,7 +145,7 @@ export const balanceApi = {
   },
 
   /**
-   * No dedicated swaps endpoint — derived from /transactions?tx_type=swap.
+   * Derived swaps from /transactions?tx_type=swap instead of the swaps endpoint.
    */
   getSwaps: async (
     page = 1,
@@ -189,20 +157,5 @@ export const balanceApi = {
     );
     if (!res) return emptyPage<SwapItem>();
     return { ...res, data: res.data.map(mapLedgerToSwap) };
-  },
-
-  /**
-   * No dedicated payout LIST endpoint — derived from /transactions?tx_type=payout.
-   */
-  getPayouts: async (
-    page = 1,
-    limit = 20,
-  ): Promise<PaginatedResponse<PayoutItem>> => {
-    const res = await safeGet<PaginatedResponse<LedgerTransaction>>(
-      "/transactions",
-      { tx_type: "payout", page, limit },
-    );
-    if (!res) return emptyPage<PayoutItem>();
-    return { ...res, data: res.data.map(mapLedgerToPayout) };
   },
 };

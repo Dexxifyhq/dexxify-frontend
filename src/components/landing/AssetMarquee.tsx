@@ -56,7 +56,7 @@ export default function AssetMarquee() {
                   {/* Brand logos are full colour; greyscale keeps them on the
                       monochrome ramp without editing the source files. */}
                   <Image
-                    src={`/cypto/${a.file}.svg`}
+                    src={`/crypto/${a.file}.svg`}
                     alt=""
                     width={28}
                     height={28}

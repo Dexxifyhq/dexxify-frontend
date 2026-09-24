@@ -13,6 +13,7 @@ import {
   Calendar,
   CreditCard,
   Loader2,
+  Lock,
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import LinkBankModal from "@/components/dashboard/bank-accounts/LinkBankModal";
@@ -20,6 +21,8 @@ import { useSavedBanks, useDeleteBank } from "@/lib/hooks/misc/useMisc";
 import type { SavedBank } from "@/lib/types/misc";
 import { toast } from "sonner";
 import { cn } from "@/utils/utils";
+import { useAuth } from "@/lib/context/AuthContext";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 
 // ── Detail drawer ──────────────────────────────────────────────────────────
 
@@ -150,6 +153,38 @@ function BankDetailDrawer({
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function BankAccountsPage() {
+  const { role, isLoading: roleLoading } = useAuth();
+
+  if (roleLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 size={20} className="animate-spin text-dash-muted" />
+      </div>
+    );
+  }
+
+  if (!hasPermission(role, PERMISSIONS.MANAGE_BANK_ACCOUNTS)) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+          <Lock size={20} />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-dash-foreground">
+            Access restricted
+          </p>
+          <p className="mt-1 text-xs text-dash-muted">
+            Your role doesn&apos;t have permission to manage bank accounts.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <BankAccountsPageContent />;
+}
+
+function BankAccountsPageContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<SavedBank | null>(null);
 

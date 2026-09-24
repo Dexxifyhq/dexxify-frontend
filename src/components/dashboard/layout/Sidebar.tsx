@@ -24,6 +24,7 @@ import {
   ChevronsUpDown,
   LogOut,
   Loader2,
+  Send,
 } from "lucide-react";
 import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
@@ -44,7 +45,12 @@ import {
 
 // ── Nav config ───────────────────────────────────────────────────────────────
 
-type NavLeaf = { label: string; href: string; icon: React.ElementType };
+type NavLeaf = {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  permission?: PermissionKey;
+};
 type NavEntry =
   | {
       kind: "link";
@@ -79,6 +85,12 @@ const NAV_TOP: NavEntry[] = [
       { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
       { label: "Payment Pages", href: "/payment-pages", icon: Layout },
       { label: "Refunds", href: "/refunds", icon: RotateCcw },
+      {
+        label: "Payouts",
+        href: "/payouts",
+        icon: Send,
+        permission: PERMISSIONS.WITHDRAW_BANK,
+      },
     ],
   },
   {
@@ -86,8 +98,18 @@ const NAV_TOP: NavEntry[] = [
     label: "Operations",
     icon: LayoutGrid,
     children: [
-      { label: "Bank Accounts", href: "/bank-accounts", icon: Landmark },
-      { label: "Crypto Wallets", href: "/crypto-wallets", icon: Coins },
+      {
+        label: "Bank Accounts",
+        href: "/bank-accounts",
+        icon: Landmark,
+        permission: PERMISSIONS.MANAGE_BANK_ACCOUNTS,
+      },
+      {
+        label: "Crypto Wallets",
+        href: "/crypto-wallets",
+        icon: Coins,
+        permission: PERMISSIONS.MANAGE_CRYPTO_ADDRESSES,
+      },
       { label: "POS Terminals", href: "/pos-terminals", icon: Monitor },
     ],
   },
@@ -130,10 +152,15 @@ export default function Sidebar({
     pathname === href || pathname.startsWith(href + "/");
 
   const { role } = useAuth();
-  const canSee = (entry: NavEntry) =>
-    entry.kind !== "link" ||
-    !entry.permission ||
-    hasPermission(role, entry.permission);
+  const canSee = (entry: NavEntry) => {
+    if (entry.kind === "link") {
+      return !entry.permission || hasPermission(role, entry.permission);
+    }
+    // A group with every child gated out has nothing left to expand into.
+    return entry.children.some(
+      (c) => !c.permission || hasPermission(role, c.permission),
+    );
+  };
   const visibleNavTop = NAV_TOP.filter(canSee);
   const visibleNavBottom = NAV_BOTTOM.filter(canSee);
 
@@ -178,9 +205,8 @@ export default function Sidebar({
 
   async function handleLogout() {
     setLoggingOut(true);
-    await authApi.logout(); // backend + clears httpOnly cookies + memory
+    await authApi.logout();
     toast.success("Signed out successfully.");
-    // Full reload so proxy.ts sees cleared cookies and redirects cleanly.
     window.location.href = "/login";
   }
 
@@ -234,6 +260,9 @@ export default function Sidebar({
 
     // group
     const Icon = entry.icon;
+    const visibleChildren = entry.children.filter(
+      (c) => !c.permission || hasPermission(role, c.permission),
+    );
     const groupActive = entry.children.some((c) => isActive(c.href));
     const isOpen = !collapsed && !!open[entry.label];
     return (
@@ -277,7 +306,7 @@ export default function Sidebar({
 
         {isOpen && (
           <div className="mt-0.5 space-y-0.5">
-            {entry.children.map((child) => {
+            {visibleChildren.map((child) => {
               const active = isActive(child.href);
               const CIcon = child.icon;
               return (
@@ -359,7 +388,7 @@ export default function Sidebar({
                           : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
                       )}
                     >
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-[10px] font-bold text-white">
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-black text-[10px] font-bold text-white">
                         {initial}
                       </div>
                       <span className="flex-1 truncate text-left">
@@ -413,7 +442,7 @@ export default function Sidebar({
                 : "gap-2.5 px-4 hover:bg-dash-hover",
             )}
           >
-            <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-linear-to-br from-[#4F46E5] to-[#9333EA] text-sm font-bold text-white">
+            <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-black text-sm font-bold text-white">
               {businessInitial}
             </div>
             {isExpanded && (
