@@ -1,14 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { payoutsApi } from "@/lib/api/payouts";
-import type {
-  BatchPayoutDto,
-  CreatePayoutDto,
-  ResolveAccountDto,
-} from "@/lib/types/payouts";
+import { useQuery } from "@tanstack/react-query";
+import { payoutsApi, type PayoutListParams } from "@/lib/api/payouts";
 
 export const payoutKeys = {
   all: ["payouts-domain"] as const, // distinct from balance/payouts key
-  detail: (payoutId: string) => [...payoutKeys.all, "detail", payoutId] as const,
+  list: (params: PayoutListParams) =>
+    [...payoutKeys.all, "list", params] as const,
+  detail: (payoutId: string) =>
+    [...payoutKeys.all, "detail", payoutId] as const,
 };
 
 // ── Queries ────────────────────────────────────────────────────────────────
@@ -22,31 +20,10 @@ export function usePayout(payoutId: string) {
   });
 }
 
-// ── Mutations ──────────────────────────────────────────────────────────────
-
-export function useCreatePayout() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: CreatePayoutDto) => payoutsApi.create(payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: payoutKeys.all });
-    },
-  });
-}
-
-export function useBatchPayout() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: BatchPayoutDto) => payoutsApi.createBatch(payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: payoutKeys.all });
-    },
-  });
-}
-
-export function useResolveAccount() {
-  return useMutation({
-    mutationFn: (payload: ResolveAccountDto) =>
-      payoutsApi.resolveAccount(payload),
+export function usePayouts(params: PayoutListParams = {}) {
+  return useQuery({
+    queryKey: payoutKeys.list(params),
+    queryFn: () => payoutsApi.getList(params),
+    staleTime: 15_000,
   });
 }

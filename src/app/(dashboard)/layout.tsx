@@ -34,9 +34,6 @@ export default function DashboardLayout({
   const { data: profile, isLoading, isError } = useProfile();
   const { user } = useProfileDisplay();
 
-  // Derived directly from profile.
-  // When useSwitchMode calls qc.setQueryData, profile updates in the same
-  // render pass and environment is correct immediately.
   const environment = profile?.mode === "live" ? "live" : "test";
 
   useEffect(() => {

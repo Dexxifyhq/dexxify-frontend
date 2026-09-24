@@ -689,7 +689,7 @@ function WithdrawModal({
     e.preventDefault();
     try {
       await withdrawFiat.mutateAsync({
-        bank_id: fiatBankId,
+        recipient_id: fiatBankId,
         amount: Number(fiatAmount),
         narration: fiatNarration || undefined,
       });
