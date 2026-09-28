@@ -4,7 +4,7 @@ import Image from "next/image";
  * Supported-asset logo strip, directly under the Hero.
  *
  * Only assets Dexxify actually supports appear here — a marquee on the homepage
- * reads as a support claim. public/cypto/ also holds ADA, AVAX, DOT, LTC and
+ * reads as a support claim. public/crypto/ also holds ADA, AVAX, DOT, LTC and
  * MATIC, which are deliberately excluded. TRX and TON are supported but have no
  * logo in that folder yet; add them here once they do.
  */
