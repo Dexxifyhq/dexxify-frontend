@@ -9,6 +9,7 @@ import {
   Star,
   Loader2,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import AddAddressModal from "@/components/dashboard/crypto-wallets/AddAddressModal";
@@ -19,6 +20,8 @@ import {
 import type { WithdrawalAddress } from "@/lib/types/deposit-accounts";
 import { toast } from "sonner";
 import { cn } from "@/utils/utils";
+import { useAuth } from "@/lib/context/AuthContext";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -151,6 +154,38 @@ const NETWORK_FILTERS = [
 ];
 
 export default function CryptoWalletsPage() {
+  const { role, isLoading: roleLoading } = useAuth();
+
+  if (roleLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 size={20} className="animate-spin text-dash-muted" />
+      </div>
+    );
+  }
+
+  if (!hasPermission(role, PERMISSIONS.MANAGE_CRYPTO_ADDRESSES)) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+          <Lock size={20} />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-dash-foreground">
+            Access restricted
+          </p>
+          <p className="mt-1 text-xs text-dash-muted">
+            Your role doesn&apos;t have permission to manage crypto wallets.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <CryptoWalletsPageContent />;
+}
+
+function CryptoWalletsPageContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [networkFilter, setNetworkFilter] = useState("all");

@@ -164,7 +164,7 @@ export interface InitiateStableCoinWithdrawalDto {
 }
 
 export interface InitiateFiatWithdrawalDto {
-  bank_id: string;
+  recipient_id: string;
   amount: number;
   narration?: string;
   pin?: string;
