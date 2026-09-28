@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { X, Loader2, RefreshCcw, Copy, Check } from "lucide-react";
 import { useInitiatePosDeviceLink } from "@/lib/hooks/pos-devices/usePosDevices";
+import { useRealtimeEvent } from "@/lib/context/RealtimeContext";
 
 interface Props {
   open: boolean;
@@ -20,6 +21,11 @@ export default function LinkDeviceModal({ open, onClose }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [copied, setCopied] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const handleLinked = useCallback(() => onCloseRef.current(), []);
+  useRealtimeEvent("pos_device.linked", handleLinked);
 
   const generate = () => {
     setCopied(false);
