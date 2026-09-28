@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   // declares its own in (marketing)/page.tsx.
   openGraph: {
     type: "website",
-    siteName: SITE_NAME,
+    siteName:  SITE_NAME,
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     locale: "en_NG",
