@@ -47,6 +47,7 @@ const INVALIDATE_ON_EVENT = [
   "ledger",
   "ramp",
   "invoices",
+  "pos-devices",
 ];
 
 // A burst of related events (e.g. transaction.received → payment.completed
@@ -68,6 +69,7 @@ const TOAST_EVENTS: Partial<
   "offramp.failed": { variant: "error", title: "Offramp failed" },
   "refund.success": { variant: "success", title: "Refund completed" },
   "refund.failed": { variant: "error", title: "Refund failed" },
+  "pos_device.linked": { variant: "success", title: "Device linked" },
 };
 
 function describeEvent(data: Record<string, unknown>): string | undefined {

@@ -19,6 +19,8 @@ export const REALTIME_EVENT_TYPES = [
   "refund.created",
   "refund.success",
   "refund.failed",
+  "pos_device.linked",
+  "pos_device.revoked",
 ] as const;
 
 export type RealtimeEventType = (typeof REALTIME_EVENT_TYPES)[number];
