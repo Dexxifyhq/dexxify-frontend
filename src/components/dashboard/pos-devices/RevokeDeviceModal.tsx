@@ -75,9 +75,11 @@ export default function RevokeDeviceModal({ device, onClose }: Props) {
               className="mt-0.5 shrink-0 text-dash-error"
             />
             <p className="text-xs text-dash-error">
-              <span className="font-semibold">{device.name || "This device"}</span>{" "}
-              will immediately lose access. It can be re-linked later with a
-              new code.
+              <span className="font-semibold">
+                {device.device_name || "This device"}
+              </span>{" "}
+              will immediately lose access. It can be re-linked later with a new
+              code.
             </p>
           </div>
 
