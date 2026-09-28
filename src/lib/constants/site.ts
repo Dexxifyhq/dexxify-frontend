@@ -14,7 +14,7 @@ export const SITE_NAME = "Dexxify";
  * and payouts, settling in Naira. It deliberately avoids claims the rest of
  * the site no longer makes (asset counts, settlement timings, fees).
  */
-export const SITE_TITLE = "Dexxify — Crypto payments and payouts, settled in Naira";
+export const SITE_TITLE = "Dexxify - Crypto payments and payouts, settled in Naira";
 
 export const SITE_DESCRIPTION =
   "Accept crypto payments and pay out in Naira with one API. Checkout, invoices, payment links and payouts for Nigerian businesses.";
