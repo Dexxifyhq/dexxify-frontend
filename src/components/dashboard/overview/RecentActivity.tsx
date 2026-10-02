@@ -46,7 +46,7 @@ export default function RecentActivity({
   loading,
 }: RecentActivityProps) {
   return (
-    <div className="rounded-xl border border-dash-border bg-dash-card p-5">
+    <div className="rounded-2xl border border-dash-border bg-dash-card p-5">
       <p className="mb-4 text-sm font-semibold text-dash-foreground">
         Recent Activity
       </p>

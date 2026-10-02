@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Wallet, Tag, AlertCircle, Loader2, Star } from "lucide-react";
+import { X, Wallet, Tag, AlertCircle, Loader2, Star, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAddWithdrawalAddress } from "@/lib/hooks/deposit-accounts/useDepositAccounts";
 import type {
@@ -310,15 +310,7 @@ export default function AddAddressModal({
               )}
             >
               {isDefault && (
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                  <path
-                    d="M1 4l2 2 4-4"
-                    stroke="white"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Check size={10} strokeWidth={3} className="text-white" />
               )}
             </div>
           </button>

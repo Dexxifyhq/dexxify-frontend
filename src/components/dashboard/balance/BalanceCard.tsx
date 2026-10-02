@@ -15,7 +15,7 @@ function Skeleton({ className }: { className?: string }) {
 
 export default function BalanceCard({ label, amount, icon, badge, action, loading }: BalanceCardProps) {
   return (
-    <div className="relative flex flex-col gap-3 rounded-xl border border-dash-border bg-dash-card p-5">
+    <div className="relative flex flex-col gap-3 rounded-2xl border border-dash-border bg-dash-card p-5">
       {/* Top row: icon + badge/action */}
       <div className="flex items-center justify-between">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-dash-hover text-dash-muted">

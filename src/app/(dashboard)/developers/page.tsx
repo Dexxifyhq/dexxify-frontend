@@ -21,6 +21,8 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Search,
 } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
 import Toggle from "@/components/dashboard/shared/Toggle";
@@ -183,7 +185,7 @@ export default function DevelopersPage() {
             {SDKS.map((sdk) => (
               <div
                 key={sdk.name}
-                className="flex items-center gap-3 rounded-xl border border-dash-border bg-dash-card p-4"
+                className="flex items-center gap-3 rounded-2xl border border-dash-border bg-dash-card p-4"
               >
                 <div
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
@@ -207,7 +209,7 @@ export default function DevelopersPage() {
           </div>
 
           {/* Base URL */}
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-dash-border bg-dash-card px-4 py-3">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-dash-border bg-dash-card px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
                 Base URL
@@ -226,10 +228,10 @@ export default function DevelopersPage() {
           </div>
 
           {/* API Keys */}
-          <section className="rounded-xl border border-dash-border bg-dash-card">
+          <section className="rounded-2xl border border-dash-border bg-dash-card">
             <header className="flex items-center justify-between border-b border-dash-border px-5 py-4">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-accent-soft text-dash-accent">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-card text-tone-violet">
                   <KeyRound size={15} />
                 </div>
                 <h2 className="text-sm font-semibold text-dash-foreground">
@@ -309,10 +311,10 @@ export default function DevelopersPage() {
           </section>
 
           {/* Webhooks */}
-          <section className="rounded-xl border border-dash-border bg-dash-card p-5">
+          <section className="rounded-2xl border border-dash-border bg-dash-card p-5">
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-accent-soft text-dash-accent">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-card text-tone-blue">
                   <Bell size={15} />
                 </div>
                 <h2 className="text-sm font-semibold text-dash-foreground">
@@ -480,9 +482,9 @@ export default function DevelopersPage() {
           </section>
 
           {/* Documentation */}
-          <section className="rounded-xl border border-dash-border bg-dash-card p-5">
+          <section className="rounded-2xl border border-dash-border bg-dash-card p-5">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-accent-soft text-dash-accent">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-card text-tone-green">
                 <BookOpen size={15} />
               </div>
               <h2 className="text-sm font-semibold text-dash-foreground">
@@ -512,7 +514,7 @@ export default function DevelopersPage() {
       {tab === "webhooks" && <WebhookEventsTab />}
 
       {(tab === "integrations" || tab === "mcp") && (
-        <div className="flex items-center justify-center rounded-xl border border-dash-border bg-dash-card py-20 text-sm text-dash-muted">
+        <div className="flex items-center justify-center rounded-2xl border border-dash-border bg-dash-card py-20 text-sm text-dash-muted">
           Coming soon.
         </div>
       )}
@@ -572,9 +574,9 @@ function WebhookEventsTab() {
   });
 
   return (
-    <section className="rounded-xl border border-dash-border bg-dash-card p-5">
+    <section className="rounded-2xl border border-dash-border bg-dash-card p-5">
       <div className="mb-5 flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-accent-soft text-dash-accent">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-card text-tone-blue">
           <Bell size={16} />
         </div>
         <div>
@@ -613,20 +615,10 @@ function WebhookEventsTab() {
           ]}
         />
         <div className="relative">
-          <svg
+          <Search
+            size={14}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
+          />
           <input
             type="text"
             value={search}
@@ -742,19 +734,10 @@ function SelectInline({
           </option>
         ))}
       </select>
-      <svg
+      <ChevronDown
+        size={14}
         className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-dash-muted"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
+      />
     </div>
   );
 }
@@ -777,7 +760,7 @@ function DocCard({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-3 rounded-xl border border-dash-border bg-dash-card p-4 hover:border-dash-accent transition-colors"
+      className="flex items-center gap-3 rounded-2xl border border-dash-border bg-dash-card p-4 hover:border-dash-accent transition-colors"
     >
       <div
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"

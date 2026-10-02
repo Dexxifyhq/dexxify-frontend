@@ -26,9 +26,12 @@ export default function ChartCard({
   children,
 }: ChartCardProps) {
   return (
-    <div className={cn("flex flex-col gap-4 rounded-xl border border-dash-border bg-dash-card p-5 h-full", className)}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
+    <div className={cn("flex flex-col gap-4 rounded-2xl border border-dash-border bg-dash-card p-5 h-full", className)}>
+      {/* The title keeps at least 12rem; when the actions don't fit beside
+          it (phones), they wrap onto their own line instead of squeezing
+          the title into a narrow column. */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-48 flex-1">
           <p className="text-sm font-semibold text-dash-foreground">{title}</p>
           {description && <p className="text-xs text-dash-muted">{description}</p>}
         </div>

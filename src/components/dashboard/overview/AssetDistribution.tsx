@@ -25,7 +25,7 @@ export default function AssetDistribution({
   const isEmpty = !loading && (!data?.assets || data.assets.length === 0);
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-dash-border bg-dash-card p-5 h-full">
+    <div className="flex flex-col gap-4 rounded-2xl border border-dash-border bg-dash-card p-5 h-full">
       <div>
         <p className="text-sm font-semibold text-dash-foreground">Asset Mix</p>
         <p className="text-xs text-dash-muted">

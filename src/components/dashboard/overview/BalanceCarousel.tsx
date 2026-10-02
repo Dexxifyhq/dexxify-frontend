@@ -1,39 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/utils";
+import CurrencyBalanceCard, {
+  CURRENCY_CARDS,
+} from "@/components/dashboard/shared/CurrencyBalanceCard";
 
 interface BalanceCarouselProps {
   balances?: { ngn: number; usdt: number; usdc: number };
   loading?: boolean;
 }
 
-const SLIDES = [
-  {
-    key: "ngn" as const,
-    label: "NGN Balance",
-    prefix: "₦",
-    gradient: "from-[#0f055c] to-[#1D4ED8]",
-  },
-  {
-    key: "usdt" as const,
-    label: "USDT Balance",
-    prefix: "$",
-    gradient: "from-[#082b21] to-[#059669]",
-  },
-  {
-    key: "usdc" as const,
-    label: "USDC Balance",
-    prefix: "$",
-    gradient: "from-[#331105] to-[#cf3d07]",
-  },
-];
+const SLIDES = CURRENCY_CARDS;
+
+const AUTOPLAY_MS = 10_000;
 
 function Skeleton() {
   return (
-    <div className="rounded-xl border border-dash-border bg-dash-card p-5">
-      <div className="h-32 animate-pulse rounded-lg bg-dash-hover" />
+    <div className="rounded-2xl border border-dash-border bg-dash-card p-5">
+      <div className="h-40 animate-pulse rounded-xl bg-dash-hover" />
     </div>
   );
 }
@@ -43,14 +29,27 @@ export default function BalanceCarousel({
   loading,
 }: BalanceCarouselProps) {
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  // Advance every 10s. Keyed on index, so a manual move restarts the wait;
+  // hovering the card holds it.
+  useEffect(() => {
+    if (loading || paused) return;
+    const t = setTimeout(
+      () => setIndex((i) => (i + 1) % SLIDES.length),
+      AUTOPLAY_MS,
+    );
+    return () => clearTimeout(t);
+  }, [index, paused, loading]);
 
   if (loading) return <Skeleton />;
 
-  const slide = SLIDES[index];
-  const value = balances?.[slide.key] ?? 0;
-
   return (
-    <div className="rounded-xl border border-dash-border bg-dash-card p-5">
+    <div
+      className="rounded-2xl border border-dash-border bg-dash-card p-5"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div className="mb-3 flex items-center justify-between">
         <p className="text-sm font-semibold text-dash-foreground">Balances</p>
         <div className="flex items-center gap-1">
@@ -59,52 +58,61 @@ export default function BalanceCarousel({
               setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
             }
             aria-label="Previous balance"
-            className="flex h-6 w-6 items-center justify-center rounded-md text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
+            className="flex h-6 w-6 items-center justify-center rounded-md text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             <ChevronLeft size={14} />
           </button>
           <button
             onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
             aria-label="Next balance"
-            className="flex h-6 w-6 items-center justify-center rounded-md text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
+            className="flex h-6 w-6 items-center justify-center rounded-md text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
             <ChevronRight size={14} />
           </button>
         </div>
       </div>
 
-      <div
-        className={cn(
-          "rounded-xl bg-linear-to-br p-5 text-white",
-          slide.gradient,
-        )}
-      >
-        <div className="mb-6 flex items-center justify-between">
-          <span className="text-xs font-medium uppercase tracking-wider text-white/70">
-            {slide.label}
-          </span>
-          <Wallet size={16} className="text-white/70" />
+      {/* Slides sit side by side; the track slides to the current one. */}
+      <div className="overflow-hidden rounded-xl">
+        <div
+          className="flex transition-transform duration-700 ease-in-out"
+          style={{ transform: `translateX(-${index * 100}%)` }}
+        >
+          {SLIDES.map((s, i) => (
+            <CurrencyBalanceCard
+              key={s.key}
+              aria-hidden={i !== index}
+              currency={s}
+              balance={balances?.[s.key]}
+              className="w-full shrink-0"
+            />
+          ))}
         </div>
-        <p className="text-2xl font-bold tracking-tight">
-          {slide.prefix}
-          {value.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </p>
       </div>
 
+      {/* Dots — the active one fills over the 10s until the next slide. */}
       <div className="mt-3 flex items-center justify-center gap-1.5">
         {SLIDES.map((s, i) => (
           <button
             key={s.key}
             onClick={() => setIndex(i)}
-            aria-label={`Show ${s.label}`}
+            aria-label={`Show ${s.code} balance`}
             className={cn(
-              "h-1.5 rounded-full transition-all",
-              i === index ? "w-4 bg-dash-accent" : "w-1.5 bg-dash-border",
+              "relative h-1.5 overflow-hidden rounded-full bg-dash-border transition-all duration-300",
+              i === index ? "w-6" : "w-1.5",
             )}
-          />
+          >
+            {i === index && (
+              <span
+                key={index}
+                className="carousel-progress absolute inset-y-0 left-0 rounded-full bg-dash-accent"
+                style={{
+                  animationDuration: `${AUTOPLAY_MS}ms`,
+                  animationPlayState: paused ? "paused" : "running",
+                }}
+              />
+            )}
+          </button>
         ))}
       </div>
     </div>

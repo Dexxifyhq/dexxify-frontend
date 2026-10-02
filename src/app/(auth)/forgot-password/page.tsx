@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import { ApiError } from "@/lib/api-client";
@@ -37,9 +37,7 @@ export default function ForgotPasswordPage() {
 
       <div className="mb-8">
         <div className="w-10 h-10 rounded-xl bg-dash-accent-soft border border-dash-accent/20 flex items-center justify-center mb-4">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 2a5 5 0 100 10A5 5 0 009 2zM4 13c-2 1-3 2.5-3 4h16c0-1.5-1-3-3-4" stroke="var(--dash-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <UserRound size={18} strokeWidth={1.5} className="text-dash-accent" />
         </div>
         <h1 className="text-2xl font-bold text-dash-foreground tracking-tight mb-2">Forgot your password?</h1>
         <p className="text-sm text-dash-muted">Enter your email and we&apos;ll send you a reset code.</p>

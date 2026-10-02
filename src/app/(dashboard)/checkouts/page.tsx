@@ -356,7 +356,7 @@ export default function CheckoutsPage() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="stat-row grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Total"
           value={String(total)}
@@ -380,7 +380,7 @@ export default function CheckoutsPage() {
       </div>
 
       {/* Table */}
-      <section className="rounded-xl border border-dash-border bg-dash-card">
+      <section className="rounded-2xl border border-dash-border bg-dash-card">
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-dash-border px-5 py-4">
           <h2 className="text-sm font-semibold text-dash-foreground">All Sessions</h2>
           <div className="flex flex-wrap items-center gap-2">

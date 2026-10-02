@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { authApi } from "@/lib/auth-api";
 import type { UserProfile } from "@/lib/auth-api";
 import type { Environment } from "@/lib/types/common";
@@ -56,6 +57,9 @@ export function useSwitchMode() {
           q.queryKey[0] !== "profile" && q.queryKey[0] !== "businesses",
       });
     },
+    // The switch UI shows the target mode optimistically while pending, so a
+    // failure snaps it back on its own — this says why.
+    onError: (e) => toast.error(e.message || "Failed to switch mode."),
   });
 }
 

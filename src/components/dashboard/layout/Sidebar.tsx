@@ -16,11 +16,11 @@ import {
   ArrowLeftRight,
   Layout,
   RotateCcw,
-  Workflow,
   Landmark,
   Coins,
   Monitor,
   ChevronDown,
+  ChevronLeft,
   ChevronsUpDown,
   LogOut,
   Loader2,
@@ -83,7 +83,7 @@ const NAV_TOP: NavEntry[] = [
       { label: "Invoices", href: "/invoices", icon: FileText },
       { label: "Checkout", href: "/checkouts", icon: ShoppingCart },
       { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
-      { label: "Payment Pages", href: "/payment-pages", icon: Layout },
+      { label: "Payment Links", href: "/payment-pages", icon: Layout },
       { label: "Refunds", href: "/refunds", icon: RotateCcw },
       {
         label: "Payouts",
@@ -121,6 +121,49 @@ const NAV_BOTTOM: NavEntry[] = [
   { kind: "link", label: "Settings", href: "/settings", icon: Settings },
 ];
 
+// Shared row styles. Active rows get a soft fill plus a hairline border; the
+// border is always present (transparent when idle) so rows never shift.
+const ROW =
+  "group relative flex items-center rounded-xl border text-[15px] transition-colors";
+const ROW_ACTIVE =
+  "border-dash-border bg-dash-accent-soft font-semibold text-dash-foreground";
+const ROW_IDLE =
+  "border-transparent text-dash-foreground/80 hover:bg-dash-hover hover:text-dash-foreground";
+
+// ── Workspace mark ───────────────────────────────────────────────────────────
+
+// The business's uploaded logo, or its initial on a dark tile when it has none.
+function WorkspaceMark({
+  name,
+  logoUrl,
+  className,
+}: {
+  name: string;
+  logoUrl?: string | null;
+  className?: string;
+}) {
+  if (logoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- user-uploaded, arbitrary host
+      <img
+        src={logoUrl}
+        alt={name}
+        className={cn("shrink-0 rounded-lg object-cover", className)}
+      />
+    );
+  }
+  return (
+    <div
+      className={cn(
+        "flex shrink-0 select-none items-center justify-center rounded-lg bg-dash-accent font-bold text-white",
+        className,
+      )}
+    >
+      {name.charAt(0).toUpperCase() || "B"}
+    </div>
+  );
+}
+
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 
 interface SidebarProps {
@@ -130,9 +173,11 @@ interface SidebarProps {
     name: string;
     initials: string;
     role: string;
+    email: string;
   };
   collapsed: boolean;
   onExpand: () => void;
+  onToggleCollapse: () => void;
   mobileOpen: boolean;
   onMobileClose: () => void;
   environment: Environment;
@@ -142,6 +187,7 @@ export default function Sidebar({
   user,
   collapsed,
   onExpand,
+  onToggleCollapse,
   mobileOpen,
   onMobileClose,
   environment,
@@ -184,20 +230,22 @@ export default function Sidebar({
   const selectBusiness = useSelectBusiness();
 
   const businessName = business?.name || user.businessName || "Business";
-  const businessInitial = businessName.charAt(0).toUpperCase() || "B";
   const businessId = business?.id || user.businessId;
-  const shortId = businessId ? businessId.slice(0, 8) : "";
-
-  const [bizMenuOpen, setBizMenuOpen] = useState(false);
 
   // True whenever the sidebar shows full content — desktop expanded OR mobile drawer open.
   const isExpanded = !collapsed || mobileOpen;
 
+  const [bizMenuOpen, setBizMenuOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const switchMode = useSwitchMode();
-  const isLive = environment === "live";
+  // Optimistic, like the Topbar switch: show the requested mode while the
+  // switch is in flight; a failure falls back to the real mode.
+  const isLive =
+    (switchMode.isPending && switchMode.variables
+      ? switchMode.variables
+      : environment) === "live";
   function handleEnvToggle() {
     const next: Environment = isLive ? "test" : "live";
     switchMode.mutate(next);
@@ -212,7 +260,7 @@ export default function Sidebar({
 
   function toggleGroup(label: string) {
     // When collapsed, opening a group expands the rail first.
-    if (collapsed) {
+    if (!isExpanded) {
       onExpand();
       setOpen((o) => ({ ...o, [label]: true }));
       return;
@@ -228,32 +276,16 @@ export default function Sidebar({
         <Link
           key={entry.href}
           href={entry.href}
-          title={collapsed ? entry.label : undefined}
+          onClick={onMobileClose}
+          title={!isExpanded ? entry.label : undefined}
           className={cn(
-            "group relative flex items-center rounded-lg text-sm transition-colors",
-            collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
-            active
-              ? "bg-dash-accent-soft font-medium text-dash-foreground"
-              : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
+            ROW,
+            !isExpanded ? "justify-center px-0 py-3" : "gap-3.5 px-4 py-3",
+            active ? ROW_ACTIVE : ROW_IDLE,
           )}
         >
-          {active && (
-            <span
-              className={cn(
-                "absolute top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-dash-accent",
-                collapsed ? "-left-2" : "-left-3",
-              )}
-            />
-          )}
-          <Icon
-            size={16}
-            className={
-              active
-                ? "text-dash-accent"
-                : "text-dash-faint group-hover:text-dash-foreground"
-            }
-          />
-          {!collapsed && entry.label}
+          <Icon size={20} strokeWidth={1.75} className="shrink-0" />
+          {isExpanded && entry.label}
         </Link>
       );
     }
@@ -264,37 +296,30 @@ export default function Sidebar({
       (c) => !c.permission || hasPermission(role, c.permission),
     );
     const groupActive = entry.children.some((c) => isActive(c.href));
-    const isOpen = !collapsed && !!open[entry.label];
+    const isOpen = isExpanded && !!open[entry.label];
     return (
       <div key={entry.label}>
         <button
           type="button"
           onClick={() => toggleGroup(entry.label)}
-          title={collapsed ? entry.label : undefined}
+          title={!isExpanded ? entry.label : undefined}
           className={cn(
-            "group relative flex w-full items-center rounded-lg text-sm transition-colors",
-            collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2",
-            groupActive
-              ? "font-medium text-dash-foreground"
-              : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
+            ROW,
+            "w-full",
+            !isExpanded ? "justify-center px-0 py-3" : "gap-3.5 px-4 py-3",
+            // Collapsed, the rail can't show the active child, so the group
+            // itself takes the active treatment.
+            groupActive && !isExpanded
+              ? ROW_ACTIVE
+              : cn(ROW_IDLE, groupActive && "font-semibold text-dash-foreground"),
           )}
         >
-          {groupActive && collapsed && (
-            <span className="absolute -left-2 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-dash-accent" />
-          )}
-          <Icon
-            size={16}
-            className={
-              groupActive
-                ? "text-dash-accent"
-                : "text-dash-faint group-hover:text-dash-foreground"
-            }
-          />
-          {!collapsed && (
+          <Icon size={20} strokeWidth={1.75} className="shrink-0" />
+          {isExpanded && (
             <>
               <span className="flex-1 text-left">{entry.label}</span>
               <ChevronDown
-                size={14}
+                size={16}
                 className={cn(
                   "text-dash-faint transition-transform",
                   isOpen && "rotate-180",
@@ -305,7 +330,7 @@ export default function Sidebar({
         </button>
 
         {isOpen && (
-          <div className="mt-0.5 space-y-0.5">
+          <div className="ml-6.25 mt-1 space-y-1 border-l border-dash-border pl-3">
             {visibleChildren.map((child) => {
               const active = isActive(child.href);
               const CIcon = child.icon;
@@ -313,17 +338,13 @@ export default function Sidebar({
                 <Link
                   key={child.href}
                   href={child.href}
+                  onClick={onMobileClose}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-lg py-2 pl-9 pr-3 text-sm transition-colors",
-                    active
-                      ? "bg-dash-accent-soft font-medium text-dash-foreground"
-                      : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
+                    "flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors",
+                    active ? ROW_ACTIVE : ROW_IDLE,
                   )}
                 >
-                  <CIcon
-                    size={15}
-                    className={active ? "text-dash-accent" : "text-dash-faint"}
-                  />
+                  <CIcon size={17} strokeWidth={1.75} className="shrink-0" />
                   {child.label}
                 </Link>
               );
@@ -346,58 +367,78 @@ export default function Sidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border border-dash-border bg-dash-card transition-[width,transform] duration-200",
-          // Desktop: collapse rail, floating with space around it
-          "lg:inset-y-32 lg:left-4 lg:translate-x-0 lg:overflow-hidden lg:rounded-2xl lg:shadow-lg",
-          collapsed ? "lg:w-16" : "lg:w-60",
-          // Mobile: full-width drawer, hidden unless open
-          "w-72",
-          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          "dash-sidebar fixed inset-y-3 left-3 z-50 flex w-72 flex-col rounded-2xl border border-dash-border bg-dash-card shadow-(--shadow-card) transition-[width,transform] duration-200",
+          // Desktop: full-height floating card, 24px top/bottom to line up
+          // with the Topbar and main card, 16px from the left edge.
+          "lg:inset-y-6 lg:left-4 lg:translate-x-0",
+          collapsed ? "lg:w-19" : "lg:w-64",
+          mobileOpen
+            ? "translate-x-0"
+            : "-translate-x-[calc(100%+1rem)] lg:translate-x-0",
         )}
       >
-        {/* Workspace block */}
-        <div className="relative border-b border-dash-border">
+        {/* Collapse tab — hangs off the right edge, desktop only */}
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="absolute left-full top-1/2 hidden h-10 w-6 -translate-y-1/2 items-center justify-center rounded-r-lg border border-l-0 border-dash-border bg-dash-card text-dash-faint transition-colors hover:text-dash-foreground lg:flex"
+        >
+          <ChevronLeft
+            size={14}
+            className={cn("transition-transform", collapsed && "rotate-180")}
+          />
+        </button>
+
+        {/* Workspace — opens the switcher */}
+        <div
+          className={cn(
+            "relative shrink-0 pb-2 pt-4",
+            !isExpanded ? "px-3" : "px-4",
+          )}
+        >
           {bizMenuOpen && isExpanded && (
             <>
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setBizMenuOpen(false)}
               />
-              <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-dash-border bg-dash-card py-1 shadow-xl">
+              <div className="absolute left-4 right-4 top-full z-50 overflow-hidden rounded-xl border border-dash-border bg-dash-card py-1 shadow-xl">
                 <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-widest text-dash-faint">
                   Workspaces
                 </p>
 
                 {allBusinesses.map((biz) => {
-                  const isActive = biz.id === businessId;
-                  const initial = biz.name.charAt(0).toUpperCase();
+                  const isCurrent = biz.id === businessId;
                   return (
                     <button
                       key={biz.id}
                       type="button"
-                      disabled={isActive || selectBusiness.isPending}
+                      disabled={isCurrent || selectBusiness.isPending}
                       onClick={async () => {
-                        if (isActive) return;
+                        if (isCurrent) return;
                         await selectBusiness.mutateAsync(biz.id);
                         setBizMenuOpen(false);
                       }}
                       className={cn(
                         "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors disabled:cursor-default",
-                        isActive
+                        isCurrent
                           ? "text-dash-foreground"
                           : "text-dash-muted hover:bg-dash-hover hover:text-dash-foreground",
                       )}
                     >
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-black text-[10px] font-bold text-white">
-                        {initial}
-                      </div>
+                      <WorkspaceMark
+                        name={biz.name}
+                        logoUrl={biz.logo_url}
+                        className="h-6 w-6 rounded-md text-[10px]"
+                      />
                       <span className="flex-1 truncate text-left">
                         {biz.name}
                       </span>
-                      {isActive && (
+                      {isCurrent && (
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-dash-success" />
                       )}
-                      {!isActive &&
+                      {!isCurrent &&
                         selectBusiness.isPending &&
                         selectBusiness.variables === biz.id && (
                           <Loader2
@@ -436,27 +477,22 @@ export default function Sidebar({
             }}
             title={!isExpanded ? businessName : undefined}
             className={cn(
-              "flex w-full items-center py-4 transition-colors",
+              "flex h-14 w-full items-center rounded-xl transition-colors",
               !isExpanded
-                ? "justify-center px-0"
-                : "gap-2.5 px-4 hover:bg-dash-hover",
+                ? "justify-center"
+                : "gap-3 px-2 hover:bg-dash-hover",
             )}
           >
-            <div className="flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-black text-sm font-bold text-white">
-              {businessInitial}
-            </div>
+            <WorkspaceMark
+              name={businessName}
+              logoUrl={business?.logo_url}
+              className="h-9 w-9 text-sm"
+            />
             {isExpanded && (
               <>
-                <div className="min-w-0 flex-1 text-left">
-                  <p className="truncate text-sm font-semibold text-dash-foreground">
-                    {businessName}
-                  </p>
-                  {shortId && (
-                    <p className="truncate text-[11px] text-dash-faint">
-                      ID {shortId}
-                    </p>
-                  )}
-                </div>
+                <span className="min-w-0 flex-1 truncate text-left text-[17px] font-bold text-dash-foreground">
+                  {businessName}
+                </span>
                 <ChevronsUpDown
                   size={14}
                   className="shrink-0 text-dash-faint"
@@ -469,128 +505,126 @@ export default function Sidebar({
         {/* Nav */}
         <nav
           className={cn(
-            "flex-1 overflow-y-auto py-4",
-            collapsed ? "px-2" : "px-3",
+            "flex-1 overflow-y-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            !isExpanded ? "px-3" : "px-4",
           )}
         >
-          <div className="space-y-0.5">{visibleNavTop.map(renderEntry)}</div>
+          <div className="space-y-1">{visibleNavTop.map(renderEntry)}</div>
           <div className="my-3 border-t border-dash-border" />
-          <div className="space-y-0.5">{visibleNavBottom.map(renderEntry)}</div>
+          <div className="space-y-1">{visibleNavBottom.map(renderEntry)}</div>
         </nav>
 
-        {/* Profile footer */}
-        <div className="relative border-t border-dash-border p-3">
-          {menuOpen && !collapsed && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setMenuOpen(false)}
-              />
-              <div className="absolute bottom-full left-3 right-3 z-50 mb-2 overflow-hidden rounded-xl border border-dash-border bg-dash-card py-1 shadow-xl">
-                <button
-                  type="button"
-                  onClick={() => {
-                    router.push("/settings");
-                    setMenuOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
-                >
-                  <User size={14} />
-                  Profile
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    router.push("/settings");
-                    setMenuOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
-                >
-                  <Settings size={14} />
-                  Settings
-                </button>
-                <div className="my-1 border-t border-dash-border" />
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  disabled={loggingOut}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-error transition-colors hover:bg-dash-hover disabled:opacity-50"
-                >
-                  {loggingOut ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <LogOut size={14} />
-                  )}
-                  {loggingOut ? "Signing out…" : "Logout"}
-                </button>
-              </div>
-            </>
-          )}
+        {/* Footer */}
+        <div className={cn("shrink-0", !isExpanded ? "px-3 pb-4" : "px-4 pb-4")}>
+          <div className="mb-4 border-t border-dash-border" />
 
-          <button
-            type="button"
-            onClick={() => {
-              if (collapsed) {
-                onExpand();
-                return;
-              }
-              setMenuOpen((v) => !v);
-            }}
-            title={collapsed ? user.name || "Account" : undefined}
-            className={cn(
-              "group flex w-full items-center rounded-lg transition-colors hover:bg-dash-hover",
-              collapsed ? "justify-center px-0 py-2" : "gap-2.5 px-2 py-2",
-            )}
-          >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-accent text-xs font-semibold text-white">
-              {user.initials || "U"}
-            </div>
-            {!collapsed && (
-              <>
-                <div className="min-w-0 flex-1 text-left">
-                  <p className="truncate text-sm font-medium text-dash-foreground">
-                    {user.name || "Account"}
-                  </p>
-                  {user.role && (
-                    <p className="truncate text-[11px] capitalize text-dash-faint">
-                      {user.role.toLowerCase()}
-                    </p>
-                  )}
-                </div>
-                <ChevronsUpDown
-                  size={14}
-                  className="shrink-0 text-dash-faint"
-                />
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Mobile-only: env toggle */}
-        <div className="border-t border-dash-border p-3 lg:hidden">
+          {/* Mobile-only: env toggle */}
           <button
             type="button"
             onClick={handleEnvToggle}
             disabled={switchMode.isPending}
             className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-full border py-2 text-xs font-semibold transition-colors disabled:opacity-60",
+              "mb-3 flex w-full items-center justify-center gap-2 rounded-full border py-2 text-xs font-semibold transition-colors lg:hidden",
               isLive
                 ? "border-dash-success-border bg-dash-success-bg text-dash-success"
                 : "border-dash-warning-border bg-dash-warning-bg text-dash-warning",
             )}
           >
-            {switchMode.isPending ? (
-              <Loader2 size={11} className="animate-spin" />
-            ) : (
-              <span
-                className={cn(
-                  "h-1.5 w-1.5 rounded-full",
-                  isLive ? "bg-dash-success" : "bg-dash-warning",
-                )}
-              />
-            )}
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                isLive ? "bg-dash-success" : "bg-dash-warning",
+              )}
+            />
             {isLive ? "LIVE MODE" : "TEST MODE"}
           </button>
+
+          <div className="relative">
+            {menuOpen && isExpanded && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setMenuOpen(false)}
+                />
+                <div className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-dash-border bg-dash-card py-1 shadow-xl">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      router.push("/settings");
+                      setMenuOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
+                  >
+                    <User size={14} />
+                    Profile
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      router.push("/settings");
+                      setMenuOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
+                  >
+                    <Settings size={14} />
+                    Settings
+                  </button>
+                  <div className="my-1 border-t border-dash-border" />
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-dash-error transition-colors hover:bg-dash-hover disabled:opacity-50"
+                  >
+                    {loggingOut ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <LogOut size={14} />
+                    )}
+                    {loggingOut ? "Signing out…" : "Logout"}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                if (!isExpanded) {
+                  onExpand();
+                  return;
+                }
+                setMenuOpen((v) => !v);
+              }}
+              title={!isExpanded ? user.name || "Account" : undefined}
+              className={cn(
+                "flex w-full items-center transition-colors",
+                !isExpanded
+                  ? "justify-center"
+                  : "gap-3 rounded-2xl border border-dash-border bg-dash-bg px-3 py-3 hover:bg-dash-hover",
+              )}
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dash-accent text-sm font-semibold text-white">
+                {user.initials || "U"}
+              </div>
+              {isExpanded && (
+                <>
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="truncate text-sm font-semibold text-dash-foreground">
+                      {user.name || "Account"}
+                    </p>
+                    <p className="truncate text-xs text-dash-faint">
+                      {user.email || user.role.toLowerCase()}
+                    </p>
+                  </div>
+                  <ChevronsUpDown
+                    size={14}
+                    className="shrink-0 text-dash-faint"
+                  />
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </aside>
     </>

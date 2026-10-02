@@ -294,7 +294,7 @@ function GeneralTab() {
         <p className="mb-2 text-sm font-semibold text-dash-foreground">
           Brand logo
         </p>
-        <div className="flex items-center gap-4 rounded-xl border border-dashed border-dash-border bg-dash-card p-4">
+        <div className="flex items-center gap-4 rounded-2xl border border-dashed border-dash-border bg-dash-card p-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-dash-hover text-dash-faint">
             <ImageIcon size={20} />
           </div>
@@ -817,7 +817,7 @@ function VerificationTab() {
 
       <div className="mt-8 flex flex-col gap-5">
         {/* ── Identity card ──────────────────────────────── */}
-        <div className="rounded-xl border border-dash-border bg-dash-card">
+        <div className="rounded-2xl border border-dash-border bg-dash-card">
           <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-accent-soft">
@@ -960,7 +960,7 @@ function VerificationTab() {
         </div>
 
         {/* ── Business / CAC card ────────────────────────── */}
-        <div className="rounded-xl border border-dash-border bg-dash-card">
+        <div className="rounded-2xl border border-dash-border bg-dash-card">
           <div className="flex items-center justify-between border-b border-dash-border px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-accent-soft">

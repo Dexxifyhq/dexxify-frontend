@@ -74,6 +74,7 @@ export default function DashboardLayout({
             user={user}
             collapsed={collapsed}
             onExpand={() => setCollapsedPersisted(false)}
+            onToggleCollapse={() => setCollapsedPersisted(!collapsed)}
             mobileOpen={mobileOpen}
             onMobileClose={() => setMobileOpen(false)}
             environment={environment}
@@ -82,20 +83,20 @@ export default function DashboardLayout({
           <div
             className={cn(
               "flex min-w-0 flex-1 flex-col transition-[padding] duration-200",
-              collapsed ? "lg:pl-[96px]" : "lg:pl-[272px]",
+              collapsed ? "lg:pl-25" : "lg:pl-70",
             )}
           >
             <Topbar
               environment={environment}
-              onToggleSidebar={() => setCollapsedPersisted(!collapsed)}
               onOpenMobile={() => setMobileOpen(true)}
             />
-            {/* Third floating card, matching the Topbar's radius, border and
-                elevation. Margins set the gutter (and the gap under the
-                Topbar); padding is now purely interior. Scrolling stays on this
-                element, so content moves inside the card while the Topbar
-                holds its place. */}
-            <main className="mx-4 mb-4 mt-4 flex-1 overflow-y-auto rounded-2xl border border-dash-border bg-dash-card p-4 shadow-xs [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-6 sm:mb-6 sm:mt-6 sm:p-6 [&::-webkit-scrollbar]:hidden">
+            {/* No card, like the Topbar: pages sit straight on the page
+                background, and their own cards are the surfaces. Margin plus
+                the 8px padding puts content on the same 16/24px gutter as the
+                Topbar; the padding keeps card borders and shadows (up to shadow-md)
+                from being clipped by the scroll container. Scrolling stays on
+                this element so the Topbar holds its place. */}
+            <main className="dash-main mx-2 mt-1 flex-1 overflow-y-auto px-2 pb-4 pt-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-4 sm:mt-2 sm:pb-6 [&::-webkit-scrollbar]:hidden">
               {children}
             </main>
           </div>

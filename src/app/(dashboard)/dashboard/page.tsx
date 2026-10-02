@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpFromLine, CreditCard, Users, ChevronDown } from "lucide-react";
+import { ArrowUpFromLine, CreditCard, Users } from "lucide-react";
 import PageHeader from "@/components/dashboard/shared/PageHeader";
+import FilterDropdown from "@/components/dashboard/shared/FilterDropdown";
 import StatCard from "@/components/dashboard/shared/StatCard";
 import AssetDistribution from "@/components/dashboard/overview/AssetDistribution";
 import RecentActivity from "@/components/dashboard/overview/RecentActivity";
@@ -32,36 +33,6 @@ const DATE_RANGES: { label: string; value: DateRange }[] = [
   { label: "1 Year", value: "1y" },
   { label: "All Time", value: "all" },
 ];
-
-function SelectButton({
-  value,
-  options,
-  onChange,
-}: {
-  value: string;
-  options: { label: string; value: string }[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 appearance-none rounded-lg border border-dash-border bg-dash-card pl-3 pr-8 text-sm font-medium text-dash-muted hover:border-dash-accent focus:border-dash-accent focus:outline-none transition-colors cursor-pointer"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        size={13}
-        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-dash-faint"
-      />
-    </div>
-  );
-}
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
@@ -135,16 +106,17 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Overview of your financial performance"
         actions={
-          <SelectButton
+          <FilterDropdown
+            label="Date range"
             value={range}
             options={DATE_RANGES}
-            onChange={(v) => setRange(v as DateRange)}
+            onChange={setRange}
           />
         }
       />
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="stat-row grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label="Pending Payouts"
           value={
