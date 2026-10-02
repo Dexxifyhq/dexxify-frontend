@@ -9,6 +9,7 @@ import {
   X,
   User,
   Mail,
+  Link2,
 } from "lucide-react";
 import { useCreatePaymentSession } from "@/lib/hooks/payment-sessions/usePaymentSessions";
 import { toast } from "sonner";
@@ -284,64 +285,129 @@ export default function CreatePaymentModal({
             </form>
           </>
         ) : (
-          /* ── Success state ── */
-          <div className="flex flex-col gap-5 px-6 py-6">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dash-success-border bg-dash-success-bg">
-                <Check size={22} className="text-dash-success" />
+          /* ── Success: a share-ready payment ticket ── */
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dash-success-bg text-dash-success">
+                  <Check size={18} strokeWidth={2.5} />
+                </span>
+                <div>
+                  <h2 className="text-base font-semibold text-dash-foreground">
+                    Checkout link ready
+                  </h2>
+                  <p className="text-xs text-dash-muted">
+                    Share the link, or let your customer scan the code.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-base font-semibold text-dash-foreground">
-                Session Created
-              </h2>
-              <p className="max-w-xs text-xs text-dash-muted">
-                Share this link with your customer — they&apos;ll choose their
-                token and complete payment.
-              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-dash-faint transition-colors hover:bg-dash-hover hover:text-dash-foreground"
+              >
+                <X size={15} />
+              </button>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
-              <WalletQRCode address={payLink} size={160} />
-              <p className="text-[11px] text-dash-faint">
-                Or scan to pay on a phone
-              </p>
+            {/* Ticket — the dark card style of the dashboard balance cards */}
+            <div className="relative isolate mt-5 overflow-hidden rounded-2xl bg-(--n-900) p-5 text-white">
+              <div
+                aria-hidden
+                className="absolute inset-0 -z-10"
+                style={{
+                  background:
+                    "radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 0.10) 0%, transparent 55%)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute -bottom-12 -left-10 -z-10 h-44 w-44 rotate-12 bg-white/6"
+                style={{
+                  maskImage: "url(/logo-set/transparent-2.png)",
+                  WebkitMaskImage: "url(/logo-set/transparent-2.png)",
+                  maskSize: "contain",
+                  WebkitMaskSize: "contain",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskPosition: "center",
+                  WebkitMaskPosition: "center",
+                }}
+              />
+
+              <div className="flex items-center gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">
+                    Amount due
+                  </p>
+                  <p className="mt-1.5 flex items-baseline gap-1">
+                    <span className="text-base text-white/55">{currencySymbol}</span>
+                    <span className="truncate text-3xl font-medium tracking-tight">
+                      {Number(amount).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <span className="ml-0.5 text-xs text-white/50">{currency}</span>
+                  </p>
+                  {(firstName.trim() || lastName.trim() || email.trim()) && (
+                    <p className="mt-4 truncate text-xs text-white/60">
+                      For{" "}
+                      <span className="font-medium text-white/85">
+                        {[firstName, lastName].filter((s) => s.trim()).join(" ") ||
+                          email}
+                      </span>
+                    </p>
+                  )}
+                  <p className="mt-1 text-[11px] text-white/40">
+                    Scan to pay on a phone
+                  </p>
+                </div>
+                <div className="shrink-0 rounded-xl ring-1 ring-white/10">
+                  <WalletQRCode
+                    address={payLink}
+                    size={104}
+                    logoUrl="/logo-set/transparent-2.png"
+                    logoSize={26}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Link box */}
-            <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-card px-3 py-2.5">
-              <span className="flex-1 truncate font-mono text-xs text-dash-muted">
-                {payLink}
+            {/* Link + copy */}
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-dash-border p-1.5 pl-3.5">
+              <Link2 size={15} className="shrink-0 text-dash-faint" />
+              <span className="min-w-0 flex-1 truncate font-mono text-xs text-dash-muted">
+                {payLink.replace(/^https?:\/\//, "")}
               </span>
               <button
                 type="button"
                 onClick={handleCopy}
-                className="shrink-0 text-dash-faint hover:text-dash-foreground transition-colors"
-                aria-label="Copy link"
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-semibold text-white transition-colors hover:bg-dash-accent-hover"
               >
-                {copied ? (
-                  <Check size={14} className="text-dash-success" />
-                ) : (
-                  <Copy size={14} />
-                )}
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? "Copied" : "Copy link"}
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 h-9 rounded-lg border border-dash-border text-sm font-medium text-dash-muted hover:bg-dash-hover hover:text-dash-foreground transition-colors"
-              >
-                Done
-              </button>
+            <div className="mt-4 grid grid-cols-2 gap-2">
               <a
                 href={payLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white hover:bg-dash-accent-hover transition-colors"
+                className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-dash-border text-sm font-medium text-dash-foreground transition-colors hover:bg-dash-hover"
               >
-                <ExternalLink size={13} />
-                Preview
+                <ExternalLink size={14} />
+                Open checkout
               </a>
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-11 rounded-xl border border-dash-border bg-dash-bg text-sm font-medium text-dash-foreground transition-colors hover:bg-dash-hover"
+              >
+                Done
+              </button>
             </div>
           </div>
         )}
