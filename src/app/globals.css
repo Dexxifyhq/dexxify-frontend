@@ -2,16 +2,22 @@
 
 :root {
   /* ── Neutral ramp ─────────────────────────────────────────────────────────
-     The single source of truth for every colour in the product. Eight steps,
-     no hue. Every semantic token below resolves to one of these and nothing
-     else — if a colour is needed that isn't here, the ramp is what changes.
+     The source of truth for every colour in the product except dashboard
+     status (see "Status" below). Eight steps, no hue. Every other semantic
+     token resolves to one of these — if a colour is needed that isn't here,
+     the ramp is what changes.
 
      --n-0 (white) is not in the source palette; it's added as the ramp head
      because the light surfaces need five steps above the midpoint (page
      ground, raised card, well, border, strong border) and the palette
-     supplies four. Cards would otherwise be indistinguishable from the page. */
+     supplies four. Cards would otherwise be indistinguishable from the page.
+     --n-25 is likewise added: a lighter dashboard page ground than n-50, now
+     that the shell is cardless and the page shows around every card; --n-75
+     is the lighter border used for page content (.dash-main). */
   --n-0:   #FFFFFF; /* White          — ramp head, added */
+  --n-25:  #FBFCFC; /* Half-step      — added, dashboard page ground */
   --n-50:  #F8F9FA; /* Bright Snow    */
+  --n-75:  #F1F3F5; /* Half-step      — added, page-content borders */
   --n-100: #E9ECEF; /* Platinum       */
   --n-200: #DEE2E6; /* Alabaster Grey */
   --n-300: #CED4DA; /* Pale Slate     */
@@ -64,7 +70,7 @@
      brand blue than the marketing cyan. With both surfaces monochrome that
      distinction is gone; the set is kept only so the two can diverge again
      later without a rename, and now draws from the same ramp. */
-  --dash-bg: var(--n-50);
+  --dash-bg: var(--n-25);
   --dash-card: var(--n-0);
   --dash-border: var(--n-200);
   --dash-border-strong: var(--n-300);
@@ -76,25 +82,43 @@
   --dash-accent-hover: var(--n-700);
   --dash-accent-soft: var(--n-100);
 
-  /* Status. Only three ramp steps read as text on a light surface (500/700/
-     900), so five statuses cannot all be told apart by colour — success and
-     purple collide, as do warning and orange. Badge text and icons are what
-     distinguish them now; the bg/border pairs add a weak second axis. */
-  --dash-success: var(--n-700);
-  --dash-success-bg: var(--n-50);
-  --dash-success-border: var(--n-300);
-  --dash-error: var(--n-900);
-  --dash-error-bg: var(--n-100);
-  --dash-error-border: var(--n-400);
-  --dash-warning: var(--n-500);
-  --dash-warning-bg: var(--n-50);
-  --dash-warning-border: var(--n-200);
-  --dash-purple: var(--n-700);
-  --dash-purple-bg: var(--n-100);
-  --dash-purple-border: var(--n-300);
-  --dash-orange: var(--n-500);
-  --dash-orange-bg: var(--n-50);
-  --dash-orange-border: var(--n-400);
+  /* Status — the one place hue comes back. Everything else stays on the
+     neutral ramp; status alone is coloured so completed / pending / failed
+     read at a glance in badges, gauges and the verification prompt. Each hue
+     is a bright text/fill step plus a tint and a border for badge grounds.
+     The fill steps are deliberately vivid (Tailwind 500s), which puts small
+     text below 4.5:1 on white — chosen for brightness over contrast. */
+  --s-green-500: #22C55E;  --s-green-50: #F0FDF4;  --s-green-200: #BBF7D0;
+  --s-amber-500: #F59E0B;  --s-amber-50: #FFFBEB;  --s-amber-200: #FDE68A;
+  --s-red-500: #EF4444;    --s-red-50: #FEF2F2;    --s-red-200: #FECACA;
+  --s-violet-500: #8B5CF6; --s-violet-50: #F5F3FF; --s-violet-200: #DDD6FE;
+  --s-orange-500: #F97316; --s-orange-50: #FFF7ED; --s-orange-200: #FED7AA;
+
+  --dash-success: var(--s-green-500);
+  --dash-success-bg: var(--s-green-50);
+  --dash-success-border: var(--s-green-200);
+  --dash-error: var(--s-red-500);
+  --dash-error-bg: var(--s-red-50);
+  --dash-error-border: var(--s-red-200);
+  --dash-warning: var(--s-amber-500);
+  --dash-warning-bg: var(--s-amber-50);
+  --dash-warning-border: var(--s-amber-200);
+  --dash-purple: var(--s-violet-500);
+  --dash-purple-bg: var(--s-violet-50);
+  --dash-purple-border: var(--s-violet-200);
+  --dash-orange: var(--s-orange-500);
+  --dash-orange-bg: var(--s-orange-50);
+  --dash-orange-border: var(--s-orange-200);
+
+  /* Icon tones — decorative colour for icon tiles (stat cards, section
+     headers). Not status: the hues are reused, but blue is added and red is
+     left out so no tile reads as an error. The glyph carries the colour; the
+     tile itself is plain white, no border. */
+  --s-blue-500: #3B82F6;
+  --tone-blue: var(--s-blue-500);
+  --tone-violet: var(--s-violet-500);
+  --tone-green: var(--s-green-500);
+  --tone-orange: var(--s-orange-500);
 
   /* Chart series — a sequential ramp doing categorical work. Ordered darkest
      to lightest so adjacent series stay separable; chart-6 is close to the
@@ -164,6 +188,10 @@
   --color-dash-orange: var(--dash-orange);
   --color-dash-orange-bg: var(--dash-orange-bg);
   --color-dash-orange-border: var(--dash-orange-border);
+  --color-tone-blue: var(--tone-blue);
+  --color-tone-violet: var(--tone-violet);
+  --color-tone-green: var(--tone-green);
+  --color-tone-orange: var(--tone-orange);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -283,10 +311,73 @@ select:autofill {
   background-size: 16px 16px;
 }
 
+/* Surface treatment shared by the sidebar and the page content: a light
+   border (n-75 rather than n-200, which read heavy against the page ground)
+   and a soft card shadow — Tailwind's shadow-md shape at 3% (its stock 10%
+   read too dark).
+   @theme inline reads --dash-border live, so every border-dash-border inside
+   either region picks the lighter value up. The sidebar applies the shadow
+   with shadow-(--shadow-card). */
+:root {
+  --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.03), 0 2px 4px -2px rgb(0 0 0 / 0.03);
+}
+.dash-main,
+.dash-sidebar { --dash-border: var(--n-75); }
+
+/* Section cards (the rounded-xl / 2xl white bordered surfaces in <main>)
+   get the card shadow. In the components layer so any shadow utility on the
+   element — a dropdown's or modal's shadow-xl — still wins; inputs and
+   buttons are rounded-lg and untouched. */
+@layer components {
+  .dash-main :is(.rounded-xl, .rounded-2xl).border.bg-dash-card {
+    box-shadow: var(--shadow-card);
+  }
+}
+
+/* Balance carousel: the active dot fills left to right over the autoplay
+   interval (duration and play state are set inline). */
+@keyframes carousel-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.carousel-progress {
+  animation-name: carousel-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* Stat card rows: on phones the cards sit in one row that scrolls sideways,
+   snapping card by card, instead of stacking. From md up the element's own
+   grid classes take over. Cards stay direct children so the tone cycle
+   below still works. The 4px padding keeps card shadows from clipping. */
+@media (max-width: 767px) {
+  .stat-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: -4px;
+    padding: 4px;
+    scrollbar-width: none;
+  }
+  .stat-row::-webkit-scrollbar { display: none; }
+  .stat-row > * {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+}
+
+/* Stat card icon tiles cycle through the tones by position in their grid, so
+   a row of cards reads blue → violet → green → orange without each page
+   picking colours. StatCard's tile reads --tone for its icon. */
+.stat-card { --tone: var(--tone-blue); }
+.stat-card:nth-child(4n + 2) { --tone: var(--tone-violet); }
+.stat-card:nth-child(4n + 3) { --tone: var(--tone-green); }
+.stat-card:nth-child(4n + 4) { --tone: var(--tone-orange); }
+
 /* Auth pages — light theme.
    The auth pages and their shared primitives colour everything through the
    dash-* tokens, which already hold light values, so only the page ground
-   changes here: --dash-bg is n-50 for the dashboard, and these pages want pure
+   changes here: --dash-bg is n-25 for the dashboard, and these pages want pure
    white. @theme inline makes the utilities read the variables live (e.g.
    .text-dash-foreground { color: var(--dash-foreground) }), so setting it on
    the auth root re-themes every auth page at once and the dashboard keeps its

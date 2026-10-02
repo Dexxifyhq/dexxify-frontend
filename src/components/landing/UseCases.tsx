@@ -91,7 +91,7 @@ function Connector({ label }: { label?: string }) {
 function CollectDiagram() {
   const inputs = [
     { icon: CreditCard, label: "Payment session" },
-    { icon: LayoutTemplate, label: "Payment page" },
+    { icon: LayoutTemplate, label: "Payment link" },
     { icon: FileText, label: "Invoice" },
     { icon: QrCode, label: "QR payment" },
   ];
@@ -231,7 +231,7 @@ export default function UseCases() {
 
         <Row
           lead="Collect crypto"
-          rest="from customers through checkout, payment pages, invoices or QR, and settle to one balance."
+          rest="from customers through checkout, payment links, invoices or QR, and settle to one balance."
           linkLabel="See how checkout works"
           items={COLLECT}
           diagram={<CollectDiagram />}

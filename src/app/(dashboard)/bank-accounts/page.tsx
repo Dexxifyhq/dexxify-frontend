@@ -165,7 +165,7 @@ export default function BankAccountsPage() {
 
   if (!hasPermission(role, PERMISSIONS.MANAGE_BANK_ACCOUNTS)) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dash-border bg-dash-card py-24 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
           <Lock size={20} />
         </div>
@@ -224,7 +224,7 @@ function BankAccountsPageContent() {
         }
       />
 
-      <section className="rounded-xl border border-dash-border bg-dash-card">
+      <section className="rounded-2xl border border-dash-border bg-dash-card">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 size={22} className="animate-spin text-dash-faint" />

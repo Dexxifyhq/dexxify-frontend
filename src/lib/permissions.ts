@@ -40,8 +40,8 @@ export const OWNER_PERMISSIONS: PermissionDef[] = [
   },
   {
     key: PERMISSIONS.MANAGE_PAYMENT_PAGES,
-    title: "Manage Payment Pages",
-    description: "Create and manage payment pages",
+    title: "Manage Payment Links",
+    description: "Create and manage payment links",
   },
   {
     key: PERMISSIONS.WITHDRAW_BANK,
@@ -85,8 +85,8 @@ export const ADMIN_PERMISSIONS: PermissionDef[] = [...OWNER_PERMISSIONS];
 export const STAFF_PERMISSIONS: PermissionDef[] = [
   {
     key: PERMISSIONS.MANAGE_PAYMENT_PAGES,
-    title: "Manage Payment Pages",
-    description: "Create and manage payment pages",
+    title: "Manage Payment Links",
+    description: "Create and manage payment links",
   },
   {
     key: PERMISSIONS.MANAGE_INVOICES,

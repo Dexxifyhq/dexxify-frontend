@@ -59,7 +59,7 @@ export default function CreatePaymentPageForm() {
       {
         onSuccess: (res: any) => setCreatedPage(res),
         onError: (err: any) =>
-          toast.error(err?.message ?? "Failed to create payment page."),
+          toast.error(err?.message ?? "Failed to create payment link."),
       },
     );
   };
@@ -82,14 +82,14 @@ export default function CreatePaymentPageForm() {
           <Check size={24} className="text-dash-success" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-dash-foreground">Page Created</h2>
+          <h2 className="text-lg font-semibold text-dash-foreground">Payment Link Created</h2>
           <p className="mt-1 text-sm text-dash-muted">
             Share this link — anyone who visits can pay you.
           </p>
         </div>
 
         <div className="w-full max-w-md">
-          <div className="flex items-center gap-2 rounded-xl border border-dash-border bg-dash-card px-3 py-2.5">
+          <div className="flex items-center gap-2 rounded-2xl border border-dash-border bg-dash-card px-3 py-2.5">
             <span className="flex-1 truncate font-mono text-xs text-dash-muted">
               {publicUrl}
             </span>
@@ -111,7 +111,7 @@ export default function CreatePaymentPageForm() {
             onClick={() => router.push("/payment-pages")}
             className="h-9 rounded-lg border border-dash-border px-4 text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-foreground"
           >
-            View all pages
+            View all links
           </button>
           <a
             href={publicUrl}
@@ -120,7 +120,7 @@ export default function CreatePaymentPageForm() {
             className="flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-4 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover"
           >
             <ExternalLink size={13} />
-            Preview page
+            Preview link
           </a>
         </div>
       </div>
@@ -142,10 +142,10 @@ export default function CreatePaymentPageForm() {
           </Link>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-dash-foreground">
-              New Payment Page
+              New Payment Link
             </h1>
             <p className="text-xs text-dash-faint">
-              Configure your page then share the link to collect payments.
+              Configure your link, then share it to collect payments.
             </p>
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function CreatePaymentPageForm() {
           ) : (
             <Zap size={14} />
           )}
-          {createPage.isPending ? "Creating…" : "Create Page"}
+          {createPage.isPending ? "Creating…" : "Create Link"}
         </button>
       </div>
 
@@ -168,13 +168,13 @@ export default function CreatePaymentPageForm() {
         {/* ── Left: form fields ────────────────────────────────────────── */}
         <div className="flex flex-col gap-4">
           {/* General */}
-          <section className="rounded-xl border border-dash-border bg-dash-card">
+          <section className="rounded-2xl border border-dash-border bg-dash-card">
             <div className="flex items-center gap-2.5 border-b border-dash-border px-5 py-3.5">
               <FileText size={14} className="text-dash-faint" />
               <h2 className="text-sm font-semibold text-dash-foreground">General</h2>
             </div>
             <div className="flex flex-col gap-4 p-5">
-              <Field label="Page Title *">
+              <Field label="Link Title *">
                 <input
                   type="text"
                   value={title}
@@ -205,7 +205,7 @@ export default function CreatePaymentPageForm() {
           </section>
 
           {/* Pricing */}
-          <section className="rounded-xl border border-dash-border bg-dash-card">
+          <section className="rounded-2xl border border-dash-border bg-dash-card">
             <div className="flex items-center gap-2.5 border-b border-dash-border px-5 py-3.5">
               <DollarSign size={14} className="text-dash-faint" />
               <h2 className="text-sm font-semibold text-dash-foreground">Pricing</h2>
@@ -276,7 +276,7 @@ export default function CreatePaymentPageForm() {
                 )}
               </div>
               <p className="text-sm font-semibold text-white">
-                {title || "Page Title"}
+                {title || "Link Title"}
               </p>
               <p className="mt-0.5 text-xs text-white/40">
                 {description || "Your description will appear here"}

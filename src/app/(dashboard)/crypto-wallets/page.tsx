@@ -76,7 +76,7 @@ function AddressCard({
   const [confirm, setConfirm] = useState(false);
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-dash-border bg-dash-card p-4">
+    <div className="flex flex-col gap-3 rounded-2xl border border-dash-border bg-dash-card p-4">
       {/* Top row */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export default function CryptoWalletsPage() {
 
   if (!hasPermission(role, PERMISSIONS.MANAGE_CRYPTO_ADDRESSES)) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dash-border bg-dash-card py-24 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
           <Lock size={20} />
         </div>

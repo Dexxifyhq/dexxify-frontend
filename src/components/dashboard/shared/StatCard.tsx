@@ -38,11 +38,11 @@ function Skeleton({ className }: { className?: string }) {
 
 export default function StatCard({ label, value, change, description, icon, loading }: StatCardProps) {
   return (
-    <div className="relative flex flex-col gap-4 rounded-xl border border-dash-border bg-dash-card p-5">
-      {/* Label + icon */}
+    <div className="stat-card relative flex flex-col gap-4 rounded-2xl border border-dash-border bg-dash-card p-5">
+      {/* Label + icon — tile colour comes from .stat-card's position (globals.css) */}
       <div className="flex items-start justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-dash-faint">{label}</p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-accent-soft text-dash-accent">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-dash-card text-(--tone)">
           {icon}
         </div>
       </div>

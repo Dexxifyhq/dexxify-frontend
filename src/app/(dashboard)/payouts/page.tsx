@@ -277,7 +277,7 @@ export default function PayoutsPage() {
 
   if (!hasPermission(role, PERMISSIONS.WITHDRAW_BANK)) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dash-border bg-dash-card py-24 text-center">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dash-border bg-dash-card py-24 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
           <Lock size={20} />
         </div>
@@ -337,7 +337,7 @@ function PayoutsPageContent() {
           description="View the status and history of your bank payouts."
         />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="stat-row grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Total"
             value={String(total)}
@@ -360,7 +360,7 @@ function PayoutsPageContent() {
           />
         </div>
 
-        <section className="rounded-xl border border-dash-border bg-dash-card">
+        <section className="rounded-2xl border border-dash-border bg-dash-card">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-dash-border px-5 py-4">
             <h2 className="text-sm font-semibold text-dash-foreground">
               All Payouts

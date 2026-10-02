@@ -67,7 +67,7 @@ export default function StackedBarChart({
       emptyIcon={<Layers size={28} strokeWidth={1.5} />}
       emptyDescription="No revenue data for the selected period."
       actions={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <select
               value={currency}

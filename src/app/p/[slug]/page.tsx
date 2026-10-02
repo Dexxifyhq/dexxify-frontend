@@ -274,7 +274,7 @@ export default function PublicPaymentPage() {
         <AlertTriangle size={32} className="text-dash-warning" strokeWidth={1.5} />
         <p className="text-base font-semibold text-dash-foreground">Page not available</p>
         <p className="max-w-xs text-sm text-dash-muted">
-          This payment page doesn&apos;t exist or has been deactivated.
+          This payment link doesn&apos;t exist or has been deactivated.
         </p>
       </div>
     );

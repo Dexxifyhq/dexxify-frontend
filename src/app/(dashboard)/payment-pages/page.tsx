@@ -138,11 +138,11 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
       },
       {
         onSuccess: () => {
-          toast.success("Payment page updated.");
+          toast.success("Payment link updated.");
           onClose();
         },
         onError: (err: any) =>
-          toast.error(err?.message ?? "Failed to update page."),
+          toast.error(err?.message ?? "Failed to update payment link."),
       },
     );
   }
@@ -161,7 +161,7 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
         <div className="flex items-center justify-between border-b border-dash-border px-6 py-5">
           <div>
             <h2 className="text-base font-bold text-dash-foreground">
-              Edit Payment Page
+              Edit Payment Link
             </h2>
             <p className="mt-0.5 font-mono text-xs text-dash-faint">
               /p/{page.slug}
@@ -178,7 +178,7 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col gap-5">
-            <DrawerField label="Page Title *">
+            <DrawerField label="Link Title *">
               <input
                 type="text"
                 value={title}
@@ -237,7 +237,7 @@ function EditDrawer({ page, onClose, updatePage }: EditDrawerProps) {
             {/* Read-only page info */}
             <div className="rounded-xl border border-dash-border bg-dash-hover p-4">
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-dash-faint">
-                Page info
+                Link info
               </p>
               <div className="flex flex-col gap-2.5">
                 <InfoRow label="Slug" value={`/p/${page.slug}`} mono />
@@ -300,7 +300,7 @@ export default function PaymentPagesPage() {
       {
         onSuccess: () =>
           toast.success(
-            `Page ${next === "active" ? "activated" : "deactivated"}.`,
+            `Payment link ${next === "active" ? "activated" : "deactivated"}.`,
           ),
         onError: (err: any) =>
           toast.error(err?.message ?? "Failed to update status."),
@@ -310,7 +310,7 @@ export default function PaymentPagesPage() {
 
   function handleDelete(id: string) {
     deletePage.mutate(id, {
-      onSuccess: () => toast.success("Payment page deleted."),
+      onSuccess: () => toast.success("Payment link deleted."),
       onError: (err: any) => toast.error(err?.message ?? "Failed to delete."),
     });
   }
@@ -318,20 +318,20 @@ export default function PaymentPagesPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Payment Pages"
-        description="Permanent, reusable pages for accepting crypto payments."
+        title="Payment Links"
+        description="Permanent, reusable links for accepting crypto payments."
         actions={
           <Link
             href="/payment-pages/new"
             className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-dash-accent px-3.5 text-sm font-medium text-white transition-colors hover:bg-dash-accent-hover"
           >
             <Plus size={15} />
-            New Page
+            New Link
           </Link>
         }
       />
 
-      <section className="rounded-xl border border-dash-border bg-dash-card">
+      <section className="rounded-2xl border border-dash-border bg-dash-card">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 size={22} className="animate-spin text-dash-faint" />
@@ -339,8 +339,8 @@ export default function PaymentPagesPage() {
         ) : pages.length === 0 ? (
           <EmptyState
             icon={<FileText size={28} strokeWidth={1.5} />}
-            title="No payment pages yet"
-            description="Create a permanent page to start accepting payments from anyone."
+            title="No payment links yet"
+            description="Create a permanent link to start accepting payments from anyone."
             className="py-24"
           />
         ) : (
