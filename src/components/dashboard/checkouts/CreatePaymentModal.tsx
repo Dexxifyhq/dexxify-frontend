@@ -99,7 +99,6 @@ export default function CreatePaymentModal({
       first_name: firstName.trim(),
       last_name: lastName.trim(),
     };
-    // if (firstName.trim()) payload.title = `Payment — ${firstName.trim()} ${lastName.trim()}`.trim();
 
     createSession.mutate(payload, {
       onSuccess: (res: any) => {
@@ -300,10 +299,6 @@ export default function CreatePaymentModal({
               </p>
             </div>
 
-            {/* The same link, scannable. Encodes payLink verbatim, which is
-                already absolute (window.location.origin + /pay/:id), so a
-                customer scanning off the merchant's screen lands on the
-                payment page directly. */}
             <div className="flex flex-col items-center gap-2">
               <WalletQRCode address={payLink} size={160} />
               <p className="text-[11px] text-dash-faint">

@@ -30,11 +30,36 @@ const PAYOUT_ROWS: {
   amount: string;
   status: "Completed" | "Processing";
 }[] = [
-  { asset: "USDT", recipient: "[WALLET ADDRESS]", amount: "300.00", status: "Completed" },
-  { asset: "NGN", recipient: "[BANK] ••••4417", amount: "₦[AMOUNT]", status: "Completed" },
-  { asset: "USDC", recipient: "[WALLET ADDRESS]", amount: "1,250.00", status: "Completed" },
-  { asset: "NGN", recipient: "[BANK] ••••[ACCT]", amount: "₦[AMOUNT]", status: "Processing" },
-  { asset: "USDT", recipient: "[WALLET ADDRESS]", amount: "80.00", status: "Completed" },
+  {
+    asset: "USDT",
+    recipient: "[WALLET ADDRESS]",
+    amount: "300.00",
+    status: "Completed",
+  },
+  {
+    asset: "NGN",
+    recipient: "[BANK] ••••4417",
+    amount: "₦[AMOUNT]",
+    status: "Completed",
+  },
+  {
+    asset: "USDC",
+    recipient: "[WALLET ADDRESS]",
+    amount: "1,250.00",
+    status: "Completed",
+  },
+  {
+    asset: "NGN",
+    recipient: "[BANK] ••••[ACCT]",
+    amount: "₦[AMOUNT]",
+    status: "Processing",
+  },
+  {
+    asset: "USDT",
+    recipient: "[WALLET ADDRESS]",
+    amount: "80.00",
+    status: "Completed",
+  },
 ];
 
 /** 09:45, as in the reference. Illustrative only; the real window comes from
@@ -308,7 +333,7 @@ function PayoutsVisual() {
                 </span>
               ) : (
                 <Image
-                  src={`/cypto/${r.asset.toLowerCase()}.svg`}
+                  src={`/crypto/${r.asset.toLowerCase()}.svg`}
                   alt=""
                   width={16}
                   height={16}

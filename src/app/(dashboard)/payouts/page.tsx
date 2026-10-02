@@ -439,7 +439,7 @@ function PayoutsPageContent() {
                       </td>
                       <td className="px-4 py-3 text-xs text-dash-muted">
                         {p.account_name || p.account_number
-                          ? `${p.account_name} ${p.account_number}`
+                          ? `${p.account_name} - ${p.account_number}`
                           : "—"}
                       </td>
                       <td className="px-4 py-3">
