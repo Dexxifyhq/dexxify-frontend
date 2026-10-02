@@ -515,8 +515,10 @@ export default function PublicPaymentPage() {
         )}
       </div>
 
-      <p className="mt-6 text-xs text-dash-muted">
-        Powered by <span className="font-semibold text-dash-muted">Dexxify</span>
+      <p className="mt-6 flex items-center gap-1.5 text-xs text-dash-muted">
+        Powered by
+        {/* eslint-disable-next-line @next/next/no-img-element -- static brand wordmark */}
+        <img src="/logo-set/dexxify-tight.png" alt="Dexxify" className="h-3.5 w-auto" />
       </p>
     </div>
   );

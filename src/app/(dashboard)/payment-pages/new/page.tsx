@@ -319,9 +319,15 @@ export default function CreatePaymentPageForm() {
               </button>
             </div>
 
-            <p className="pb-3.5 text-center text-[10px] text-white/15">
-              Powered by{" "}
-              <span className="font-semibold text-white/20">Dexxify</span>
+            <p className="flex items-center justify-center gap-1.5 pb-3.5 text-[10px] text-white/15">
+              Powered by
+              {/* Black wordmark inverted to white for this dark preview. */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- static brand wordmark */}
+              <img
+                src="/logo-set/dexxify-tight.png"
+                alt="Dexxify"
+                className="h-2.5 w-auto opacity-25 invert"
+              />
             </p>
           </div>
         </aside>
