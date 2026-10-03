@@ -6,10 +6,11 @@ export const posDeviceKeys = {
   list: () => [...posDeviceKeys.all, "list"] as const,
 };
 
-export function usePosDevices() {
+export function usePosDevices(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: posDeviceKeys.list(),
     queryFn: posDevicesApi.getAll,
+    enabled: options?.enabled ?? true,
     staleTime: 15_000,
   });
 }

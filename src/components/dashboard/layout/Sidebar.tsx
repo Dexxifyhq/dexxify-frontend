@@ -50,7 +50,6 @@ type NavLeaf = {
   href: string;
   icon: React.ElementType;
   permission?: PermissionKey;
-  liveOnly?: boolean;
 };
 type NavEntry =
   | {
@@ -59,7 +58,6 @@ type NavEntry =
       href: string;
       icon: React.ElementType;
       permission?: PermissionKey;
-      liveOnly?: boolean;
     }
   | {
       kind: "group";
@@ -112,12 +110,7 @@ const NAV_TOP: NavEntry[] = [
         icon: Coins,
         permission: PERMISSIONS.MANAGE_CRYPTO_ADDRESSES,
       },
-      {
-        label: "POS Terminals",
-        href: "/pos-terminals",
-        icon: Monitor,
-        liveOnly: true,
-      },
+      { label: "POS Terminals", href: "/pos-terminals", icon: Monitor },
     ],
   },
   { kind: "link", label: "Customers", href: "/customers", icon: User },
@@ -214,7 +207,6 @@ export default function Sidebar({
       : environment) === "live";
   const canSeeLeaf = (c: NavLeaf | Extract<NavEntry, { kind: "link" }>) => {
     if (c.permission && !hasPermission(role, c.permission)) return false;
-    if (c.liveOnly && !isLive) return false;
     return true;
   };
   const canSee = (entry: NavEntry) => {
