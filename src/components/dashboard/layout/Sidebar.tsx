@@ -50,6 +50,7 @@ type NavLeaf = {
   href: string;
   icon: React.ElementType;
   permission?: PermissionKey;
+  liveOnly?: boolean;
 };
 type NavEntry =
   | {
@@ -58,6 +59,7 @@ type NavEntry =
       href: string;
       icon: React.ElementType;
       permission?: PermissionKey;
+      liveOnly?: boolean;
     }
   | {
       kind: "group";
@@ -110,7 +112,12 @@ const NAV_TOP: NavEntry[] = [
         icon: Coins,
         permission: PERMISSIONS.MANAGE_CRYPTO_ADDRESSES,
       },
-      { label: "POS Terminals", href: "/pos-terminals", icon: Monitor },
+      {
+        label: "POS Terminals",
+        href: "/pos-terminals",
+        icon: Monitor,
+        liveOnly: true,
+      },
     ],
   },
   { kind: "link", label: "Customers", href: "/customers", icon: User },
@@ -198,14 +205,24 @@ export default function Sidebar({
     pathname === href || pathname.startsWith(href + "/");
 
   const { role } = useAuth();
+  const switchMode = useSwitchMode();
+  // Optimistic, like the Topbar switch: show the requested mode while the
+  // switch is in flight; a failure falls back to the real mode.
+  const isLive =
+    (switchMode.isPending && switchMode.variables
+      ? switchMode.variables
+      : environment) === "live";
+  const canSeeLeaf = (c: NavLeaf | Extract<NavEntry, { kind: "link" }>) => {
+    if (c.permission && !hasPermission(role, c.permission)) return false;
+    if (c.liveOnly && !isLive) return false;
+    return true;
+  };
   const canSee = (entry: NavEntry) => {
     if (entry.kind === "link") {
-      return !entry.permission || hasPermission(role, entry.permission);
+      return canSeeLeaf(entry);
     }
     // A group with every child gated out has nothing left to expand into.
-    return entry.children.some(
-      (c) => !c.permission || hasPermission(role, c.permission),
-    );
+    return entry.children.some(canSeeLeaf);
   };
   const visibleNavTop = NAV_TOP.filter(canSee);
   const visibleNavBottom = NAV_BOTTOM.filter(canSee);
@@ -239,13 +256,6 @@ export default function Sidebar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const switchMode = useSwitchMode();
-  // Optimistic, like the Topbar switch: show the requested mode while the
-  // switch is in flight; a failure falls back to the real mode.
-  const isLive =
-    (switchMode.isPending && switchMode.variables
-      ? switchMode.variables
-      : environment) === "live";
   function handleEnvToggle() {
     const next: Environment = isLive ? "test" : "live";
     switchMode.mutate(next);
@@ -292,9 +302,7 @@ export default function Sidebar({
 
     // group
     const Icon = entry.icon;
-    const visibleChildren = entry.children.filter(
-      (c) => !c.permission || hasPermission(role, c.permission),
-    );
+    const visibleChildren = entry.children.filter(canSeeLeaf);
     const groupActive = entry.children.some((c) => isActive(c.href));
     const isOpen = isExpanded && !!open[entry.label];
     return (
