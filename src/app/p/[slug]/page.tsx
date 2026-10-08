@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { payApi } from "@/lib/api/pay";
+import { usePaymentSessionEvents } from "@/lib/hooks/payment-sessions/usePaymentSessionEvents";
 import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
+import { humanizeFailureReason } from "@/lib/utils/payment-result";
 import {
   ChevronDown,
   Search,
@@ -16,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCountdown } from "@/lib/hooks/useCountdown";
+import { PaymentResultIcon } from "@/components/pay/hosted-pay";
 
 type Step = "form" | "deposit" | "error";
 
@@ -205,6 +208,9 @@ export default function PublicPaymentPage() {
   const expired =
     depositInfo && count === 0 && !!depositInfo.session?.expires_at;
 
+  const sessionId: string | undefined = depositInfo?.session?.id;
+  const { partial, completed, failed } = usePaymentSessionEvents(sessionId);
+
   const timerDisplay = (() => {
     const m = Math.floor(count / 60);
     const s = count % 60;
@@ -275,6 +281,37 @@ export default function PublicPaymentPage() {
         <p className="text-base font-semibold text-dash-foreground">Page not available</p>
         <p className="max-w-xs text-sm text-dash-muted">
           This payment link doesn&apos;t exist or has been deactivated.
+        </p>
+      </div>
+    );
+  }
+
+  if (completed) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-dash-bg p-6 text-center">
+        <PaymentResultIcon variant="success" />
+        <p className="text-base font-semibold text-dash-foreground">
+          Payment successful
+        </p>
+        <p className="text-sm text-dash-muted">
+          You paid{" "}
+          <span className="font-semibold text-dash-foreground">
+            {Number(completed.amount_paid).toFixed(2)} {completed.currency}
+          </span>
+        </p>
+      </div>
+    );
+  }
+
+  if (failed) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-dash-bg p-6 text-center">
+        <PaymentResultIcon variant="failed" />
+        <p className="text-base font-semibold text-dash-foreground">
+          Payment failed
+        </p>
+        <p className="max-w-xs text-sm text-dash-muted">
+          {humanizeFailureReason(failed.reason)}
         </p>
       </div>
     );
@@ -394,6 +431,32 @@ export default function PublicPaymentPage() {
                 Send the exact crypto amount shown to the address below.
               </p>
             </div>
+
+            {partial && (
+              <div className="fade-up flex items-start gap-3 rounded-xl border border-dash-warning-border bg-dash-warning-bg px-3.5 py-3 text-left">
+                <Clock size={14} className="mt-0.5 shrink-0 text-dash-warning" />
+                <div className="min-w-0 flex-1 text-xs">
+                  <p className="font-semibold text-dash-warning">
+                    Partial payment received
+                  </p>
+                  <p className="mt-0.5 text-dash-warning">
+                    We&apos;ve received{" "}
+                    <span className="font-semibold">
+                      {Number(partial.amount_paid).toFixed(2)} {partial.currency}
+                    </span>{" "}
+                    so far.{" "}
+                    <span className="font-semibold">
+                      {Number(
+                        partial.amount_due ??
+                          Math.max(fixedAmount - Number(partial.amount_paid), 0),
+                      ).toFixed(2)}{" "}
+                      {partial.currency}
+                    </span>{" "}
+                    still due.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Expiry timer */}
             {depositInfo.session?.expires_at && (

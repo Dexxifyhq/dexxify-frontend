@@ -58,6 +58,7 @@ const TOAST_EVENTS: Partial<
   Record<RealtimeEventType, { variant: "success" | "error"; title: string }>
 > = {
   "payment.completed": { variant: "success", title: "Payment completed" },
+  "payment.partial": { variant: "error", title: "Partial payment" },
   "payment.failed": { variant: "error", title: "Payment failed" },
   "deposit.confirmed": { variant: "success", title: "Deposit confirmed" },
   "deposit.failed": { variant: "error", title: "Deposit failed" },
