@@ -39,13 +39,6 @@ export const CARD =
 
 // ── Page frame ────────────────────────────────────────────────────────────────
 
-/**
- * All white. Mobile: one column — summary, then payment — with a faint D in
- * the bottom-right corner. Desktop: two halves with no divider, fitted to the
- * screen — the summary on the left (dark D watermark in its bottom-left
- * corner), the payment on the right, the two pulled toward the middle. A side
- * that outgrows the screen scrolls on its own, without a visible scrollbar.
- */
 export function HostedPayShell({
   summary,
   payment,
@@ -418,6 +411,59 @@ export function DepositDetails({
         </span>
       </p>
     </>
+  );
+}
+
+// ── Result icon ──────────────────────────────────────────────────────────────
+
+/**
+ * Animated circle + check/X — the result screen for a live payment.completed
+ * / payment.failed SSE event. Shared across every hosted payment surface
+ * (checkout sessions, invoices, payment pages).
+ */
+export function PaymentResultIcon({
+  variant,
+}: {
+  variant: "success" | "failed";
+}) {
+  return (
+    <svg
+      viewBox="0 0 52 52"
+      className={cn(
+        "h-16 w-16",
+        variant === "success" ? "text-dash-success" : "text-dash-error",
+      )}
+    >
+      <circle
+        className="result-ring"
+        cx="26"
+        cy="26"
+        r="25"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      />
+      {variant === "success" ? (
+        <path
+          className="result-check"
+          d="M14.1 27.2l7.1 7.2 16.7-16.8"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <path
+          className="result-x"
+          d="M17 17l18 18M35 17l-18 18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
   );
 }
 

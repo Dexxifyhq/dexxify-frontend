@@ -304,6 +304,47 @@ select:autofill {
   }
 }
 
+/* Checkout result icon: a circle that draws itself in, then a check or X
+   stroke draws inside it, with a small bounce at the end. Used on the hosted
+   checkout page when a payment.completed / payment.failed SSE event lands. */
+@keyframes result-ring {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes result-mark {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes result-pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.result-ring {
+  stroke-dasharray: 157;
+  stroke-dashoffset: 157;
+  animation: result-ring 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.result-check {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation:
+    result-mark 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards,
+    result-pop 0.35s ease-in-out 0.8s both;
+}
+.result-x {
+  stroke-dasharray: 52;
+  stroke-dashoffset: 52;
+  animation:
+    result-mark 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards,
+    result-pop 0.35s ease-in-out 0.8s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .result-ring,
+  .result-check,
+  .result-x {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Faint dot grid for dark surfaces, drawn from the ramp so it stays
    monochrome. Shared by the dark bento cards and the use-case band. */
 .bg-dots-dark {

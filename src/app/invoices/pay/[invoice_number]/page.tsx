@@ -5,12 +5,15 @@ import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { invoicesApi } from "@/lib/api/invoices";
 import { payApi } from "@/lib/api/pay";
+import { usePaymentSessionEvents } from "@/lib/hooks/payment-sessions/usePaymentSessionEvents";
 import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
+import { humanizeFailureReason } from "@/lib/utils/payment-result";
 import type { Invoice } from "@/lib/types/invoices";
 import {
   AlertTriangle,
   Check,
   ChevronDown,
+  Clock,
   Copy,
   Download,
   FileText,
@@ -22,6 +25,7 @@ import {
   Centered,
   DepositDetails,
   HostedPayShell,
+  PaymentResultIcon,
   Steps,
   TimerPill,
 } from "@/components/pay/hosted-pay";
@@ -117,6 +121,9 @@ export default function InvoicePayPage() {
     return () => clearInterval(id);
   }, [step, expiresAt, timerExpired]);
 
+  const sessionId: string | undefined = depositInfo?.id;
+  const { partial, completed, failed } = usePaymentSessionEvents(sessionId);
+
   const handlePay = () => {
     if (!selectedAsset || sessionMutation.isPending) return;
     sessionMutation.mutate(
@@ -201,6 +208,44 @@ export default function InvoicePayPage() {
         </p>
         <p className="max-w-xs text-sm text-dash-muted">
           This invoice has been {invoice.status} and can no longer be paid.
+        </p>
+      </Centered>
+    );
+  }
+
+  if (completed) {
+    return (
+      <Centered>
+        <PaymentResultIcon variant="success" />
+        <p className="text-lg font-semibold text-dash-foreground">
+          Payment successful
+        </p>
+        <p className="text-sm text-dash-muted">
+          You paid{" "}
+          <span className="font-semibold text-dash-foreground">
+            {SYMBOL[invoice.currency?.toUpperCase()] ?? ""}
+            {fmt(Number(completed.amount_paid))}
+          </span>
+        </p>
+        <p className="mt-1 font-mono text-xs text-dash-faint">
+          {invoice.invoice_number}
+        </p>
+      </Centered>
+    );
+  }
+
+  if (failed) {
+    return (
+      <Centered>
+        <PaymentResultIcon variant="failed" />
+        <p className="text-lg font-semibold text-dash-foreground">
+          Payment failed
+        </p>
+        <p className="max-w-xs text-sm text-dash-muted">
+          {humanizeFailureReason(failed.reason)}
+        </p>
+        <p className="mt-1 font-mono text-xs text-dash-faint">
+          {invoice.invoice_number}
         </p>
       </Centered>
     );
@@ -411,8 +456,36 @@ export default function InvoicePayPage() {
 
   // ── Payment ───────────────────────────────────────────────────────────────
 
+  const amountRemaining = partial
+    ? partial.amount_due ?? Math.max(total - Number(partial.amount_paid), 0)
+    : 0;
+
   const paymentCard = (
     <section className={CARD}>
+      {partial && (
+        <div className="fade-up mb-5 flex items-start gap-3 rounded-2xl border border-dash-warning-border bg-dash-warning-bg px-4 py-3.5">
+          <Clock size={16} className="mt-0.5 shrink-0 text-dash-warning" />
+          <div className="min-w-0 flex-1 text-sm">
+            <p className="font-semibold text-dash-warning">
+              Partial payment received
+            </p>
+            <p className="mt-0.5 text-dash-warning">
+              We&apos;ve received{" "}
+              <span className="font-semibold">
+                {sym}
+                {fmt(Number(partial.amount_paid))}
+              </span>{" "}
+              so far.{" "}
+              <span className="font-semibold">
+                {sym}
+                {fmt(amountRemaining)}
+              </span>{" "}
+              still due.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mb-5">
         <Steps current={step === "deposit" ? 1 : 0} />
       </div>
