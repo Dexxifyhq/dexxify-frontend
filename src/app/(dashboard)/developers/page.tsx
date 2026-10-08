@@ -181,7 +181,7 @@ export default function DevelopersPage() {
               Coming soon
             </span>
           </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          {/* <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {SDKS.map((sdk) => (
               <div
                 key={sdk.name}
@@ -206,7 +206,7 @@ export default function DevelopersPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* Base URL */}
           <div className="flex items-center justify-between gap-3 rounded-2xl border border-dash-border bg-dash-card px-4 py-3">

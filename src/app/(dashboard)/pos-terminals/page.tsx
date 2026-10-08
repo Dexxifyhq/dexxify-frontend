@@ -80,35 +80,22 @@ export default function PosTerminalsPage() {
                   key={device.id}
                   className="flex items-center justify-between gap-4 px-5 py-4"
                 >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span
-                      className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                        device.status === "active"
-                          ? "border-dash-success-border bg-dash-success-bg text-dash-success"
-                          : "border-dash-border bg-dash-hover text-dash-muted"
-                      }`}
-                    >
-                      {device.status}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-dash-foreground">
-                        {device.device_name || "Unknown device"}
-                      </p>
-                      <p className="truncate text-xs text-dash-muted">
-                        Linked {fmtDate(device.created_at)}
-                      </p>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-dash-foreground">
+                      {device.device_name || "Unknown device"}
+                    </p>
+                    <p className="truncate text-xs text-dash-muted">
+                      Linked {fmtDate(device.created_at)}
+                    </p>
                   </div>
 
-                  {device.status === "active" && (
-                    <button
-                      type="button"
-                      onClick={() => setRevokeTarget(device)}
-                      className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-dash-border px-3 text-xs font-medium text-dash-muted hover:border-dash-error-border hover:bg-dash-error-bg hover:text-dash-error transition-colors"
-                    >
-                      <Ban size={12} /> Unlink
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setRevokeTarget(device)}
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-dash-border px-3 text-xs font-medium text-dash-muted hover:border-dash-error-border hover:bg-dash-error-bg hover:text-dash-error transition-colors"
+                  >
+                    <Ban size={12} /> Unlink
+                  </button>
                 </div>
               ))}
             </div>
