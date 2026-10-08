@@ -1,6 +1,4 @@
-// ── POS devices ────────────────────────────────────────────────────────────
-
-export type PosDeviceStatus = "active" | "revoked";
+export type PosDeviceStatus = "active";
 
 export interface PosDevice {
   id: string;
@@ -9,7 +7,6 @@ export interface PosDevice {
   os_name: string;
   os_version: string;
   status: PosDeviceStatus;
-  revoked_at?: string;
   created_at: string;
   user_agent?: string;
 }

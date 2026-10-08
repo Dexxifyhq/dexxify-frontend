@@ -78,8 +78,9 @@ export default function RevokeDeviceModal({ device, onClose }: Props) {
               <span className="font-semibold">
                 {device.device_name || "This device"}
               </span>{" "}
-              will immediately lose access. It can be re-linked later with a new
-              code.
+              will be permanently removed and immediately lose access. This
+              can&apos;t be undone — to use it again, you&apos;ll need to link
+              it as a new device.
             </p>
           </div>
 
