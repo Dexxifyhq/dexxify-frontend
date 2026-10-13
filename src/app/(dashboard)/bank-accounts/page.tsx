@@ -272,11 +272,11 @@ function BankAccountsPageContent() {
                       <p className="truncate text-sm font-medium text-dash-foreground">
                         {bank.account_name}
                       </p>
-                      {bank.primary && (
+                      {/* {bank.primary && (
                         <span className="shrink-0 rounded-full border border-dash-success-border bg-dash-success-bg px-2 py-px text-[10px] font-semibold text-dash-success">
                           Primary
                         </span>
-                      )}
+                      )} */}
                     </div>
                     <p className="mt-0.5 text-xs text-dash-muted">
                       {bank.bank_name} · {bank.account_number}

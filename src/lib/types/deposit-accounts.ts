@@ -149,7 +149,7 @@ export interface AddWithdrawalAddressDto {
   network: WithdrawalNetwork;
   token: WithdrawalToken;
   label: string;
-  isDefault: boolean;
+  // isDefault: boolean;
 }
 
 // ── Withdrawals ──────────────────────────────────────────────────────────────
