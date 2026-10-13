@@ -40,7 +40,7 @@ export default function LinkBankModal({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
   const [label, setLabel] = useState("");
-  const [isDefault, setIsDefault] = useState(false);
+  // const [isDefault, setIsDefault] = useState(false);
   const [verifiedName, setVerifiedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -68,7 +68,7 @@ export default function LinkBankModal({
     setDropdownOpen(false);
     setAccountNumber("");
     setLabel("");
-    setIsDefault(false);
+    // setIsDefault(false);
     setVerifiedName(null);
     setError(null);
     verifyBank.reset();
@@ -140,7 +140,7 @@ export default function LinkBankModal({
         accountNumber: accountNumber.trim(),
         bankCode: selectedBank.code,
         label: label.trim() || undefined,
-        isDefault,
+        // isDefault,
       },
       {
         onSuccess: () => {
@@ -284,7 +284,10 @@ export default function LinkBankModal({
           {verifiedName && (
             <>
               <div className="flex items-center gap-2 rounded-lg border border-dash-success-border bg-dash-success-bg px-3 py-2.5">
-                <CheckCircle2 size={14} className="shrink-0 text-dash-success" />
+                <CheckCircle2
+                  size={14}
+                  className="shrink-0 text-dash-success"
+                />
                 <p className="text-xs">
                   <span className="text-dash-muted">Account name: </span>
                   <span className="font-medium text-dash-foreground">
@@ -297,7 +300,9 @@ export default function LinkBankModal({
               <div>
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Label{" "}
-                  <span className="normal-case text-dash-faint">(optional)</span>
+                  <span className="normal-case text-dash-faint">
+                    (optional)
+                  </span>
                 </label>
                 <div className="relative">
                   <Tag
@@ -315,7 +320,7 @@ export default function LinkBankModal({
               </div>
 
               {/* Set as primary */}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => setIsDefault((v) => !v)}
                 className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${
@@ -351,7 +356,7 @@ export default function LinkBankModal({
                     <Check size={10} strokeWidth={3} className="text-white" />
                   )}
                 </div>
-              </button>
+              </button> */}
             </>
           )}
 

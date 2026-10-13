@@ -83,7 +83,7 @@ export interface AddBankDto {
   accountNumber: string;
   bankCode: string;
   label?: string;
-  isDefault: boolean;
+  // isDefault: boolean;
 }
 
 export interface VerifyBankAccountDto {
