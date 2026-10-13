@@ -10,7 +10,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import PhoneInputBase, { type Value as PhoneValue } from "react-phone-number-input";
+import PhoneInputBase, {
+  type Value as PhoneValue,
+} from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Eye, EyeOff, ArrowLeft, Loader2, Check } from "lucide-react";
 import { highlight } from "@/lib/utils/highlight";
@@ -37,7 +39,9 @@ export function AuthAlert({ message, variant }: AlertProps) {
           isError ? "bg-dash-error" : "bg-dash-success"
         }`}
       />
-      <p className={`text-sm ${isError ? "text-dash-error" : "text-dash-success"}`}>
+      <p
+        className={`text-sm ${isError ? "text-dash-error" : "text-dash-success"}`}
+      >
         {message}
       </p>
     </div>
@@ -72,7 +76,9 @@ export function AuthLabel({
   return (
     <label className="text-sm font-medium text-dash-foreground">
       {children}
-      {optional && <span className="text-dash-muted font-normal ml-1">(optional)</span>}
+      {optional && (
+        <span className="text-dash-muted font-normal ml-1">(optional)</span>
+      )}
     </label>
   );
 }
@@ -83,7 +89,9 @@ export const inputClass =
   "w-full h-11 px-3.5 bg-transparent border border-dash-border rounded-lg text-sm text-dash-foreground placeholder:text-dash-faint focus:outline-none focus:border-dash-muted transition-colors";
 
 export function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={`${inputClass} ${props.className ?? ""}`} />;
+  return (
+    <input {...props} className={`${inputClass} ${props.className ?? ""}`} />
+  );
 }
 
 // ── Phone input — international format, outputs E.164 (e.g. +2348065924354) ─
@@ -121,13 +129,19 @@ export function PhoneField({ value, onChange, placeholder }: PhoneFieldProps) {
 
 // ── Password input with show/hide toggle ───────────────────────────────────
 
-interface PasswordInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
+interface PasswordInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "type"
+> {
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-export function PasswordInput({ value, onChange, ...rest }: PasswordInputProps) {
+export function PasswordInput({
+  value,
+  onChange,
+  ...rest
+}: PasswordInputProps) {
   const [show, setShow] = useState(false);
   return (
     <div className="relative">
@@ -249,7 +263,7 @@ export function AuthField({
  * fields the dashboard actually sends. ${API_URL} and ${API_KEY} stand in for
  * the base URL and the key.
  */
-const AUTH_SNIPPET = `const res = await fetch(\`\${API_URL}/payment-sessions\`, {
+const AUTH_SNIPPET = `const res = await fetch(\`https://api.dexxify.com/payment-sessions\`, {
   method: "POST",
   headers: { Authorization: \`Bearer \${API_KEY}\` },
   body: JSON.stringify({
@@ -282,7 +296,7 @@ export function AuthCodePanel() {
   const lines = AUTH_SNIPPET.slice(0, count).split("\n");
 
   return (
-    <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-code-border bg-code-bg shadow-2xl">
+    <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-code-border bg-code-bg shadow-2xl">
       <div className="min-h-[340px] overflow-x-auto p-6 font-mono text-[13px] text-code-fg">
         {lines.map((line, i) => (
           <div key={i} className="flex">

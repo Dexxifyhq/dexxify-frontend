@@ -28,9 +28,8 @@ export default function Waitlist() {
 
   return (
     <section id="waitlist" className="relative border-b border-border">
-      {/* Same rail container as Hero/Announcement, so the vertical rules stay
-          continuous down the page. */}
-      <div className="max-w-[1200px] mx-auto border-x border-border">
+      {/* Same max-width container as the other sections. */}
+      <div className="max-w-[1200px] mx-auto">
         <div className="px-4 sm:px-6 py-16 sm:py-24">
           <div className="mx-auto max-w-xl text-center">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">

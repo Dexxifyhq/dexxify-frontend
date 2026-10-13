@@ -209,7 +209,9 @@ export default function WithdrawModal({
                           setScNetwork(sa.network);
                           setScToken(sa.token);
                         }}
-                        leading={<AssetLogo symbol={sa.token} className="h-8 w-8" />}
+                        leading={
+                          <AssetLogo symbol={sa.token} className="h-8 w-8" />
+                        }
                         title={sa.label}
                         subtitle={`${shortAddress(sa.address)} · ${sa.network}`}
                       />
@@ -217,7 +219,7 @@ export default function WithdrawModal({
                   </div>
                 </div>
               )}
-              <div>
+              {/* <div>
                 <FieldLabel>
                   {addressList.length > 0
                     ? "Or enter an address"
@@ -232,7 +234,7 @@ export default function WithdrawModal({
                   }}
                   className="font-mono"
                 />
-              </div>
+              </div> */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <FieldLabel>Network</FieldLabel>
@@ -272,9 +274,7 @@ export default function WithdrawModal({
                   }
                 />
               </div>
-              <Note>
-                A {STABLECOIN_FEE} fee is deducted from your balance.
-              </Note>
+              <Note>A {STABLECOIN_FEE} fee is deducted from your balance.</Note>
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
                   disabled={!(Number(scAmount) > 0)}
@@ -291,10 +291,19 @@ export default function WithdrawModal({
               <Summary
                 rows={[
                   { label: "To", value: scLabel || shortAddress(scAddress) },
-                  { label: "Address", value: <span className="font-mono text-xs">{scAddress}</span> },
+                  {
+                    label: "Address",
+                    value: (
+                      <span className="font-mono text-xs">{scAddress}</span>
+                    ),
+                  },
                   { label: "Network", value: scNetwork || "—" },
                   { label: "Fee", value: `${STABLECOIN_FEE} · from balance` },
-                  { label: "Amount", value: `${fmt(scAmount)} ${scToken}`, emphasis: true },
+                  {
+                    label: "Amount",
+                    value: `${fmt(scAmount)} ${scToken}`,
+                    emphasis: true,
+                  },
                 ]}
               />
               <ErrorNote message={scError} />
@@ -320,7 +329,9 @@ export default function WithdrawModal({
                       <OptionRow
                         key={bank.id}
                         selected={fiatBankId === bank.provider_recipient_id}
-                        onSelect={() => setFiatBankId(bank.provider_recipient_id)}
+                        onSelect={() =>
+                          setFiatBankId(bank.provider_recipient_id)
+                        }
                         leading={
                           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
                             <Landmark size={15} />
@@ -390,7 +401,9 @@ export default function WithdrawModal({
                 rows={[
                   {
                     label: "To",
-                    value: selectedBank ? selectedBank.account_name : fiatBankId,
+                    value: selectedBank
+                      ? selectedBank.account_name
+                      : fiatBankId,
                   },
                   ...(selectedBank
                     ? [
@@ -404,7 +417,11 @@ export default function WithdrawModal({
                     ? [{ label: "Narration", value: fiatNarration }]
                     : []),
                   { label: "Fee", value: `${FIAT_FEE} · from balance` },
-                  { label: "Amount", value: `₦${fmt(fiatAmount)}`, emphasis: true },
+                  {
+                    label: "Amount",
+                    value: `₦${fmt(fiatAmount)}`,
+                    emphasis: true,
+                  },
                 ]}
               />
               <ErrorNote message={fiatError} />

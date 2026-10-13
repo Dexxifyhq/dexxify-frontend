@@ -27,8 +27,8 @@ const COPIES = 4;
 
 export default function AssetMarquee() {
   return (
-    <section className="relative border-b border-border">
-      <div className="max-w-[1200px] mx-auto border-x border-border">
+    <section className="relative">
+      <div className="max-w-[1200px] mx-auto">
         {/* The moving strip repeats every logo four times, so it's hidden from
             assistive tech and this single list is announced instead. */}
         <h2 className="sr-only">Supported assets</h2>

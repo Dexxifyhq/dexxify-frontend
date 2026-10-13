@@ -196,7 +196,9 @@ export default function DepositModal({
                       key={a.key}
                       selected={a.key === selectedKey}
                       onSelect={() => setSelectedKey(a.key)}
-                      leading={<AssetLogo symbol={a.symbol} className="h-8 w-8" />}
+                      leading={
+                        <AssetLogo symbol={a.symbol} className="h-8 w-8" />
+                      }
                       title={a.symbol}
                       subtitle={a.name}
                       trailing={
@@ -233,7 +235,9 @@ export default function DepositModal({
                   <p className="text-sm font-semibold text-dash-foreground">
                     {selectedAsset.symbol}
                   </p>
-                  <p className="text-xs text-dash-muted">{selectedAsset.name}</p>
+                  <p className="text-xs text-dash-muted">
+                    {selectedAsset.name}
+                  </p>
                 </div>
                 <span className="rounded-full bg-dash-card px-2.5 py-1 text-xs font-medium text-dash-muted">
                   {selectedAsset.networkDisplay}

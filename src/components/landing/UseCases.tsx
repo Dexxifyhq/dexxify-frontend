@@ -209,7 +209,7 @@ function Row({
 export default function UseCases() {
   return (
     <section className="relative border-b border-code-border bg-foreground bg-dots-dark">
-      <div className="max-w-[1200px] mx-auto border-x border-code-border">
+      <div className="max-w-[1200px] mx-auto">
         {/* Intro */}
         <div className="px-4 sm:px-6 py-16 sm:py-24">
           <h2 className="max-w-2xl text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.2]">
