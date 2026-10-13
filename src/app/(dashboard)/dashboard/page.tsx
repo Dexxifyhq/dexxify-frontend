@@ -166,7 +166,7 @@ export default function DashboardPage() {
         />
         <div className="lg:col-span-2">
           <AreaLineChart
-            title="Revenue Trend"
+            title="Revenue Trend (NGN)"
             description="Daily revenue over the selected period"
             data={revenueChart?.data}
             loading={chartLoading}

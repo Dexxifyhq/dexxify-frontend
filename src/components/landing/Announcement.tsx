@@ -48,11 +48,10 @@ function Ridges() {
 
 export default function Announcement() {
   return (
-    <section className="relative border-b border-border">
-      {/* Same rail container as Hero — matching max-w keeps the vertical rules
-          continuous down the page, so this width must track Hero's. The
+    <section className="relative">
+      {/* Same max-width as Hero, so content lines up across sections. The
           horizontal rule lives on the section so it spans the full viewport. */}
-      <div className="max-w-[1200px] mx-auto border-x border-border">
+      <div className="max-w-[1200px] mx-auto">
         <div className="px-4 sm:px-6 py-6 shadow-sm">
           <div className="flex flex-col overflow-hidden rounded-xl bg-foreground md:flex-row">
             {/* Copy */}

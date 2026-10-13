@@ -43,10 +43,10 @@ export default function GroupedBarChart({
       actions={
         <div className="flex items-center gap-3 text-xs text-dash-muted">
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-chart-1" /> NGN
+            <span className="h-2 w-2 rounded-full bg-tone-green" /> NGN
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-chart-2" /> Stablecoin
+            <span className="h-2 w-2 rounded-full bg-tone-blue" /> Stablecoin
           </span>
         </div>
       }
@@ -60,13 +60,13 @@ export default function GroupedBarChart({
             onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
           >
             <div
-              className="w-full rounded-t-sm bg-chart-1 transition-opacity"
+              className="w-2.5 max-w-full rounded-t-sm bg-tone-green transition-opacity"
               style={{
                 height: `${Math.max((row.ngn / max) * 100, row.ngn > 0 ? 2 : 0)}%`,
               }}
             />
             <div
-              className="w-full rounded-t-sm bg-chart-2 transition-opacity"
+              className="w-2.5 max-w-full rounded-t-sm bg-tone-blue transition-opacity"
               style={{
                 height: `${Math.max((row.stable / max) * 100, row.stable > 0 ? 2 : 0)}%`,
               }}
