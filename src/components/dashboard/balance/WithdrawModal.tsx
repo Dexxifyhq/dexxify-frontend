@@ -39,7 +39,7 @@ const TABS: { value: WithdrawTab; label: string }[] = [
 ];
 const STEPS = ["Destination", "Amount", "Review"];
 
-const STABLECOIN_FEE = "$1.00";
+const STABLECOIN_FEE = "$1.50";
 const FIAT_FEE = "₦300.00";
 
 function generateUUID() {
