@@ -39,6 +39,8 @@ const TABS: { value: WithdrawTab; label: string }[] = [
 ];
 const STEPS = ["Destination", "Amount", "Review"];
 
+const MIN_STABLECOIN_WITHDRAWAL = "$1.20";
+const MIN_FIAT_WITHDRAWAL = "₦1000";
 const STABLECOIN_FEE = "$1.50";
 const FIAT_FEE = "₦300.00";
 
@@ -274,6 +276,7 @@ export default function WithdrawModal({
                   }
                 />
               </div>
+              <Note>Minimum withdrawal is {MIN_STABLECOIN_WITHDRAWAL}.</Note>
               <Note>A {STABLECOIN_FEE} fee is deducted from your balance.</Note>
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
@@ -383,6 +386,7 @@ export default function WithdrawModal({
                   onChange={(e) => setFiatNarration(e.target.value)}
                 />
               </div>
+              <Note>Minimum withdrawal is {MIN_FIAT_WITHDRAWAL}.</Note>
               <Note>A {FIAT_FEE} fee is deducted from your balance.</Note>
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
