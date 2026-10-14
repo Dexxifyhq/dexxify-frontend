@@ -213,7 +213,7 @@ export default function CreatePaymentModal({
               {/* Customer fields */}
               <div className="flex flex-col gap-3 px-5 pb-5">
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="First Name">
+                  <Field label="First Name (Optional)">
                     <input
                       type="text"
                       value={firstName}
@@ -222,7 +222,7 @@ export default function CreatePaymentModal({
                       className={inputCls}
                     />
                   </Field>
-                  <Field label="Last Name">
+                  <Field label="Last Name (Optional)">
                     <input
                       type="text"
                       value={lastName}
@@ -342,21 +342,26 @@ export default function CreatePaymentModal({
                     Amount due
                   </p>
                   <p className="mt-1.5 flex items-baseline gap-1">
-                    <span className="text-base text-white/55">{currencySymbol}</span>
+                    <span className="text-base text-white/55">
+                      {currencySymbol}
+                    </span>
                     <span className="truncate text-3xl font-medium tracking-tight">
                       {Number(amount).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </span>
-                    <span className="ml-0.5 text-xs text-white/50">{currency}</span>
+                    <span className="ml-0.5 text-xs text-white/50">
+                      {currency}
+                    </span>
                   </p>
                   {(firstName.trim() || lastName.trim() || email.trim()) && (
                     <p className="mt-4 truncate text-xs text-white/60">
                       For{" "}
                       <span className="font-medium text-white/85">
-                        {[firstName, lastName].filter((s) => s.trim()).join(" ") ||
-                          email}
+                        {[firstName, lastName]
+                          .filter((s) => s.trim())
+                          .join(" ") || email}
                       </span>
                     </p>
                   )}
