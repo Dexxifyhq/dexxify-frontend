@@ -34,7 +34,17 @@ export function shortAddress(s: string) {
 // ── Asset logos ──────────────────────────────────────────────────────────────
 
 const CRYPTO_LOGOS = new Set([
-  "ada", "avax", "bnb", "btc", "dot", "eth", "ltc", "matic", "sol", "usdc", "usdt",
+  "ada",
+  "avax",
+  "bnb",
+  "btc",
+  "dot",
+  "eth",
+  "ltc",
+  "matic",
+  "sol",
+  "usdc",
+  "usdt",
 ]);
 
 function logoFor(symbol: string): string | null {
@@ -172,7 +182,9 @@ export function Segmented<T extends string>({
     <div
       role="tablist"
       className="relative grid h-10 rounded-full bg-dash-bg p-1 shadow-[inset_0_2px_5px_rgb(0_0_0/0.10),inset_0_-1px_1px_rgb(255_255_255/0.9)]"
-      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+      style={{
+        gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+      }}
     >
       <span
         aria-hidden
@@ -220,7 +232,10 @@ export function Stepper({
         return (
           <li
             key={label}
-            className={cn("flex items-center gap-2", i < steps.length - 1 && "flex-1")}
+            className={cn(
+              "flex items-center gap-2",
+              i < steps.length - 1 && "flex-1",
+            )}
           >
             <span
               className={cn(
@@ -235,7 +250,9 @@ export function Stepper({
             <span
               className={cn(
                 "whitespace-nowrap text-xs",
-                active ? "font-semibold text-dash-foreground" : "text-dash-muted",
+                active
+                  ? "font-semibold text-dash-foreground"
+                  : "text-dash-muted",
               )}
             >
               {label}
@@ -357,7 +374,10 @@ export function CurrencyPicker({
         {value}
         <ChevronDown
           size={14}
-          className={cn("text-dash-faint transition-transform", open && "rotate-180")}
+          className={cn(
+            "text-dash-faint transition-transform",
+            open && "rotate-180",
+          )}
         />
       </button>
       {open && (
@@ -379,7 +399,9 @@ export function CurrencyPicker({
               >
                 <AssetLogo symbol={o} className="h-5 w-5" />
                 <span className="flex-1 text-left">{o}</span>
-                {o === value && <Check size={14} className="text-dash-foreground" />}
+                {o === value && (
+                  <Check size={14} className="text-dash-foreground" />
+                )}
               </button>
             </li>
           ))}
@@ -485,7 +507,7 @@ export function Note({
   return (
     <p
       className={cn(
-        "flex items-start gap-2 rounded-xl px-3 py-2.5 text-xs",
+        "flex items-start gap-2 rounded-xl px-3 text-xs",
         tone === "warning"
           ? "border border-dash-warning-border bg-dash-warning-bg text-dash-warning"
           : "bg-dash-bg text-dash-muted",
