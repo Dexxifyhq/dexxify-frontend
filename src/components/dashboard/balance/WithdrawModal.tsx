@@ -44,14 +44,6 @@ const MIN_FIAT_WITHDRAWAL = "₦1000";
 const STABLECOIN_FEE = "$1.50";
 const FIAT_FEE = "₦300.00";
 
-function generateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
 export default function WithdrawModal({
   open,
   onClose,
@@ -109,7 +101,7 @@ export default function WithdrawModal({
         amount: Number(scAmount),
         network: scNetwork,
         token: scToken,
-        externalId: generateUUID(),
+        externalId: crypto.randomUUID(),
       });
       setScSuccess(true);
     } catch {
