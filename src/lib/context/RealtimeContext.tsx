@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { API_BASE } from "@/lib/api-client";
+import { API_BASE, refreshAccessToken } from "@/lib/api-client";
 import { useProfile } from "@/lib/hooks/auth/useProfile";
 import {
   REALTIME_EVENT_TYPES,
@@ -94,12 +94,10 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!mode) return;
 
-    const source = new EventSource(`${API_BASE}/realtime/events`, {
-      withCredentials: true,
-    });
-
-    source.onopen = () => setConnected(true);
-    source.onerror = () => setConnected(false);
+    let cancelled = false;
+    let source: EventSource | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let cleanupListeners: (() => void) | null = null;
 
     const scheduleInvalidate = () => {
       if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
@@ -110,38 +108,66 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       }, INVALIDATE_DEBOUNCE_MS);
     };
 
-    const cleanups = REALTIME_EVENT_TYPES.map((eventType) => {
-      const handler = (event: MessageEvent) => {
-        let data: Record<string, unknown> = {};
-        try {
-          const raw = event.data as string;
-          data = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
-        } catch {
-          // non-JSON payload — ignore, still route/invalidate below
-        }
+    const connect = () => {
+      const es = new EventSource(`${API_BASE}/realtime/events`, {
+        withCredentials: true,
+      });
+      source = es;
 
-        listenersRef.current
-          .get(eventType)
-          ?.forEach((listener) => listener(data));
+      es.onopen = () => setConnected(true);
 
-        const toastConfig = TOAST_EVENTS[eventType];
-        if (toastConfig) {
-          toast[toastConfig.variant](toastConfig.title, {
-            description: describeEvent(data),
+      es.onerror = () => {
+        setConnected(false);
+        if (cancelled) return;
+
+        if (es.readyState === EventSource.CLOSED) {
+          es.close();
+          void refreshAccessToken().then((refreshed) => {
+            if (cancelled || !refreshed) return;
+            reconnectTimer = setTimeout(connect, 500);
           });
         }
-
-        scheduleInvalidate();
       };
 
-      source.addEventListener(eventType, handler);
-      return () => source.removeEventListener(eventType, handler);
-    });
+      const cleanups = REALTIME_EVENT_TYPES.map((eventType) => {
+        const handler = (event: MessageEvent) => {
+          let data: Record<string, unknown> = {};
+          try {
+            const raw = event.data as string;
+            data = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+          } catch {
+            // non-JSON payload — ignore, still route/invalidate below
+          }
+
+          listenersRef.current
+            .get(eventType)
+            ?.forEach((listener) => listener(data));
+
+          const toastConfig = TOAST_EVENTS[eventType];
+          if (toastConfig) {
+            toast[toastConfig.variant](toastConfig.title, {
+              description: describeEvent(data),
+            });
+          }
+
+          scheduleInvalidate();
+        };
+
+        es.addEventListener(eventType, handler);
+        return () => es.removeEventListener(eventType, handler);
+      });
+
+      cleanupListeners = () => cleanups.forEach((cleanup) => cleanup());
+    };
+
+    connect();
 
     return () => {
-      cleanups.forEach((cleanup) => cleanup());
+      cancelled = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
       if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
-      source.close();
+      cleanupListeners?.();
+      source?.close();
       setConnected(false);
     };
   }, [mode, qc]);
