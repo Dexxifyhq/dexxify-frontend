@@ -54,6 +54,9 @@ const INVALIDATE_ON_EVENT = [
 // for one payment) should trigger one refetch pass, not one per event.
 const INVALIDATE_DEBOUNCE_MS = 400;
 
+const MAX_RECONNECT_ATTEMPTS = 3;
+const RECONNECT_BASE_DELAY_MS = 500;
+
 const TOAST_EVENTS: Partial<
   Record<RealtimeEventType, { variant: "success" | "error"; title: string }>
 > = {
@@ -98,6 +101,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     let source: EventSource | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     let cleanupListeners: (() => void) | null = null;
+    let consecutiveFailures = 0;
 
     const scheduleInvalidate = () => {
       if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
@@ -114,7 +118,10 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       });
       source = es;
 
-      es.onopen = () => setConnected(true);
+      es.onopen = () => {
+        setConnected(true);
+        consecutiveFailures = 0;
+      };
 
       es.onerror = () => {
         setConnected(false);
@@ -122,9 +129,20 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
         if (es.readyState === EventSource.CLOSED) {
           es.close();
+
+          if (consecutiveFailures >= MAX_RECONNECT_ATTEMPTS) {
+            console.warn(
+              "[realtime] giving up after repeated connection failures — check auth/business context",
+            );
+            return;
+          }
+          consecutiveFailures += 1;
+
           void refreshAccessToken().then((refreshed) => {
             if (cancelled || !refreshed) return;
-            reconnectTimer = setTimeout(connect, 500);
+            const delay =
+              RECONNECT_BASE_DELAY_MS * 2 ** (consecutiveFailures - 1);
+            reconnectTimer = setTimeout(connect, delay);
           });
         }
       };
