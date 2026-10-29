@@ -67,6 +67,7 @@ export default function WithdrawModal({
   const [fiatAmount, setFiatAmount] = useState("");
   const [fiatNarration, setFiatNarration] = useState("");
   const [fiatSuccess, setFiatSuccess] = useState(false);
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
 
   const withdrawStableCoin = useWithdrawStableCoin();
   const withdrawFiat = useWithdrawFiat();
@@ -76,9 +77,7 @@ export default function WithdrawModal({
 
   const addressList = (savedAddresses as WithdrawalAddress[] | undefined) ?? [];
   const bankList = (savedBanks as SavedBank[] | undefined) ?? [];
-  const selectedBank = bankList.find(
-    (b) => b.provider_recipient_id === fiatBankId,
-  );
+  const selectedBank = bankList.find((b) => b.id === fiatBankId);
 
   const handleClose = useCallback(() => {
     setStep(0);
@@ -323,14 +322,25 @@ export default function WithdrawModal({
                     {bankList.map((bank) => (
                       <OptionRow
                         key={bank.id}
-                        selected={fiatBankId === bank.provider_recipient_id}
-                        onSelect={() =>
-                          setFiatBankId(bank.provider_recipient_id)
-                        }
+                        selected={fiatBankId === bank.id}
+                        onSelect={() => setFiatBankId(bank.id)}
                         leading={
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
-                            <Landmark size={15} />
-                          </span>
+                          bank.logo_url && !brokenLogos.has(bank.logo_url) ? (
+                            <img
+                              src={bank.logo_url}
+                              alt=""
+                              className="h-8 w-8 shrink-0 rounded-full bg-dash-hover object-contain"
+                              onError={() =>
+                                setBrokenLogos((s) =>
+                                  new Set(s).add(bank.logo_url),
+                                )
+                              }
+                            />
+                          ) : (
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+                              <Landmark size={15} />
+                            </span>
+                          )
                         }
                         title={bank.account_name}
                         subtitle={`${bank.bank_name} · ${bank.account_number}`}

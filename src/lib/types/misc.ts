@@ -2,15 +2,13 @@
 
 export interface Bank {
   name: string;
-  slug: string;
   code: string;
-  country: string;
+  nipCode: string;
+  logo: string;
 }
 
 export interface SavedBank {
   id: string;
-  provider_recipient_id: string;
-  developer_id: string;
   bank_name: string;
   account_number: string;
   account_name: string;
@@ -20,6 +18,7 @@ export interface SavedBank {
   label: string | null;
   is_trusted: boolean;
   primary: boolean;
+  logo_url: string;
   created_at: string;
   updated_at: string;
 }
@@ -27,12 +26,10 @@ export interface SavedBank {
 export interface BankVerification {
   valid: boolean;
   type: string;
-  resolved: {
-    accountName: string;
-    bankName: string;
-    bankCode: string;
-    accountNumber: string;
-  };
+  accountName: string;
+  bankName: string;
+  bankCode: string;
+  accountNumber: string;
 }
 
 // ── Crypto assets ──────────────────────────────────────────────────────────

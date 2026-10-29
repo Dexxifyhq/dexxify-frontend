@@ -28,9 +28,7 @@ export default function LinkBankModal({
   onSuccess,
 }: LinkBankModalProps) {
   const { data: banksData } = useBanks();
-  // console.log(banksData);
-  // Response shape after unwrap: { banks: {data: Bank[]}, cached: boolean }
-  const bankList: Bank[] = banksData?.banks?.data ?? [];
+  const bankList: Bank[] = banksData?.banks ?? [];
 
   const verifyBank = useVerifyBank();
   const saveBank = useSaveBank();
@@ -43,6 +41,7 @@ export default function LinkBankModal({
   // const [isDefault, setIsDefault] = useState(false);
   const [verifiedName, setVerifiedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const filtered = search.trim()
@@ -116,7 +115,8 @@ export default function LinkBankModal({
       { accountNumber: accountNumber.trim(), bankCode: selectedBank.code },
       {
         onSuccess: (res) => {
-          const name = res.resolved?.accountName;
+          console.log(res);
+          const name = res?.accountName;
           if (name) {
             setVerifiedName(name);
           } else {
@@ -242,10 +242,24 @@ export default function LinkBankModal({
                                 : "text-dash-muted"
                             }`}
                           >
+                            {bank.logo && !brokenLogos.has(bank.logo) ? (
+                              <img
+                                src={bank.logo}
+                                alt=""
+                                className="h-5 w-5 shrink-0 rounded-full object-contain"
+                                onError={() =>
+                                  setBrokenLogos((s) =>
+                                    new Set(s).add(bank.logo),
+                                  )
+                                }
+                              />
+                            ) : (
+                              <Landmark
+                                size={14}
+                                className="shrink-0 text-dash-faint"
+                              />
+                            )}
                             <span className="truncate">{bank.name}</span>
-                            <span className="ml-auto shrink-0 font-mono text-[10px] text-dash-faint">
-                              {bank.code}
-                            </span>
                           </button>
                         </li>
                       ))

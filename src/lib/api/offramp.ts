@@ -17,7 +17,7 @@ export type WalletAsset =
 export interface CreateOfframpDto {
   crypto_asset: WalletAsset;
   crypto_amount: number;
-  recipient_id: string;
+  bank_id: string;
   metadata?: Record<string, unknown>;
 }
 
