@@ -126,10 +126,7 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
       const t = Date.now();
       setNow(t);
       setQuoteWindow(
-        Math.max(
-          0,
-          Math.round((new Date(q.expiresAt).getTime() - t) / 1000),
-        ),
+        Math.max(0, Math.round((new Date(q.expiresAt).getTime() - t) / 1000)),
       );
       setQuotation(q);
       setStep("quotation");
@@ -170,8 +167,14 @@ function CryptoSwapFlow({ onDone }: { onDone: () => void }) {
       >
         <Summary
           rows={[
-            { label: "You paid", value: `${fmt(quotation.sourceAmount)} ${quotation.fromCurrency}` },
-            { label: "You received", value: `${fmt(quotation.targetAmount)} ${quotation.toCurrency}` },
+            {
+              label: "You paid",
+              value: `${fmt(quotation.sourceAmount)} ${quotation.fromCurrency}`,
+            },
+            {
+              label: "You received",
+              value: `${fmt(quotation.targetAmount)} ${quotation.toCurrency}`,
+            },
           ]}
         />
       </SuccessState>
@@ -349,18 +352,17 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState(0);
   const [cryptoAsset, setCryptoAsset] = useState<WalletAsset>("USDT");
   const [cryptoAmount, setCryptoAmount] = useState("");
-  const [recipientId, setRecipientId] = useState("");
+  const [bankId, setBankId] = useState("");
   const [success, setSuccess] = useState(false);
   const [belowMinError, setBelowMinError] = useState<string | null>(null);
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
 
   const { data: savedBanks, isLoading: banksLoading } = useSavedBanks();
   const createOfframp = useCreateOfframp();
   const available = useAvailable();
 
   const bankList: SavedBank[] = (savedBanks as SavedBank[] | undefined) ?? [];
-  const selectedBank = bankList.find(
-    (b) => b.provider_recipient_id === recipientId,
-  );
+  const selectedBank = bankList.find((b) => b.id === bankId);
 
   const belowMin = () => {
     if (Number(cryptoAmount) < MIN_OFFRAMP_USD) {
@@ -379,7 +381,7 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
       await createOfframp.mutateAsync({
         crypto_asset: cryptoAsset,
         crypto_amount: Number(cryptoAmount),
-        recipient_id: recipientId,
+        bank_id: bankId,
       });
       setSuccess(true);
     } catch {
@@ -405,7 +407,7 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
               label: "To",
               value: selectedBank
                 ? `${selectedBank.bank_name} · ${selectedBank.account_number}`
-                : recipientId,
+                : bankId,
             },
           ]}
         />
@@ -474,12 +476,24 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
                 {bankList.map((bank) => (
                   <OptionRow
                     key={bank.id}
-                    selected={recipientId === bank.provider_recipient_id}
-                    onSelect={() => setRecipientId(bank.provider_recipient_id)}
+                    selected={bankId === bank.id}
+                    onSelect={() => setBankId(bank.id)}
                     leading={
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
-                        <Landmark size={15} />
-                      </span>
+                      bank.logo_url && !brokenLogos.has(bank.logo_url) ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- remote bank logos, arbitrary host
+                        <img
+                          src={bank.logo_url}
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-full bg-dash-hover object-contain"
+                          onError={() =>
+                            setBrokenLogos((s) => new Set(s).add(bank.logo_url))
+                          }
+                        />
+                      ) : (
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+                          <Landmark size={15} />
+                        </span>
+                      )
                     }
                     title={bank.account_name}
                     subtitle={`${bank.bank_name} · ${bank.account_number}`}
@@ -488,17 +502,14 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
               </div>
             ) : (
               <TextInput
-                placeholder="Recipient ID"
-                value={recipientId}
-                onChange={(e) => setRecipientId(e.target.value)}
+                placeholder="Bank ID"
+                value={bankId}
+                onChange={(e) => setBankId(e.target.value)}
               />
             )}
           </div>
           <StepActions onBack={() => setStep(0)}>
-            <PrimaryButton
-              disabled={!recipientId.trim()}
-              onClick={() => setStep(2)}
-            >
+            <PrimaryButton disabled={!bankId.trim()} onClick={() => setStep(2)}>
               Continue
             </PrimaryButton>
           </StepActions>
@@ -511,7 +522,7 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
             rows={[
               {
                 label: "To",
-                value: selectedBank ? selectedBank.account_name : recipientId,
+                value: selectedBank ? selectedBank.account_name : bankId,
               },
               ...(selectedBank
                 ? [
