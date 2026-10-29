@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { useCountdown } from "@/lib/hooks/useCountdown";
 import { PaymentResultIcon } from "@/components/pay/hosted-pay";
+import { AuthBands } from "@/components/ui/auth-bands";
 
 type Step = "form" | "deposit" | "error";
 
@@ -318,7 +319,18 @@ export default function PublicPaymentPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-dash-bg p-4">
+    <div className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden bg-dash-bg p-4">
+      {/* Decorative background band, right side only — ties the public
+          checkout to the same brand bands used on the auth pages. Purely
+          decorative, so it's aria-hidden and sits behind the card. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 overflow-hidden text-dash-border-strong lg:block"
+      >
+        <AuthBands />
+      </div>
+
+      <div className="relative z-10 flex w-full flex-col items-center">
       <p className="mb-8 text-sm font-semibold uppercase tracking-widest text-dash-muted">
         Dexxify
       </p>
@@ -583,6 +595,7 @@ export default function PublicPaymentPage() {
         {/* eslint-disable-next-line @next/next/no-img-element -- static brand wordmark */}
         <img src="/logo-set/dexxify-tight.png" alt="Dexxify" className="h-3.5 w-auto" />
       </p>
+      </div>
     </div>
   );
 }

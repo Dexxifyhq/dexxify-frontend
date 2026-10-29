@@ -480,7 +480,6 @@ function OfframpFlow({ onDone }: { onDone: () => void }) {
                     onSelect={() => setBankId(bank.id)}
                     leading={
                       bank.logo_url && !brokenLogos.has(bank.logo_url) ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- remote bank logos, arbitrary host
                         <img
                           src={bank.logo_url}
                           alt=""

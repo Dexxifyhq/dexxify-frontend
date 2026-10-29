@@ -19,6 +19,7 @@ import {
 import type { FlatAsset } from "@/lib/utils/assets";
 import WalletQRCode from "@/components/ui/WalletQRCode";
 import { AssetLogo } from "@/components/dashboard/balance/modal-kit";
+import { AuthBands } from "@/components/ui/auth-bands";
 import { cn } from "@/utils/utils";
 
 // The Dexxify D, cut from the transparent logo as a mask so a watermark can
@@ -55,20 +56,23 @@ export function HostedPayShell({
       />
 
       <section className="relative isolate overflow-hidden px-4 pt-10 sm:pt-14 lg:h-screen lg:p-0 print:block print:h-auto">
+        {/* Brand bands, behind the D-mark watermark below — same ambient
+            background used on the public checkout/payment pages. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-28 -left-24 -z-10 hidden h-120 w-120 rotate-12 bg-black/6 lg:block print:hidden"
-          style={WATERMARK_MASK}
-        />
+          className="pointer-events-none absolute inset-0 -z-10 hidden overflow-hidden text-dash-border-strong lg:block print:hidden"
+        >
+          <AuthBands />
+        </div>
         <div className="lg:flex lg:h-full lg:overflow-y-auto lg:px-10 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
-          <div className="mx-auto w-full max-w-md lg:my-auto lg:ml-auto lg:mr-0 lg:py-10">
+          <div className="mx-auto w-full max-w-md lg:my-auto lg:py-10">
             {summary}
           </div>
         </div>
       </section>
 
       <section className="px-4 pb-10 pt-4 sm:pb-14 lg:flex lg:h-screen lg:overflow-y-auto lg:px-10 lg:py-0 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden print:hidden">
-        <div className="mx-auto w-full max-w-md lg:my-auto lg:ml-0 lg:mr-auto lg:py-6">
+        <div className="mx-auto w-full max-w-md lg:my-auto lg:py-10">
           {payment}
           <p className="mt-8 flex items-center justify-center gap-2 text-sm text-dash-muted">
             Powered by
