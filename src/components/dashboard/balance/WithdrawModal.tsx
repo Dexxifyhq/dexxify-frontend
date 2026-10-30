@@ -111,7 +111,7 @@ export default function WithdrawModal({
   const handleFiatSubmit = async () => {
     try {
       await withdrawFiat.mutateAsync({
-        recipient_id: fiatBankId,
+        bank_id: fiatBankId,
         amount: Number(fiatAmount),
         narration: fiatNarration || undefined,
       });
