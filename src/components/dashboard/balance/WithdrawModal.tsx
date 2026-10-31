@@ -85,6 +85,9 @@ export default function WithdrawModal({
   const bankList = (savedBanks as SavedBank[] | undefined) ?? [];
   const selectedBank = bankList.find((b) => b.id === fiatBankId);
 
+  let scError;
+  let fiatError;
+
   const handleClose = useCallback(() => {
     setStep(0);
     setScSuccess(false);
@@ -100,6 +103,14 @@ export default function WithdrawModal({
   };
 
   const handleStablecoinSubmit = async () => {
+    if (
+      !scAmount ||
+      Number(scAmount) <
+        MIN_STABLECOIN_WITHDRAWAL_AMOUNT + STABLECOIN_FEE_AMOUNT
+    ) {
+      scError = "Insufficient balance to process withdrawal";
+      return;
+    }
     try {
       await withdrawStableCoin.mutateAsync({
         address: scAddress,
@@ -115,6 +126,13 @@ export default function WithdrawModal({
   };
 
   const handleFiatSubmit = async () => {
+    if (
+      !fiatAmount ||
+      Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT + FIAT_FEE_AMOUNT
+    ) {
+      fiatError = "Insufficient balance to process withdrawal";
+      return;
+    }
     try {
       await withdrawFiat.mutateAsync({
         bank_id: fiatBankId,
@@ -127,23 +145,23 @@ export default function WithdrawModal({
     }
   };
 
-  const scError =
+  scError =
     withdrawStableCoin.error instanceof Error
       ? withdrawStableCoin.error.message
       : null;
-  const fiatError =
+  fiatError =
     withdrawFiat.error instanceof Error ? withdrawFiat.error.message : null;
 
   const scAmountError =
     scAmount.trim() !== "" &&
     Number(scAmount) > 0 &&
-    Number(scAmount) < MIN_STABLECOIN_WITHDRAWAL_AMOUNT + STABLECOIN_FEE_AMOUNT
+    Number(scAmount) < MIN_STABLECOIN_WITHDRAWAL_AMOUNT
       ? `Minimum withdrawal is ${MIN_STABLECOIN_WITHDRAWAL}.`
       : null;
   const fiatAmountError =
     fiatAmount.trim() !== "" &&
     Number(fiatAmount) > 0 &&
-    Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT + FIAT_FEE_AMOUNT
+    Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT
       ? `Minimum withdrawal is ${MIN_FIAT_WITHDRAWAL}.`
       : null;
 
@@ -284,7 +302,10 @@ export default function WithdrawModal({
                   disabled={
                     !(Number(scAmount) >= MIN_STABLECOIN_WITHDRAWAL_AMOUNT)
                   }
-                  onClick={() => setStep(2)}
+                  onClick={() => {
+                    scError = null;
+                    setStep(2);
+                  }}
                 >
                   Continue
                 </PrimaryButton>
@@ -406,7 +427,10 @@ export default function WithdrawModal({
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
                   disabled={!(Number(fiatAmount) >= MIN_FIAT_WITHDRAWAL_AMOUNT)}
-                  onClick={() => setStep(2)}
+                  onClick={() => {
+                    fiatError = null;
+                    setStep(2);
+                  }}
                 >
                   Continue
                 </PrimaryButton>
