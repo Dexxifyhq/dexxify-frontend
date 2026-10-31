@@ -15,6 +15,7 @@ export const REALTIME_EVENT_TYPES = [
   "offramp.failed",
   "payout.created",
   "payout.success",
+  "payout.processing",
   "payout.failed",
   "refund.created",
   "refund.success",

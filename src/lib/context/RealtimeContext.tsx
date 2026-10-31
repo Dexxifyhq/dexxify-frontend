@@ -66,6 +66,7 @@ const TOAST_EVENTS: Partial<
   "deposit.confirmed": { variant: "success", title: "Deposit confirmed" },
   "deposit.failed": { variant: "error", title: "Deposit failed" },
   "payout.success": { variant: "success", title: "Payout sent" },
+  "payout.processing": { variant: "success", title: "Payout processing" },
   "payout.failed": { variant: "error", title: "Payout failed" },
   "swap.completed": { variant: "success", title: "Swap completed" },
   "swap.failed": { variant: "error", title: "Swap failed" },
