@@ -85,9 +85,6 @@ export default function WithdrawModal({
   const bankList = (savedBanks as SavedBank[] | undefined) ?? [];
   const selectedBank = bankList.find((b) => b.id === fiatBankId);
 
-  let scError;
-  let fiatError;
-
   const handleClose = useCallback(() => {
     setStep(0);
     setScSuccess(false);
@@ -103,14 +100,6 @@ export default function WithdrawModal({
   };
 
   const handleStablecoinSubmit = async () => {
-    if (
-      !scAmount ||
-      Number(scAmount) <
-        MIN_STABLECOIN_WITHDRAWAL_AMOUNT + STABLECOIN_FEE_AMOUNT
-    ) {
-      scError = "Insufficient balance to process withdrawal";
-      return;
-    }
     try {
       await withdrawStableCoin.mutateAsync({
         address: scAddress,
@@ -126,13 +115,6 @@ export default function WithdrawModal({
   };
 
   const handleFiatSubmit = async () => {
-    if (
-      !fiatAmount ||
-      Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT + FIAT_FEE_AMOUNT
-    ) {
-      fiatError = "Insufficient balance to process withdrawal";
-      return;
-    }
     try {
       await withdrawFiat.mutateAsync({
         bank_id: fiatBankId,
@@ -145,11 +127,11 @@ export default function WithdrawModal({
     }
   };
 
-  scError =
+  const scError =
     withdrawStableCoin.error instanceof Error
       ? withdrawStableCoin.error.message
       : null;
-  fiatError =
+  const fiatError =
     withdrawFiat.error instanceof Error ? withdrawFiat.error.message : null;
 
   const scAmountError =
@@ -165,12 +147,23 @@ export default function WithdrawModal({
       ? `Minimum withdrawal is ${MIN_FIAT_WITHDRAWAL}.`
       : null;
 
-  // Available balance for the token being withdrawn, when the ledger tracks it.
   const tokenKey = scToken.toLowerCase();
   const scAvailable =
     tokenKey === "usdt" || tokenKey === "usdc"
       ? balance?.[tokenKey].balance
       : undefined;
+  const fiatAvailable = balance?.ngn.balance;
+
+  const scInsufficientBalance =
+    scAvailable !== undefined &&
+    Number(scAmount) + STABLECOIN_FEE_AMOUNT > scAvailable
+      ? `Insufficient balance. You need ${fmt(Number(scAmount) + STABLECOIN_FEE_AMOUNT)} ${scToken} (incl. fee) but have ${fmt(scAvailable)} ${scToken}.`
+      : null;
+  const fiatInsufficientBalance =
+    fiatAvailable !== undefined &&
+    Number(fiatAmount) + FIAT_FEE_AMOUNT > fiatAvailable
+      ? `Insufficient balance. You need ₦${fmt(Number(fiatAmount) + FIAT_FEE_AMOUNT)} (incl. fee) but have ₦${fmt(fiatAvailable)}.`
+      : null;
 
   const success = tab === "stablecoin" ? scSuccess : fiatSuccess;
 
@@ -299,13 +292,8 @@ export default function WithdrawModal({
               <ErrorNote message={scAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={
-                    !(Number(scAmount) >= MIN_STABLECOIN_WITHDRAWAL_AMOUNT)
-                  }
-                  onClick={() => {
-                    scError = null;
-                    setStep(2);
-                  }}
+                  disabled={!!scInsufficientBalance}
+                  onClick={() => setStep(2)}
                 >
                   Continue
                 </PrimaryButton>
@@ -333,9 +321,10 @@ export default function WithdrawModal({
                   },
                 ]}
               />
-              <ErrorNote message={scError} />
+              <ErrorNote message={scError ?? scInsufficientBalance} />
               <StepActions onBack={() => setStep(1)}>
                 <PrimaryButton
+                  disabled={!!scInsufficientBalance}
                   loading={withdrawStableCoin.isPending}
                   onClick={handleStablecoinSubmit}
                 >
@@ -426,11 +415,8 @@ export default function WithdrawModal({
               <ErrorNote message={fiatAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={!(Number(fiatAmount) >= MIN_FIAT_WITHDRAWAL_AMOUNT)}
-                  onClick={() => {
-                    fiatError = null;
-                    setStep(2);
-                  }}
+                  disabled={!!fiatInsufficientBalance}
+                  onClick={() => setStep(2)}
                 >
                   Continue
                 </PrimaryButton>
@@ -467,9 +453,10 @@ export default function WithdrawModal({
                   },
                 ]}
               />
-              <ErrorNote message={fiatError} />
+              <ErrorNote message={fiatError ?? fiatInsufficientBalance} />
               <StepActions onBack={() => setStep(1)}>
                 <PrimaryButton
+                  disabled={!!fiatInsufficientBalance}
                   loading={withdrawFiat.isPending}
                   onClick={handleFiatSubmit}
                 >
