@@ -41,8 +41,10 @@ const STEPS = ["Destination", "Amount", "Review"];
 
 // CC MIN_STABLECOIN_WITHDRAWAL = 1.2
 // CC MIN_FIAT_WITHDRAWAL = 1000
-const MIN_STABLECOIN_WITHDRAWAL_AMOUNT = 2.0;
+const MIN_STABLECOIN_WITHDRAWAL_AMOUNT = 2;
 const MIN_FIAT_WITHDRAWAL_AMOUNT = 2000;
+const FIAT_FEE_AMOUNT = 400;
+const STABLECOIN_FEE_AMOUNT = 1.5;
 const MIN_STABLECOIN_WITHDRAWAL = "$2.00";
 const MIN_FIAT_WITHDRAWAL = "₦2000";
 const STABLECOIN_FEE = "$1.50";
@@ -135,13 +137,13 @@ export default function WithdrawModal({
   const scAmountError =
     scAmount.trim() !== "" &&
     Number(scAmount) > 0 &&
-    Number(scAmount) < MIN_STABLECOIN_WITHDRAWAL_AMOUNT
+    Number(scAmount) < MIN_STABLECOIN_WITHDRAWAL_AMOUNT + STABLECOIN_FEE_AMOUNT
       ? `Minimum withdrawal is ${MIN_STABLECOIN_WITHDRAWAL}.`
       : null;
   const fiatAmountError =
     fiatAmount.trim() !== "" &&
     Number(fiatAmount) > 0 &&
-    Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT
+    Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT + FIAT_FEE_AMOUNT
       ? `Minimum withdrawal is ${MIN_FIAT_WITHDRAWAL}.`
       : null;
 
@@ -229,22 +231,12 @@ export default function WithdrawModal({
                   </div>
                 </div>
               )}
-              {/* <div>
+              <div>
                 <FieldLabel>
-                  {addressList.length > 0
-                    ? "Or enter an address"
-                    : "Destination address"}
+                  {addressList.length === 0 &&
+                    "Please add a wallet address for withdrawal"}
                 </FieldLabel>
-                <TextInput
-                  placeholder="0x…"
-                  value={scAddress}
-                  onChange={(e) => {
-                    setScAddress(e.target.value);
-                    setScLabel("");
-                  }}
-                  className="font-mono"
-                />
-              </div> */}
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <FieldLabel>Network</FieldLabel>
@@ -290,7 +282,10 @@ export default function WithdrawModal({
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
                   disabled={
-                    !(Number(scAmount) >= MIN_STABLECOIN_WITHDRAWAL_AMOUNT)
+                    !(
+                      Number(scAmount) >=
+                      MIN_STABLECOIN_WITHDRAWAL_AMOUNT + STABLECOIN_FEE_AMOUNT
+                    )
                   }
                   onClick={() => setStep(2)}
                 >
@@ -413,7 +408,12 @@ export default function WithdrawModal({
               <ErrorNote message={fiatAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={!(Number(fiatAmount) >= MIN_FIAT_WITHDRAWAL_AMOUNT)}
+                  disabled={
+                    !(
+                      Number(fiatAmount) >=
+                      MIN_FIAT_WITHDRAWAL_AMOUNT + FIAT_FEE_AMOUNT
+                    )
+                  }
                   onClick={() => setStep(2)}
                 >
                   Continue
