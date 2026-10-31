@@ -282,10 +282,7 @@ export default function WithdrawModal({
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
                   disabled={
-                    !(
-                      Number(scAmount) >=
-                      MIN_STABLECOIN_WITHDRAWAL_AMOUNT + STABLECOIN_FEE_AMOUNT
-                    )
+                    !(Number(scAmount) >= MIN_STABLECOIN_WITHDRAWAL_AMOUNT)
                   }
                   onClick={() => setStep(2)}
                 >
@@ -408,12 +405,7 @@ export default function WithdrawModal({
               <ErrorNote message={fiatAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={
-                    !(
-                      Number(fiatAmount) >=
-                      MIN_FIAT_WITHDRAWAL_AMOUNT + FIAT_FEE_AMOUNT
-                    )
-                  }
+                  disabled={!(Number(fiatAmount) >= MIN_FIAT_WITHDRAWAL_AMOUNT)}
                   onClick={() => setStep(2)}
                 >
                   Continue
