@@ -39,6 +39,8 @@ const TABS: { value: WithdrawTab; label: string }[] = [
 ];
 const STEPS = ["Destination", "Amount", "Review"];
 
+const MIN_STABLECOIN_WITHDRAWAL_AMOUNT = 1.2;
+const MIN_FIAT_WITHDRAWAL_AMOUNT = 1000;
 const MIN_STABLECOIN_WITHDRAWAL = "$1.20";
 const MIN_FIAT_WITHDRAWAL = "₦1000";
 const STABLECOIN_FEE = "$1.50";
@@ -127,6 +129,19 @@ export default function WithdrawModal({
       : null;
   const fiatError =
     withdrawFiat.error instanceof Error ? withdrawFiat.error.message : null;
+
+  const scAmountError =
+    scAmount.trim() !== "" &&
+    Number(scAmount) > 0 &&
+    Number(scAmount) < MIN_STABLECOIN_WITHDRAWAL_AMOUNT
+      ? `Minimum withdrawal is ${MIN_STABLECOIN_WITHDRAWAL}.`
+      : null;
+  const fiatAmountError =
+    fiatAmount.trim() !== "" &&
+    Number(fiatAmount) > 0 &&
+    Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT
+      ? `Minimum withdrawal is ${MIN_FIAT_WITHDRAWAL}.`
+      : null;
 
   // Available balance for the token being withdrawn, when the ledger tracks it.
   const tokenKey = scToken.toLowerCase();
@@ -269,9 +284,12 @@ export default function WithdrawModal({
               </div>
               <Note>Minimum withdrawal is {MIN_STABLECOIN_WITHDRAWAL}.</Note>
               <Note>A {STABLECOIN_FEE} fee is deducted from your balance.</Note>
+              <ErrorNote message={scAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={!(Number(scAmount) > 0)}
+                  disabled={
+                    !(Number(scAmount) >= MIN_STABLECOIN_WITHDRAWAL_AMOUNT)
+                  }
                   onClick={() => setStep(2)}
                 >
                   Continue
@@ -390,9 +408,10 @@ export default function WithdrawModal({
               </div>
               <Note>Minimum withdrawal is {MIN_FIAT_WITHDRAWAL}.</Note>
               <Note>A {FIAT_FEE} fee is deducted from your balance.</Note>
+              <ErrorNote message={fiatAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={!(Number(fiatAmount) > 0)}
+                  disabled={!(Number(fiatAmount) >= MIN_FIAT_WITHDRAWAL_AMOUNT)}
                   onClick={() => setStep(2)}
                 >
                   Continue
