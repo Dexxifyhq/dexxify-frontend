@@ -42,7 +42,7 @@ const STEPS = ["Destination", "Amount", "Review"];
 const MIN_STABLECOIN_WITHDRAWAL = "$1.20";
 const MIN_FIAT_WITHDRAWAL = "₦1000";
 const STABLECOIN_FEE = "$1.50";
-const FIAT_FEE = "₦300.00";
+const FIAT_FEE = "₦400.00";
 
 export default function WithdrawModal({
   open,
