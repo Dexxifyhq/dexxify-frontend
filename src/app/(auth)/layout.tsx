@@ -4,6 +4,7 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import { AuthCodePanel } from "@/components/ui/auth";
 import { AuthBands } from "@/components/ui/auth-bands";
+import SiteAnalytics from "@/components/analytics/SiteAnalytics";
 
 export const metadata: Metadata = {
   title: {
@@ -64,6 +65,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <AuthCodePanel />
         </div>
       </aside>
+      <SiteAnalytics />
     </div>
   );
 }

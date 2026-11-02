@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/utils";
 import { authApi } from "@/lib/auth-api";
+import { resetAnalytics } from "@/components/analytics/PostHogAnalytics";
 import { toast } from "sonner";
 import {
   useMyBusiness,
@@ -256,6 +257,7 @@ export default function Sidebar({
   async function handleLogout() {
     setLoggingOut(true);
     await authApi.logout();
+    resetAnalytics();
     toast.success("Signed out successfully.");
     window.location.href = "/login";
   }

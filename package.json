@@ -10,6 +10,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@next/third-parties": "16.4.3",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
     "@sentry/nextjs": "^10.78.0",
@@ -22,6 +23,7 @@
     "lucide-react": "^0.577.0",
     "next": "16.4.3",
     "ogl": "^1.0.11",
+    "posthog-js": "^1.444.0",
     "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
