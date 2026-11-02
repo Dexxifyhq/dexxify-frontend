@@ -1,3 +1,11 @@
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Banknote,
+  CreditCard,
+  Repeat,
+  Undo2,
+} from "lucide-react";
 import { cn } from "@/utils/utils";
 import EmptyState from "@/components/dashboard/shared/EmptyState";
 import type { ActivityItem } from "@/lib/types/dashboard";
@@ -9,6 +17,15 @@ const TYPE_LABELS: Record<ActivityItem["type"], string> = {
   deposit: "Deposit",
   refund: "Refund",
   offramp: "Offramp",
+};
+
+const TYPE_ICONS: Record<ActivityItem["type"], React.ComponentType<{ size?: number }>> = {
+  payment: CreditCard,
+  withdrawal: ArrowUpRight,
+  swap: Repeat,
+  deposit: ArrowDownLeft,
+  refund: Undo2,
+  offramp: Banknote,
 };
 
 const STATUS_STYLES: Record<ActivityItem["status"], string> = {
@@ -59,20 +76,23 @@ export default function RecentActivity({
 
       {!loading && items && items.length > 0 && (
         <div className="divide-y divide-dash-border">
-          {items.map((item) => (
+          {items.map((item) => {
+            const TypeIcon = TYPE_ICONS[item.type];
+            return (
             <div
               key={item.id}
               className="flex items-center justify-between py-3.5 gap-4"
             >
               <div className="flex items-center gap-6 min-w-0">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted text-xs font-medium">
-                  {TYPE_LABELS[item.type]}
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+                  <TypeIcon size={16} />
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-sm text-dash-foreground">
-                    {item.description ?? item.type}
+                    {item.description ?? TYPE_LABELS[item.type]}
                   </p>
-                  <p className="text-xs text-dash-faint">
+                  <p className="truncate text-xs text-dash-faint">
+                    {TYPE_LABELS[item.type]} ·{" "}
                     {new Date(item.created_at).toLocaleDateString("en", {
                       month: "short",
                       day: "numeric",
@@ -103,7 +123,8 @@ export default function RecentActivity({
                 </span>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

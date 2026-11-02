@@ -28,9 +28,7 @@ export default function LinkBankModal({
   onSuccess,
 }: LinkBankModalProps) {
   const { data: banksData } = useBanks();
-  // console.log(banksData);
-  // Response shape after unwrap: { banks: {data: Bank[]}, cached: boolean }
-  const bankList: Bank[] = banksData?.banks?.data ?? [];
+  const bankList: Bank[] = banksData?.banks ?? [];
 
   const verifyBank = useVerifyBank();
   const saveBank = useSaveBank();
@@ -40,9 +38,10 @@ export default function LinkBankModal({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
   const [label, setLabel] = useState("");
-  const [isDefault, setIsDefault] = useState(false);
+  // const [isDefault, setIsDefault] = useState(false);
   const [verifiedName, setVerifiedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const filtered = search.trim()
@@ -68,7 +67,7 @@ export default function LinkBankModal({
     setDropdownOpen(false);
     setAccountNumber("");
     setLabel("");
-    setIsDefault(false);
+    // setIsDefault(false);
     setVerifiedName(null);
     setError(null);
     verifyBank.reset();
@@ -116,7 +115,8 @@ export default function LinkBankModal({
       { accountNumber: accountNumber.trim(), bankCode: selectedBank.code },
       {
         onSuccess: (res) => {
-          const name = res.resolved?.accountName;
+          console.log(res);
+          const name = res?.accountName;
           if (name) {
             setVerifiedName(name);
           } else {
@@ -140,7 +140,7 @@ export default function LinkBankModal({
         accountNumber: accountNumber.trim(),
         bankCode: selectedBank.code,
         label: label.trim() || undefined,
-        isDefault,
+        // isDefault,
       },
       {
         onSuccess: () => {
@@ -242,10 +242,24 @@ export default function LinkBankModal({
                                 : "text-dash-muted"
                             }`}
                           >
+                            {bank.logo && !brokenLogos.has(bank.logo) ? (
+                              <img
+                                src={bank.logo}
+                                alt=""
+                                className="h-5 w-5 shrink-0 rounded-full object-contain"
+                                onError={() =>
+                                  setBrokenLogos((s) =>
+                                    new Set(s).add(bank.logo),
+                                  )
+                                }
+                              />
+                            ) : (
+                              <Landmark
+                                size={14}
+                                className="shrink-0 text-dash-faint"
+                              />
+                            )}
                             <span className="truncate">{bank.name}</span>
-                            <span className="ml-auto shrink-0 font-mono text-[10px] text-dash-faint">
-                              {bank.code}
-                            </span>
                           </button>
                         </li>
                       ))
@@ -284,7 +298,10 @@ export default function LinkBankModal({
           {verifiedName && (
             <>
               <div className="flex items-center gap-2 rounded-lg border border-dash-success-border bg-dash-success-bg px-3 py-2.5">
-                <CheckCircle2 size={14} className="shrink-0 text-dash-success" />
+                <CheckCircle2
+                  size={14}
+                  className="shrink-0 text-dash-success"
+                />
                 <p className="text-xs">
                   <span className="text-dash-muted">Account name: </span>
                   <span className="font-medium text-dash-foreground">
@@ -297,7 +314,9 @@ export default function LinkBankModal({
               <div>
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-dash-muted">
                   Label{" "}
-                  <span className="normal-case text-dash-faint">(optional)</span>
+                  <span className="normal-case text-dash-faint">
+                    (optional)
+                  </span>
                 </label>
                 <div className="relative">
                   <Tag
@@ -315,7 +334,7 @@ export default function LinkBankModal({
               </div>
 
               {/* Set as primary */}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => setIsDefault((v) => !v)}
                 className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${
@@ -351,7 +370,7 @@ export default function LinkBankModal({
                     <Check size={10} strokeWidth={3} className="text-white" />
                   )}
                 </div>
-              </button>
+              </button> */}
             </>
           )}
 

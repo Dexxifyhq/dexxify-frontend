@@ -15,8 +15,7 @@ export const miscApi = {
   // ── Banks ────────────────────────────────────────────────────────────────
 
   // GET /misc/banks — list of Nigerian banks (server-cached 24h)
-  getBanks: () =>
-    get<{ banks: { data: Bank[] }; cached: boolean }>("/misc/banks"),
+  getBanks: () => get<{ banks: Bank[]; cached: boolean }>("/misc/banks"),
 
   // POST /misc/banks/verify — resolve account name before saving
   verifyBank: (payload: VerifyBankAccountDto) =>

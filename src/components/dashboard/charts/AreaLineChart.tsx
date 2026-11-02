@@ -119,7 +119,13 @@ export default function AreaLineChart({
                 key={i}
                 x={p.x}
                 y={HEIGHT - 6}
-                textAnchor="middle"
+                textAnchor={
+                  i === 0
+                    ? "start"
+                    : i === points.length - 1
+                      ? "end"
+                      : "middle"
+                }
                 fontSize={9}
                 fill="var(--dash-faint)"
               >

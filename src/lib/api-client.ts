@@ -52,6 +52,46 @@ const processQueue = (error: Error | null = null) => {
   failedQueue = [];
 };
 
+export async function refreshAccessToken(): Promise<boolean> {
+  if (isRefreshing) {
+    return new Promise<boolean>((resolve) => {
+      failedQueue.push({
+        resolve: () => resolve(true),
+        reject: () => resolve(false),
+      });
+    });
+  }
+
+  isRefreshing = true;
+  try {
+    await axios.post(
+      `${API_BASE}/auth/refresh`,
+      {},
+      {
+        withCredentials: true, // Sends refreshToken cookie
+      },
+    );
+
+    // Server will set new access_token cookie
+    processQueue(null); // Tell waiting callers to proceed
+    return true;
+  } catch {
+    processQueue(new Error("Token refresh failed")); // Reject all waiting callers
+
+    if (typeof window !== "undefined") {
+      // Clear local storage items
+      localStorage.clear();
+
+      // Redirect to login
+      window.location.href = "/login";
+    }
+
+    return false;
+  } finally {
+    isRefreshing = false;
+  }
+}
+
 /**
  * Response Interceptor
  * Automatically refreshes access token when it expires (401 error)
@@ -78,55 +118,14 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      if (isRefreshing) {
-        // If refresh is already in progress, queue this request
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => {
-            return apiClient(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
-      }
-
       originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        await axios.post(
-          `${API_BASE}/auth/refresh`,
-          {},
-          {
-            withCredentials: true, // Sends refreshToken cookie
-          },
-        );
-
-        // console.log(response.data.data);
-
-        // Server will set new access_token cookie
-        processQueue(null); // Tell waiting requests to retry
-
-        // Retry the original request
-        return apiClient(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed - redirect to login
-        processQueue(new Error("Token refresh failed")); // Reject all waiting requests
-        // console.error("refreshError", refreshError);
-
-        if (typeof window !== "undefined") {
-          // Clear local storage items
-          localStorage.clear();
-
-          // Redirect to login
-          window.location.href = "/login";
-        }
-
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
+      const refreshed = await refreshAccessToken();
+      if (!refreshed) {
+        return Promise.reject(error);
       }
+
+      // Retry the original request
+      return apiClient(originalRequest);
     }
 
     // Handle other errors

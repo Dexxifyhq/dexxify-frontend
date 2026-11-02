@@ -1,6 +1,14 @@
 "use client";
 
-import { X, Wallet, Tag, AlertCircle, Loader2, Star, Check } from "lucide-react";
+import {
+  X,
+  Wallet,
+  Tag,
+  AlertCircle,
+  Loader2,
+  Star,
+  Check,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAddWithdrawalAddress } from "@/lib/hooks/deposit-accounts/useDepositAccounts";
 import type {
@@ -77,7 +85,7 @@ export default function AddAddressModal({
   const [token, setToken] = useState<WithdrawalToken>("USDT");
   const [address, setAddress] = useState("");
   const [label, setLabel] = useState("");
-  const [isDefault, setIsDefault] = useState(false);
+  // const [isDefault, setIsDefault] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const selectedNet = NETWORK_OPTIONS.find((n) => n.value === network)!;
@@ -94,7 +102,7 @@ export default function AddAddressModal({
     setToken("USDT");
     setAddress("");
     setLabel("");
-    setIsDefault(false);
+    // setIsDefault(false);
     setError(null);
     addAddress.reset();
   }, [open]);
@@ -122,7 +130,7 @@ export default function AddAddressModal({
         network,
         token,
         label: label.trim(),
-        isDefault,
+        // isDefault,
       },
       {
         onSuccess: () => {
@@ -275,7 +283,7 @@ export default function AddAddressModal({
           </div>
 
           {/* Set as default */}
-          <button
+          {/* <button
             type="button"
             onClick={() => setIsDefault((v) => !v)}
             className={cn(
@@ -313,7 +321,7 @@ export default function AddAddressModal({
                 <Check size={10} strokeWidth={3} className="text-white" />
               )}
             </div>
-          </button>
+          </button> */}
 
           {/* Error */}
           {error && (

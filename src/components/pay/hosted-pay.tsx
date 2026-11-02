@@ -19,6 +19,7 @@ import {
 import type { FlatAsset } from "@/lib/utils/assets";
 import WalletQRCode from "@/components/ui/WalletQRCode";
 import { AssetLogo } from "@/components/dashboard/balance/modal-kit";
+import { AuthBands } from "@/components/ui/auth-bands";
 import { cn } from "@/utils/utils";
 
 // The Dexxify D, cut from the transparent logo as a mask so a watermark can
@@ -39,13 +40,6 @@ export const CARD =
 
 // ── Page frame ────────────────────────────────────────────────────────────────
 
-/**
- * All white. Mobile: one column — summary, then payment — with a faint D in
- * the bottom-right corner. Desktop: two halves with no divider, fitted to the
- * screen — the summary on the left (dark D watermark in its bottom-left
- * corner), the payment on the right, the two pulled toward the middle. A side
- * that outgrows the screen scrolls on its own, without a visible scrollbar.
- */
 export function HostedPayShell({
   summary,
   payment,
@@ -62,20 +56,23 @@ export function HostedPayShell({
       />
 
       <section className="relative isolate overflow-hidden px-4 pt-10 sm:pt-14 lg:h-screen lg:p-0 print:block print:h-auto">
+        {/* Brand bands, behind the D-mark watermark below — same ambient
+            background used on the public checkout/payment pages. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-28 -left-24 -z-10 hidden h-120 w-120 rotate-12 bg-black/6 lg:block print:hidden"
-          style={WATERMARK_MASK}
-        />
+          className="pointer-events-none absolute inset-0 -z-10 hidden overflow-hidden text-dash-border-strong lg:block print:hidden"
+        >
+          <AuthBands />
+        </div>
         <div className="lg:flex lg:h-full lg:overflow-y-auto lg:px-10 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
-          <div className="mx-auto w-full max-w-md lg:my-auto lg:ml-auto lg:mr-0 lg:py-10">
+          <div className="mx-auto w-full max-w-md lg:my-auto lg:py-10">
             {summary}
           </div>
         </div>
       </section>
 
       <section className="px-4 pb-10 pt-4 sm:pb-14 lg:flex lg:h-screen lg:overflow-y-auto lg:px-10 lg:py-0 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden print:hidden">
-        <div className="mx-auto w-full max-w-md lg:my-auto lg:ml-0 lg:mr-auto lg:py-6">
+        <div className="mx-auto w-full max-w-md lg:my-auto lg:py-10">
           {payment}
           <p className="mt-8 flex items-center justify-center gap-2 text-sm text-dash-muted">
             Powered by
@@ -418,6 +415,59 @@ export function DepositDetails({
         </span>
       </p>
     </>
+  );
+}
+
+// ── Result icon ──────────────────────────────────────────────────────────────
+
+/**
+ * Animated circle + check/X — the result screen for a live payment.completed
+ * / payment.failed SSE event. Shared across every hosted payment surface
+ * (checkout sessions, invoices, payment pages).
+ */
+export function PaymentResultIcon({
+  variant,
+}: {
+  variant: "success" | "failed";
+}) {
+  return (
+    <svg
+      viewBox="0 0 52 52"
+      className={cn(
+        "h-16 w-16",
+        variant === "success" ? "text-dash-success" : "text-dash-error",
+      )}
+    >
+      <circle
+        className="result-ring"
+        cx="26"
+        cy="26"
+        r="25"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      />
+      {variant === "success" ? (
+        <path
+          className="result-check"
+          d="M14.1 27.2l7.1 7.2 16.7-16.8"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <path
+          className="result-x"
+          d="M17 17l18 18M35 17l-18 18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
   );
 }
 

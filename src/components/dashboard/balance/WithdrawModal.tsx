@@ -39,16 +39,16 @@ const TABS: { value: WithdrawTab; label: string }[] = [
 ];
 const STEPS = ["Destination", "Amount", "Review"];
 
-const STABLECOIN_FEE = "$1.00";
-const FIAT_FEE = "₦300.00";
-
-function generateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
+// CC MIN_STABLECOIN_WITHDRAWAL = 1.2
+// CC MIN_FIAT_WITHDRAWAL = 1000
+const MIN_STABLECOIN_WITHDRAWAL_AMOUNT = 2;
+const MIN_FIAT_WITHDRAWAL_AMOUNT = 2000;
+const FIAT_FEE_AMOUNT = 400;
+const STABLECOIN_FEE_AMOUNT = 1.5;
+const MIN_STABLECOIN_WITHDRAWAL = "$2.00";
+const MIN_FIAT_WITHDRAWAL = "₦2000";
+const STABLECOIN_FEE = "$1.50";
+const FIAT_FEE = "₦400.00";
 
 export default function WithdrawModal({
   open,
@@ -73,6 +73,7 @@ export default function WithdrawModal({
   const [fiatAmount, setFiatAmount] = useState("");
   const [fiatNarration, setFiatNarration] = useState("");
   const [fiatSuccess, setFiatSuccess] = useState(false);
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
 
   const withdrawStableCoin = useWithdrawStableCoin();
   const withdrawFiat = useWithdrawFiat();
@@ -82,9 +83,7 @@ export default function WithdrawModal({
 
   const addressList = (savedAddresses as WithdrawalAddress[] | undefined) ?? [];
   const bankList = (savedBanks as SavedBank[] | undefined) ?? [];
-  const selectedBank = bankList.find(
-    (b) => b.provider_recipient_id === fiatBankId,
-  );
+  const selectedBank = bankList.find((b) => b.id === fiatBankId);
 
   const handleClose = useCallback(() => {
     setStep(0);
@@ -107,7 +106,7 @@ export default function WithdrawModal({
         amount: Number(scAmount),
         network: scNetwork,
         token: scToken,
-        externalId: generateUUID(),
+        externalId: crypto.randomUUID(),
       });
       setScSuccess(true);
     } catch {
@@ -118,7 +117,7 @@ export default function WithdrawModal({
   const handleFiatSubmit = async () => {
     try {
       await withdrawFiat.mutateAsync({
-        recipient_id: fiatBankId,
+        bank_id: fiatBankId,
         amount: Number(fiatAmount),
         narration: fiatNarration || undefined,
       });
@@ -135,12 +134,36 @@ export default function WithdrawModal({
   const fiatError =
     withdrawFiat.error instanceof Error ? withdrawFiat.error.message : null;
 
-  // Available balance for the token being withdrawn, when the ledger tracks it.
+  const scAmountError =
+    scAmount.trim() !== "" &&
+    Number(scAmount) > 0 &&
+    Number(scAmount) < MIN_STABLECOIN_WITHDRAWAL_AMOUNT
+      ? `Minimum withdrawal is ${MIN_STABLECOIN_WITHDRAWAL}.`
+      : null;
+  const fiatAmountError =
+    fiatAmount.trim() !== "" &&
+    Number(fiatAmount) > 0 &&
+    Number(fiatAmount) < MIN_FIAT_WITHDRAWAL_AMOUNT
+      ? `Minimum withdrawal is ${MIN_FIAT_WITHDRAWAL}.`
+      : null;
+
   const tokenKey = scToken.toLowerCase();
   const scAvailable =
     tokenKey === "usdt" || tokenKey === "usdc"
       ? balance?.[tokenKey].balance
       : undefined;
+  const fiatAvailable = balance?.ngn.balance;
+
+  const scInsufficientBalance =
+    scAvailable !== undefined &&
+    Number(scAmount) + STABLECOIN_FEE_AMOUNT > scAvailable
+      ? `Insufficient balance. You need ${fmt(Number(scAmount) + STABLECOIN_FEE_AMOUNT)} ${scToken} (incl. fee) but have ${fmt(scAvailable)} ${scToken}.`
+      : null;
+  const fiatInsufficientBalance =
+    fiatAvailable !== undefined &&
+    Number(fiatAmount) + FIAT_FEE_AMOUNT > fiatAvailable
+      ? `Insufficient balance. You need ₦${fmt(Number(fiatAmount) + FIAT_FEE_AMOUNT)} (incl. fee) but have ₦${fmt(fiatAvailable)}.`
+      : null;
 
   const success = tab === "stablecoin" ? scSuccess : fiatSuccess;
 
@@ -209,7 +232,9 @@ export default function WithdrawModal({
                           setScNetwork(sa.network);
                           setScToken(sa.token);
                         }}
-                        leading={<AssetLogo symbol={sa.token} className="h-8 w-8" />}
+                        leading={
+                          <AssetLogo symbol={sa.token} className="h-8 w-8" />
+                        }
                         title={sa.label}
                         subtitle={`${shortAddress(sa.address)} · ${sa.network}`}
                       />
@@ -219,19 +244,9 @@ export default function WithdrawModal({
               )}
               <div>
                 <FieldLabel>
-                  {addressList.length > 0
-                    ? "Or enter an address"
-                    : "Destination address"}
+                  {addressList.length === 0 &&
+                    "Please add a wallet address for withdrawal"}
                 </FieldLabel>
-                <TextInput
-                  placeholder="0x…"
-                  value={scAddress}
-                  onChange={(e) => {
-                    setScAddress(e.target.value);
-                    setScLabel("");
-                  }}
-                  className="font-mono"
-                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -272,12 +287,12 @@ export default function WithdrawModal({
                   }
                 />
               </div>
-              <Note>
-                A {STABLECOIN_FEE} fee is deducted from your balance.
-              </Note>
+              <Note>Minimum withdrawal is {MIN_STABLECOIN_WITHDRAWAL}.</Note>
+              <Note>A {STABLECOIN_FEE} fee is deducted from your balance.</Note>
+              <ErrorNote message={scAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={!(Number(scAmount) > 0)}
+                  disabled={!!scInsufficientBalance}
                   onClick={() => setStep(2)}
                 >
                   Continue
@@ -291,15 +306,25 @@ export default function WithdrawModal({
               <Summary
                 rows={[
                   { label: "To", value: scLabel || shortAddress(scAddress) },
-                  { label: "Address", value: <span className="font-mono text-xs">{scAddress}</span> },
+                  {
+                    label: "Address",
+                    value: (
+                      <span className="font-mono text-xs">{scAddress}</span>
+                    ),
+                  },
                   { label: "Network", value: scNetwork || "—" },
                   { label: "Fee", value: `${STABLECOIN_FEE} · from balance` },
-                  { label: "Amount", value: `${fmt(scAmount)} ${scToken}`, emphasis: true },
+                  {
+                    label: "Amount",
+                    value: `${fmt(scAmount)} ${scToken}`,
+                    emphasis: true,
+                  },
                 ]}
               />
-              <ErrorNote message={scError} />
+              <ErrorNote message={scError ?? scInsufficientBalance} />
               <StepActions onBack={() => setStep(1)}>
                 <PrimaryButton
+                  disabled={!!scInsufficientBalance}
                   loading={withdrawStableCoin.isPending}
                   onClick={handleStablecoinSubmit}
                 >
@@ -319,12 +344,25 @@ export default function WithdrawModal({
                     {bankList.map((bank) => (
                       <OptionRow
                         key={bank.id}
-                        selected={fiatBankId === bank.provider_recipient_id}
-                        onSelect={() => setFiatBankId(bank.provider_recipient_id)}
+                        selected={fiatBankId === bank.id}
+                        onSelect={() => setFiatBankId(bank.id)}
                         leading={
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
-                            <Landmark size={15} />
-                          </span>
+                          bank.logo_url && !brokenLogos.has(bank.logo_url) ? (
+                            <img
+                              src={bank.logo_url}
+                              alt=""
+                              className="h-8 w-8 shrink-0 rounded-full bg-dash-hover object-contain"
+                              onError={() =>
+                                setBrokenLogos((s) =>
+                                  new Set(s).add(bank.logo_url),
+                                )
+                              }
+                            />
+                          ) : (
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dash-hover text-dash-muted">
+                              <Landmark size={15} />
+                            </span>
+                          )
                         }
                         title={bank.account_name}
                         subtitle={`${bank.bank_name} · ${bank.account_number}`}
@@ -372,10 +410,12 @@ export default function WithdrawModal({
                   onChange={(e) => setFiatNarration(e.target.value)}
                 />
               </div>
+              <Note>Minimum withdrawal is {MIN_FIAT_WITHDRAWAL}.</Note>
               <Note>A {FIAT_FEE} fee is deducted from your balance.</Note>
+              <ErrorNote message={fiatAmountError} />
               <StepActions onBack={() => setStep(0)}>
                 <PrimaryButton
-                  disabled={!(Number(fiatAmount) > 0)}
+                  disabled={!!fiatInsufficientBalance}
                   onClick={() => setStep(2)}
                 >
                   Continue
@@ -390,7 +430,9 @@ export default function WithdrawModal({
                 rows={[
                   {
                     label: "To",
-                    value: selectedBank ? selectedBank.account_name : fiatBankId,
+                    value: selectedBank
+                      ? selectedBank.account_name
+                      : fiatBankId,
                   },
                   ...(selectedBank
                     ? [
@@ -404,12 +446,17 @@ export default function WithdrawModal({
                     ? [{ label: "Narration", value: fiatNarration }]
                     : []),
                   { label: "Fee", value: `${FIAT_FEE} · from balance` },
-                  { label: "Amount", value: `₦${fmt(fiatAmount)}`, emphasis: true },
+                  {
+                    label: "Amount",
+                    value: `₦${fmt(fiatAmount)}`,
+                    emphasis: true,
+                  },
                 ]}
               />
-              <ErrorNote message={fiatError} />
+              <ErrorNote message={fiatError ?? fiatInsufficientBalance} />
               <StepActions onBack={() => setStep(1)}>
                 <PrimaryButton
+                  disabled={!!fiatInsufficientBalance}
                   loading={withdrawFiat.isPending}
                   onClick={handleFiatSubmit}
                 >

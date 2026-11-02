@@ -5,18 +5,28 @@ import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { payApi } from "@/lib/api/pay";
 import { useEstimatePayment } from "@/lib/hooks/payment-sessions/usePaymentSessions";
+import { usePaymentSessionEvents } from "@/lib/hooks/payment-sessions/usePaymentSessionEvents";
 import { flattenAssets, type FlatAsset } from "@/lib/utils/assets";
 import { useCountdown } from "@/lib/hooks/useCountdown";
-import { AlertTriangle, Check, Copy, Loader2, ShoppingBag } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  Clock,
+  Copy,
+  Loader2,
+  ShoppingBag,
+} from "lucide-react";
 import {
   AssetNetworkPicker,
   CARD,
   Centered,
   DepositDetails,
   HostedPayShell,
+  PaymentResultIcon,
   Steps,
   TimerPill,
 } from "@/components/pay/hosted-pay";
+import { humanizeFailureReason } from "@/lib/utils/payment-result";
 import { cn } from "@/utils/utils";
 
 type Step = "form" | "deposit" | "error";
@@ -113,6 +123,8 @@ export default function CheckoutSessionPage() {
 
   const expired = !!session?.expires_at && count === 0;
 
+  const { partial, completed, failed } = usePaymentSessionEvents(session_id);
+
   const handlePay = () => {
     if (!selectedAsset || depositMutation.isPending || expired) return;
     depositMutation.mutate(
@@ -158,6 +170,45 @@ export default function CheckoutSessionPage() {
   const sym = SYMBOL[currency] ?? "";
   const sessionAmount = Number(session.amount ?? 0);
   const reference: string | undefined = session.reference;
+
+  if (completed) {
+    return (
+      <Centered>
+        <PaymentResultIcon variant="success" />
+        <p className="text-lg font-semibold text-dash-foreground">
+          Payment successful
+        </p>
+        <p className="text-sm text-dash-muted">
+          You paid{" "}
+          <span className="font-semibold text-dash-foreground">
+            {sym}
+            {fmt(Number(completed.amount_paid))}
+            {!sym && ` ${currency}`}
+          </span>
+        </p>
+        {reference && (
+          <p className="mt-1 font-mono text-xs text-dash-faint">{reference}</p>
+        )}
+      </Centered>
+    );
+  }
+
+  if (failed) {
+    return (
+      <Centered>
+        <PaymentResultIcon variant="failed" />
+        <p className="text-lg font-semibold text-dash-foreground">
+          Payment failed
+        </p>
+        <p className="max-w-xs text-sm text-dash-muted">
+          {humanizeFailureReason(failed.reason)}
+        </p>
+        {reference && (
+          <p className="mt-1 font-mono text-xs text-dash-faint">{reference}</p>
+        )}
+      </Centered>
+    );
+  }
   const customer = session.customer as
     | {
         first_name?: string | null;
@@ -279,8 +330,39 @@ export default function CheckoutSessionPage() {
 
   // ── Payment ───────────────────────────────────────────────────────────────
 
+  const amountRemaining = partial
+    ? (partial.amount_due ??
+      Math.max(sessionAmount - Number(partial.amount_paid), 0))
+    : 0;
+
   const payment = (
     <section className={CARD}>
+      {partial && (
+        <div className="fade-up mb-5 flex items-start gap-3 rounded-2xl border border-dash-warning-border bg-dash-warning-bg px-4 py-3.5">
+          <Clock size={16} className="mt-0.5 shrink-0 text-dash-warning" />
+          <div className="min-w-0 flex-1 text-sm">
+            <p className="font-semibold text-dash-warning">
+              Partial payment received
+            </p>
+            <p className="mt-0.5 text-dash-warning">
+              We&apos;ve received{" "}
+              <span className="font-semibold">
+                {sym}
+                {fmt(Number(partial.amount_paid))}
+                {!sym && ` ${currency}`}
+              </span>{" "}
+              so far.{" "}
+              <span className="font-semibold">
+                {sym}
+                {fmt(amountRemaining)}
+                {!sym && ` ${currency}`}
+              </span>{" "}
+              still due.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mb-5">
         <Steps current={step === "deposit" ? 1 : 0} />
       </div>

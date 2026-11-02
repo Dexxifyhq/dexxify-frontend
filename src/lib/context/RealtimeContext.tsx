@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { API_BASE } from "@/lib/api-client";
+import { API_BASE, refreshAccessToken } from "@/lib/api-client";
 import { useProfile } from "@/lib/hooks/auth/useProfile";
 import {
   REALTIME_EVENT_TYPES,
@@ -54,14 +54,19 @@ const INVALIDATE_ON_EVENT = [
 // for one payment) should trigger one refetch pass, not one per event.
 const INVALIDATE_DEBOUNCE_MS = 400;
 
+const MAX_RECONNECT_ATTEMPTS = 3;
+const RECONNECT_BASE_DELAY_MS = 500;
+
 const TOAST_EVENTS: Partial<
   Record<RealtimeEventType, { variant: "success" | "error"; title: string }>
 > = {
   "payment.completed": { variant: "success", title: "Payment completed" },
+  "payment.partial": { variant: "error", title: "Partial payment" },
   "payment.failed": { variant: "error", title: "Payment failed" },
   "deposit.confirmed": { variant: "success", title: "Deposit confirmed" },
   "deposit.failed": { variant: "error", title: "Deposit failed" },
   "payout.success": { variant: "success", title: "Payout sent" },
+  "payout.processing": { variant: "success", title: "Payout processing" },
   "payout.failed": { variant: "error", title: "Payout failed" },
   "swap.completed": { variant: "success", title: "Swap completed" },
   "swap.failed": { variant: "error", title: "Swap failed" },
@@ -93,12 +98,11 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!mode) return;
 
-    const source = new EventSource(`${API_BASE}/realtime/events`, {
-      withCredentials: true,
-    });
-
-    source.onopen = () => setConnected(true);
-    source.onerror = () => setConnected(false);
+    let cancelled = false;
+    let source: EventSource | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let cleanupListeners: (() => void) | null = null;
+    let consecutiveFailures = 0;
 
     const scheduleInvalidate = () => {
       if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
@@ -109,38 +113,80 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       }, INVALIDATE_DEBOUNCE_MS);
     };
 
-    const cleanups = REALTIME_EVENT_TYPES.map((eventType) => {
-      const handler = (event: MessageEvent) => {
-        let data: Record<string, unknown> = {};
-        try {
-          const raw = event.data as string;
-          data = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
-        } catch {
-          // non-JSON payload — ignore, still route/invalidate below
-        }
+    const connect = () => {
+      const es = new EventSource(`${API_BASE}/realtime/events`, {
+        withCredentials: true,
+      });
+      source = es;
 
-        listenersRef.current
-          .get(eventType)
-          ?.forEach((listener) => listener(data));
-
-        const toastConfig = TOAST_EVENTS[eventType];
-        if (toastConfig) {
-          toast[toastConfig.variant](toastConfig.title, {
-            description: describeEvent(data),
-          });
-        }
-
-        scheduleInvalidate();
+      es.onopen = () => {
+        setConnected(true);
+        consecutiveFailures = 0;
       };
 
-      source.addEventListener(eventType, handler);
-      return () => source.removeEventListener(eventType, handler);
-    });
+      es.onerror = () => {
+        setConnected(false);
+        if (cancelled) return;
+
+        if (es.readyState === EventSource.CLOSED) {
+          es.close();
+
+          if (consecutiveFailures >= MAX_RECONNECT_ATTEMPTS) {
+            console.warn(
+              "[realtime] giving up after repeated connection failures — check auth/business context",
+            );
+            return;
+          }
+          consecutiveFailures += 1;
+
+          void refreshAccessToken().then((refreshed) => {
+            if (cancelled || !refreshed) return;
+            const delay =
+              RECONNECT_BASE_DELAY_MS * 2 ** (consecutiveFailures - 1);
+            reconnectTimer = setTimeout(connect, delay);
+          });
+        }
+      };
+
+      const cleanups = REALTIME_EVENT_TYPES.map((eventType) => {
+        const handler = (event: MessageEvent) => {
+          let data: Record<string, unknown> = {};
+          try {
+            const raw = event.data as string;
+            data = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+          } catch {
+            // non-JSON payload — ignore, still route/invalidate below
+          }
+
+          listenersRef.current
+            .get(eventType)
+            ?.forEach((listener) => listener(data));
+
+          const toastConfig = TOAST_EVENTS[eventType];
+          if (toastConfig) {
+            toast[toastConfig.variant](toastConfig.title, {
+              description: describeEvent(data),
+            });
+          }
+
+          scheduleInvalidate();
+        };
+
+        es.addEventListener(eventType, handler);
+        return () => es.removeEventListener(eventType, handler);
+      });
+
+      cleanupListeners = () => cleanups.forEach((cleanup) => cleanup());
+    };
+
+    connect();
 
     return () => {
-      cleanups.forEach((cleanup) => cleanup());
+      cancelled = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
       if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
-      source.close();
+      cleanupListeners?.();
+      source?.close();
       setConnected(false);
     };
   }, [mode, qc]);

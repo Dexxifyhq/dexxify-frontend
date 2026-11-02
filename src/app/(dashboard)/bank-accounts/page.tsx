@@ -187,6 +187,7 @@ export default function BankAccountsPage() {
 function BankAccountsPageContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<SavedBank | null>(null);
+  const [brokenLogos, setBrokenLogos] = useState<Set<string>>(new Set());
 
   const { data: savedBanks, isLoading } = useSavedBanks();
   const deleteBank = useDeleteBank();
@@ -262,9 +263,20 @@ function BankAccountsPageContent() {
                   className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-dash-hover"
                 >
                   {/* Icon */}
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-dash-border bg-dash-hover">
-                    <Landmark size={15} className="text-dash-faint" />
-                  </div>
+                  {bank.logo_url && !brokenLogos.has(bank.logo_url) ? (
+                    <img
+                      src={bank.logo_url}
+                      alt=""
+                      className="h-9 w-9 shrink-0 rounded-lg border border-dash-border bg-dash-hover object-contain"
+                      onError={() =>
+                        setBrokenLogos((s) => new Set(s).add(bank.logo_url))
+                      }
+                    />
+                  ) : (
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-dash-border bg-dash-hover">
+                      <Landmark size={15} className="text-dash-faint" />
+                    </div>
+                  )}
 
                   {/* Main info */}
                   <div className="min-w-0 flex-1">
@@ -272,11 +284,11 @@ function BankAccountsPageContent() {
                       <p className="truncate text-sm font-medium text-dash-foreground">
                         {bank.account_name}
                       </p>
-                      {bank.primary && (
+                      {/* {bank.primary && (
                         <span className="shrink-0 rounded-full border border-dash-success-border bg-dash-success-bg px-2 py-px text-[10px] font-semibold text-dash-success">
                           Primary
                         </span>
-                      )}
+                      )} */}
                     </div>
                     <p className="mt-0.5 text-xs text-dash-muted">
                       {bank.bank_name} · {bank.account_number}

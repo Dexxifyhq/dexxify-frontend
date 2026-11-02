@@ -88,12 +88,12 @@ function AddressCard({
               <p className="truncate text-sm font-semibold text-dash-foreground">
                 {item.label}
               </p>
-              {item.primary && (
+              {/* {item.primary && (
                 <Star
                   size={11}
                   className="shrink-0 fill-dash-warning text-dash-warning"
                 />
-              )}
+              )} */}
             </div>
             <p className="mt-0.5 font-mono text-xs text-dash-faint">
               {truncateAddress(item.address)}
