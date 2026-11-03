@@ -6,7 +6,8 @@ import Infrastructure from "@/components/landing/Infrastructure";
 import UseCases from "@/components/landing/UseCases";
 import TrustSecurity from "@/components/landing/TrustSecurity";
 import FAQ from "@/components/landing/FAQ";
-import Waitlist from "@/components/landing/Waitlist";
+// Waitlist section hidden for now — uncomment this and <Waitlist /> below to bring it back.
+// import Waitlist from "@/components/landing/Waitlist";
 import Footer from "@/components/layout/Footer";
 import type { Metadata } from "next";
 import { DOCS_URL } from "@/lib/constants/links";
@@ -86,7 +87,7 @@ export default function Home() {
       <TrustSecurity />
       <Announcement />
       <FAQ />
-      <Waitlist />
+      {/* <Waitlist /> */}
       <Footer />
     </main>
   );

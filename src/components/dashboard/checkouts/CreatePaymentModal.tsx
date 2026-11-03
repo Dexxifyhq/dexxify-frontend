@@ -15,6 +15,7 @@ import { useCreatePaymentSession } from "@/lib/hooks/payment-sessions/usePayment
 import { toast } from "sonner";
 import { cn } from "@/utils/utils";
 import WalletQRCode from "@/components/ui/WalletQRCode";
+import { track } from "@/components/analytics/PostHogAnalytics";
 
 interface CreatePaymentModalProps {
   open: boolean;
@@ -106,6 +107,7 @@ export default function CreatePaymentModal({
         const sessionId = res?.id;
         const link = `${window.location.origin}/pay/${sessionId}`;
         setPayLink(link);
+        track("checkout_created", { amount: Number(amount), currency });
         onSuccess?.();
       },
       onError: (err: any) => {

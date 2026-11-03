@@ -9,6 +9,7 @@ import { useMyBusiness } from "@/lib/hooks/businesses/useBusinesses";
 import { AuthProvider } from "@/lib/context/AuthContext";
 import { RealtimeProvider } from "@/lib/context/RealtimeContext";
 import { cn } from "@/utils/utils";
+import PostHogAnalytics from "@/components/analytics/PostHogAnalytics";
 
 const SIDEBAR_KEY = "dexxify:sidebar-collapsed";
 
@@ -101,6 +102,22 @@ export default function DashboardLayout({
             </main>
           </div>
         </div>
+        {/* PostHog with the signed-in merchant identified, so their visit →
+            sign-up → dashboard journey is one person in the reports. */}
+        <PostHogAnalytics
+          identity={
+            profile
+              ? {
+                  id: profile.id,
+                  email: profile.email,
+                  name: user.name,
+                  role: profile.role,
+                  businessId: business?.id,
+                  businessName: business?.name,
+                }
+              : null
+          }
+        />
       </RealtimeProvider>
     </AuthProvider>
   );
