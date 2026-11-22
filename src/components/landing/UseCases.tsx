@@ -1,249 +1,327 @@
-import { DOCS_URL } from "@/lib/constants/links";
-import {
-  ArrowUpRight,
-  ShoppingCart,
-  Monitor,
-  Trophy,
-  Wrench,
-  Palette,
-  BarChart2,
-  Briefcase,
-  Plane,
-  Gamepad2,
-  Wallet,
-  FileText,
-  LayoutTemplate,
-  QrCode,
-  CreditCard,
-  Landmark,
-  Coins,
-  type LucideIcon,
-} from "lucide-react";
+"use client";
 
-interface UseCase {
-  icon: LucideIcon;
-  title: string;
-  desc: string;
-}
+import { useRef } from "react";
+import Image from "next/image";
+import WalletQRCode from "@/components/ui/WalletQRCode";
+import { SITE_URL } from "@/lib/constants/site";
 
 /**
+ * Use cases — an Anchor-style carousel, black and white. One slide per
+ * example: group label, title, one-line description, product tiles, and a
+ * product preview bottom-right that bleeds off the slide.
+ *
+ * Carousel is CSS scroll-snap; the arrow buttons scroll one slide at a time.
+ * Swipe works on touch too; on phones the arrows sit under the heading.
+ *
  * Copy is held to what the product does today. Changes from the original
  * WhoItsFor copy:
  * - E-commerce no longer says "without a crypto wallet" — paying in crypto
  *   needs one.
  * - SaaS no longer says "subscriptions" — invoices are one-off, there is no
  *   recurring billing.
- * - Betting and gaming lose "instantly"/"instant" — no settlement timing we
- *   can't verify.
+ * - Betting loses "instantly" — no settlement timing we can't verify.
+ *
+ * The previews are illustrative. Naira figures stay literal placeholders: an
+ * NGN amount implies a published exchange rate.
  */
-const COLLECT: UseCase[] = [
-  { icon: ShoppingCart, title: "E-commerce stores", desc: "Accept crypto from customers anywhere and settle to your bank." },
-  { icon: Monitor, title: "SaaS platforms", desc: "Bill customers with crypto invoices and payment links." },
-  { icon: Trophy, title: "Betting platforms", desc: "Take crypto deposits that settle to your bank." },
-  { icon: Wrench, title: "Service businesses", desc: "Invoice clients in crypto, get paid in Naira." },
-  { icon: Palette, title: "Digital creators", desc: "Sell digital products globally, receive Naira locally." },
+
+type Product = "checkout" | "swap" | "payouts" | "kyc" | "invoices";
+type Mock = "checkout" | "invoice" | "payouts" | "swap";
+
+type UseCase = {
+  group: string;
+  title: string;
+  line: string;
+  products: Product[];
+  mock: Mock;
+};
+
+const COLLECT = "Collect crypto";
+const PAY_OUT = "Pay out in Naira";
+
+const CASES: UseCase[] = [
+  { group: COLLECT, title: "E-commerce stores", line: "Accept crypto from customers anywhere and settle to your bank.", products: ["checkout", "swap", "payouts"], mock: "checkout" },
+  { group: COLLECT, title: "SaaS platforms", line: "Bill customers with crypto invoices and payment links.", products: ["invoices", "checkout"], mock: "invoice" },
+  { group: COLLECT, title: "Betting platforms", line: "Take crypto deposits that settle to your bank.", products: ["checkout", "payouts"], mock: "checkout" },
+  { group: COLLECT, title: "Service businesses", line: "Invoice clients in crypto, get paid in Naira.", products: ["invoices", "swap"], mock: "invoice" },
+  { group: COLLECT, title: "Digital creators", line: "Sell digital products globally, receive Naira locally.", products: ["checkout", "swap"], mock: "checkout" },
+  { group: PAY_OUT, title: "Crypto exchanges", line: "Automate NGN withdrawals and replace manual P2P desks.", products: ["swap", "payouts", "kyc"], mock: "swap" },
+  { group: PAY_OUT, title: "Payroll tools", line: "Disburse salaries in Naira from a stablecoin treasury.", products: ["payouts", "kyc"], mock: "payouts" },
 ];
 
-const PAY_OUT: UseCase[] = [
-  { icon: BarChart2, title: "Crypto exchanges", desc: "Automate NGN withdrawals and replace manual P2P desks." },
-  { icon: Briefcase, title: "Freelance platforms", desc: "Pay Nigerian contractors in Naira from USDT balances." },
-  { icon: Plane, title: "Remittance apps", desc: "Crypto in from abroad, Naira out to any Nigerian bank." },
-  { icon: Gamepad2, title: "Gaming platforms", desc: "Crypto-to-Naira payouts for Nigerian players." },
-  { icon: Wallet, title: "Payroll tools", desc: "Disburse salaries in Naira from a stablecoin treasury." },
+// Slide backgrounds cycle dark / light, like the product cards.
+const THEMES = [
+  { bg: "#0A0A0A", fg: "#FFFFFF", tile: "#1F1F1F" },
+  { bg: "#EDEDED", fg: "#0A0A0A", tile: "#FFFFFF" },
+  { bg: "#262626", fg: "#FFFFFF", tile: "#3A3A3A" },
+  { bg: "#DCDCDC", fg: "#0A0A0A", tile: "#F5F5F5" },
+  { bg: "#161616", fg: "#FFFFFF", tile: "#2A2A2A" },
 ];
 
-// ── Diagram primitives ──────────────────────────────────────────────────────
-// Every connector in these diagrams is horizontal, as in the reference, so
-// they're plain grid rows with a 1px line and a CSS arrowhead rather than an
-// SVG whose text and arrowheads would distort as it scales.
+const GAP = 24; // px between slides; the arrows step by slide width + this
 
-function Node({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+// ── Product previews ─────────────────────────────────────────────────────────
+// White panels; on desktop they sit bottom-right and bleed off the slide.
+
+const PANEL =
+  "w-[320px] max-w-full rounded-2xl bg-white p-[22px] text-[#0A0A0A] shadow-[0_30px_60px_rgba(0,0,0,0.25)] lg:min-h-[400px]";
+
+function Dot({ dark }: { dark?: boolean }) {
   return (
-    <div className="flex items-center gap-2 rounded-md border border-code-border bg-foreground px-2.5 py-2 text-[11px] font-medium text-background sm:px-3 sm:text-xs">
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-background/10">
-        <Icon size={11} />
-      </span>
-      <span className="whitespace-nowrap">{label}</span>
-    </div>
+    <span
+      className={`inline-block h-[7px] w-[7px] shrink-0 rounded-full ${dark ? "bg-[#0A0A0A]" : "bg-[#BDBDBD]"}`}
+    />
   );
 }
 
-/** A horizontal connector ending in an arrowhead, with an optional pill label
- *  sitting on the line. */
-function Connector({ label }: { label?: string }) {
+function CheckoutMock() {
   return (
-    <div className="relative mx-1 h-px min-w-10 flex-1 bg-code-border">
-      <span className="absolute right-0 top-1/2 h-0 w-0 -translate-y-1/2 border-y-[4px] border-l-[6px] border-y-transparent border-l-code-muted" />
-      {label && (
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-code-border bg-foreground px-2 py-0.5 text-[10px] text-background/70">
-          {label}
+    <div className={PANEL}>
+      <div className="flex items-center gap-[10px]">
+        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#0A0A0A] text-[11px] font-semibold text-white">
+          YS
         </span>
-      )}
+        <span className="flex flex-col">
+          <span className="text-[13px] font-semibold">Your store</span>
+          <span className="text-[11px] text-[#767676]">Order #10482</span>
+        </span>
+      </div>
+      <p className="mt-5 text-center text-[12px] text-[#767676]">Amount due</p>
+      <p className="text-center text-[30px] font-medium tracking-[-0.5px]">
+        200.00 USDT
+      </p>
+      {/* A real, scannable QR — it opens the Dexxify site. */}
+      <div className="mx-auto mt-4 w-fit rounded-xl border border-[#EEEEEE]">
+        <WalletQRCode address={SITE_URL} size={114} />
+      </div>
+      <p className="mt-4 flex items-center justify-center gap-[6px] text-[12px] text-[#767676]">
+        <Dot />
+        Waiting for payment
+      </p>
     </div>
   );
 }
 
-/**
- * Collect: every way a payment comes in, all settling to one balance.
- * All four inputs are real (payment sessions, payment pages, invoices, the
- * pay-link QR), and a wallet can auto-settle to a bank account.
- */
-function CollectDiagram() {
-  const inputs = [
-    { icon: CreditCard, label: "Payment session" },
-    { icon: LayoutTemplate, label: "Payment link" },
-    { icon: FileText, label: "Invoice" },
-    { icon: QrCode, label: "QR payment" },
+function InvoiceMock() {
+  const lines = [
+    ["Design retainer", "$250.00"],
+    ["Hosting", "$50.00"],
   ];
   return (
-    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-y-3">
-      {inputs.map((n, i) => (
-        <div key={n.label} className="contents">
-          <div className="col-start-1" style={{ gridRow: i + 1 }}>
-            <Node icon={n.icon} label={n.label} />
-          </div>
-          <div className="col-start-2 flex" style={{ gridRow: i + 1 }}>
-            <Connector />
-          </div>
-        </div>
-      ))}
-      {/* One destination spanning every input row */}
-      <div
-        className="col-start-3 flex h-full flex-col items-center justify-center gap-1 rounded-md border border-code-border bg-foreground px-4 text-center"
-        style={{ gridRow: `1 / span ${inputs.length}` }}
-      >
-        <Landmark size={14} className="text-background" />
-        <span className="text-xs font-medium text-background">
-          Your balance
+    <div className={PANEL}>
+      <div className="flex items-center justify-between">
+        <span className="text-[13px] font-semibold">Invoice INV-0231</span>
+        <span className="rounded-full bg-[#F2F2F2] px-[10px] py-1 text-[11px] font-medium">
+          Unpaid
         </span>
-        <span className="text-[10px] text-background/60">
-          Wallet or bank
+      </div>
+      <p className="mt-5 text-[12px] text-[#767676]">Amount</p>
+      <p className="text-[30px] font-medium tracking-[-0.5px]">$300.00</p>
+      <div className="mt-4 flex flex-col gap-2 text-[13px]">
+        {lines.map(([item, amount]) => (
+          <div key={item} className="flex justify-between border-t border-[#F0F0F0] pt-2">
+            <span>{item}</span>
+            <span className="font-medium">{amount}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 flex gap-2">
+        <span className="flex-1 rounded-[10px] bg-[#0A0A0A] py-[10px] text-center text-[13px] font-medium text-white">
+          Pay in USDT
+        </span>
+        <span className="flex-1 rounded-[10px] bg-[#F2F2F2] py-[10px] text-center text-[13px] font-medium">
+          Pay in USDC
         </span>
       </div>
     </div>
   );
 }
 
-/**
- * Pay out: the three real outbound flows — off-ramp (crypto to a Naira
- * recipient), payouts (POST /payouts, NGN to a bank) and stablecoin
- * withdrawals to a wallet address.
- */
-function PayOutDiagram() {
-  const flows = [
-    { from: { icon: Coins, label: "USDT / USDC" }, via: "off-ramp", to: { icon: Landmark, label: "Nigerian bank" } },
-    { from: { icon: Wallet, label: "NGN balance" }, via: "payout", to: { icon: Landmark, label: "Nigerian bank" } },
-    { from: { icon: Coins, label: "USDT / USDC" }, via: "withdrawal", to: { icon: Wallet, label: "Wallet address" } },
+function PayoutsMock() {
+  const rows: { to: string; amount: string; status: string; done: boolean }[] = [
+    { to: "Bank ••••4417", amount: "₦[AMOUNT]", status: "Completed", done: true },
+    { to: "Wallet TXk2…9fQa", amount: "300.00 USDT", status: "Completed", done: true },
+    { to: "Bank ••••0932", amount: "₦[AMOUNT]", status: "Processing", done: false },
+    { to: "Bank ••••1288", amount: "₦[AMOUNT]", status: "Queued", done: false },
+    { to: "Wallet 0x8f…21Cd", amount: "120.00 USDC", status: "Queued", done: false },
   ];
   return (
-    <div className="space-y-5">
-      {flows.map((f) => (
-        <div key={f.via} className="flex items-center">
-          <Node icon={f.from.icon} label={f.from.label} />
-          <Connector label={f.via} />
-          <Node icon={f.to.icon} label={f.to.label} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Rows ────────────────────────────────────────────────────────────────────
-
-/**
- * One band of the section: two-tone lead and link top-left, the real use-case
- * list bottom-left, diagram on the right. The reference puts a customer
- * testimonial in the bottom-left slot; there are no real ones to quote, and an
- * invented quote would be a fabricated endorsement, so that slot holds the use
- * cases instead.
- */
-function Row({
-  lead,
-  rest,
-  linkLabel,
-  items,
-  diagram,
-}: {
-  lead: string;
-  rest: string;
-  linkLabel: string;
-  items: UseCase[];
-  diagram: React.ReactNode;
-}) {
-  return (
-    <div className="grid gap-10 border-t border-code-border px-4 sm:px-6 py-12 sm:py-16 lg:grid-cols-2 lg:gap-12">
-      <div className="flex flex-col">
-        <h3 className="max-w-md text-lg sm:text-xl leading-snug tracking-tight">
-          <span className="font-semibold text-background">{lead}</span>{" "}
-          <span className="text-background/60">{rest}</span>
-        </h3>
-        <a
-          href={DOCS_URL}
-          className="mt-4 inline-flex w-fit items-center gap-1 text-xs font-medium text-background hover:gap-2 transition-all duration-200"
+    <div className={`${PANEL} px-[18px] py-2 lg:w-[340px] lg:max-w-[340px]`}>
+      <p className="mb-1 mt-2 text-[13px] font-semibold">Batch payout · PO-2291</p>
+      {rows.map((r, i) => (
+        <div
+          key={r.to}
+          className={`flex items-center gap-[10px] py-[11px] text-[13px] ${i ? "border-t border-[#F0F0F0]" : ""}`}
         >
-          {linkLabel}
-          <ArrowUpRight size={12} />
-        </a>
-
-        <ul className="mt-10 space-y-3 lg:mt-auto lg:pt-10">
-          {items.map((u) => (
-            <li key={u.title} className="flex items-start gap-3">
-              <u.icon size={14} className="mt-0.5 shrink-0 text-background/60" />
-              <p className="text-sm leading-relaxed">
-                <span className="font-medium text-background">{u.title}</span>{" "}
-                <span className="text-background/60">{u.desc}</span>
-              </p>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* The diagram restates the lead in picture form, so it's decorative */}
-      <div aria-hidden="true" className="flex items-center overflow-x-auto lg:justify-end">
-        <div className="w-full max-w-md">{diagram}</div>
+          <span className="min-w-0 flex-1 truncate font-medium">{r.to}</span>
+          <span className="font-medium">{r.amount}</span>
+          <span className="flex items-center gap-[5px] text-[11px] text-[#767676]">
+            <Dot dark={r.done} />
+            {r.status}
+          </span>
+        </div>
+      ))}
+      <div className="mt-1 flex justify-between border-t border-[#E5E5E5] py-3 text-[13px] font-semibold">
+        <span>5 recipients</span>
+        <span>Send batch</span>
       </div>
     </div>
   );
 }
+
+function SwapRow({ label, value, unit }: { label: string; value: string; unit: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-[10px] bg-[#F5F5F5] px-[14px] py-3">
+      <span className="flex flex-col">
+        <span className="text-[11px] text-[#767676]">{label}</span>
+        <span className="text-[26px] font-medium tracking-[-0.5px]">{value}</span>
+      </span>
+      <span className="rounded-full border border-[#E5E5E5] bg-white px-[10px] py-1.5 text-[13px] font-semibold">
+        {unit}
+      </span>
+    </div>
+  );
+}
+
+function SwapMock() {
+  return (
+    <div className={`${PANEL} flex flex-col gap-1.5 p-[14px]`}>
+      <SwapRow label="You pay" value="1,000.00" unit="USDT" />
+      <SwapRow label="You receive" value="₦[AMOUNT]" unit="NGN" />
+      <div className="flex flex-col gap-2 px-1 py-3 text-[13px]">
+        <div className="flex justify-between">
+          <span className="text-[#767676]">Rate</span>
+          <span className="font-medium">1 USDT = ₦[RATE]</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-[#767676]">Settle to</span>
+          <span className="font-medium">Bank ••••4417</span>
+        </div>
+      </div>
+      <span className="mt-1.5 rounded-[9px] bg-[#0A0A0A] py-[11px] text-center text-[13px] font-medium text-white">
+        Swap and withdraw
+      </span>
+    </div>
+  );
+}
+
+const MOCKS: Record<Mock, () => React.JSX.Element> = {
+  checkout: CheckoutMock,
+  invoice: InvoiceMock,
+  payouts: PayoutsMock,
+  swap: SwapMock,
+};
+
+// ── Section ──────────────────────────────────────────────────────────────────
 
 export default function UseCases() {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const go = (dir: 1 | -1) => {
+    const track = trackRef.current;
+    const slide = track?.querySelector<HTMLElement>("[data-slide]");
+    if (!track || !slide) return;
+    track.scrollBy({ left: dir * (slide.offsetWidth + GAP), behavior: "smooth" });
+  };
+
   return (
-    <section className="relative border-b border-code-border bg-foreground bg-dots-dark">
-      <div className="max-w-[1200px] mx-auto">
-        {/* Intro */}
-        <div className="px-4 sm:px-6 py-16 sm:py-24">
-          <h2 className="max-w-2xl text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.2]">
-            <span className="font-bold text-background">
-              Built for every Nigerian business.
-            </span>{" "}
-            <span className="font-normal text-background/60">
-              From storefronts collecting crypto to platforms paying out in
-              Naira, on one integration.
-            </span>
-          </h2>
-          <a
-            href={DOCS_URL}
-            className="mt-8 inline-flex h-9 items-center rounded-md bg-background px-4 text-sm font-medium text-foreground hover:bg-card transition-colors duration-200"
-          >
-            Read the docs
-          </a>
+    <section className="overflow-x-clip py-12 lg:py-24">
+      {/* Heading left, arrows right on desktop; arrows under the heading on
+          phones, as on the Anchor mobile reference. */}
+      <div className="mx-auto flex max-w-[1180px] flex-col items-start gap-5 px-6 pb-6 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:px-0 lg:pb-9">
+        <h2 className="max-w-[760px] text-[26px] font-normal leading-[1.18] tracking-[-0.8px] text-[#0A0A0A] lg:text-[46px] lg:tracking-[-1px]">
+          Built for every Nigerian business.
+        </h2>
+        <div className="flex gap-[10px]">
+          {([-1, 1] as const).map((dir) => (
+            <button
+              key={dir}
+              type="button"
+              onClick={() => go(dir)}
+              aria-label={dir < 0 ? "Previous use case" : "Next use case"}
+              aria-controls="use-cases-track"
+              className="grid h-12 w-12 place-items-center rounded-xl bg-[#F2F2F2] text-[#0A0A0A] transition-colors hover:bg-[#E5E5E5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A0A0A]"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d={dir < 0 ? "M10 3 5 8l5 5" : "M6 3l5 5-5 5"}
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ))}
         </div>
+      </div>
 
-        <Row
-          lead="Collect crypto"
-          rest="from customers through checkout, payment links, invoices or QR, and settle to one balance."
-          linkLabel="See how checkout works"
-          items={COLLECT}
-          diagram={<CollectDiagram />}
-        />
+      {/* Track. On desktop the first slide lines up with the 1180px heading
+          column and the next one peeks in on the right. Focusable so keyboard
+          users can scroll it with the arrow keys. The smooth-scroll library
+          leaves horizontal gestures here to the browser. */}
+      <div
+        ref={trackRef}
+        id="use-cases-track"
+        role="region"
+        aria-label="Use cases"
+        tabIndex={0}
+        data-lenis-prevent-horizontal
+        className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 [scroll-padding-inline:24px] [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0A0A0A] lg:px-[max(24px,calc((100%_-_1180px)/2))] lg:[scroll-padding-inline:max(24px,calc((100%_-_1180px)/2))] [&::-webkit-scrollbar]:hidden"
+      >
+        {CASES.map((c, i) => {
+          const t = THEMES[i % THEMES.length];
+          const Preview = MOCKS[c.mock];
+          return (
+            <article
+              key={c.title}
+              data-slide
+              aria-label={`${i + 1} of ${CASES.length}: ${c.title}`}
+              className="relative flex w-[calc(100vw-48px)] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] px-7 pt-9 lg:h-[540px] lg:w-[1180px] lg:flex-row lg:items-start lg:justify-between lg:px-20 lg:pt-[72px]"
+              style={{ background: t.bg, color: t.fg }}
+            >
+              <div className="flex flex-col gap-5 lg:h-[396px]">
+                <span className="text-[16px] font-medium">{c.group}</span>
+                <h3 className="max-w-[560px] text-[40px] font-medium leading-[0.95] tracking-[-2px] lg:text-[92px]">
+                  {c.title}.
+                </h3>
+                <p className="max-w-[460px] text-[16px] leading-[1.5] opacity-80">
+                  {c.line}
+                </p>
+                {/* Product tiles reuse the product-card illustrations. */}
+                <div aria-hidden="true" className="mt-6 flex gap-[10px] lg:mt-auto">
+                  {c.products.map((p) => (
+                    <span
+                      key={p}
+                      className="relative h-[54px] w-[72px] overflow-hidden rounded-[10px]"
+                      style={{ background: t.tile }}
+                    >
+                      <Image
+                        src={`/illustrations/${p}.svg`}
+                        alt=""
+                        fill
+                        unoptimized
+                        sizes="72px"
+                        className="object-cover object-[50%_60%]"
+                      />
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-        <Row
-          lead="Pay out in Naira"
-          rest="to any Nigerian bank, or send stablecoins to a wallet, from the same balance."
-          linkLabel="See how payouts work"
-          items={PAY_OUT}
-          diagram={<PayOutDiagram />}
-        />
+              {/* Preview: below the text on mobile; bottom-right on desktop,
+                  bleeding off the slide's bottom edge. Illustrative only. */}
+              <div
+                aria-hidden="true"
+                className="-mb-10 mt-10 w-full self-center lg:mb-0 lg:mt-0 lg:w-auto lg:translate-y-10 lg:self-end"
+              >
+                <div className="mx-auto flex max-w-full justify-center lg:mx-0">
+                  <Preview />
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

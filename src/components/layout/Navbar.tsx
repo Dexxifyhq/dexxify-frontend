@@ -1,32 +1,167 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { DOCS_URL, PRODUCT_LINKS } from "@/lib/constants/links";
 
-const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
-  { label: "Products", href: "#" },
-  { label: "Developers", href: "https://docs.dexxify.com", external: true },
-  { label: "Company", href: "#" },
+/**
+ * Marketing navbar — black-and-white, Anchor-style layout.
+ *
+ * Desktop: logo left, nav centred, actions right in a three-column grid.
+ * Products opens a dropdown on click; Escape or a click outside
+ * closes it. Mobile (<768px): logo plus a menu button that opens a
+ * full-height panel, where the dropdown becomes an expandable row.
+ *
+ * Palette is limited to #0A0A0A, #767676, #F5F5F5, #EEEEEE and white. The font
+ * is inherited from the site (no font of its own).
+ *
+ * There are no product or about pages yet, so those links point at /#…
+ * anchors; Pricing likewise until a pricing section exists.
+ */
+
+type MenuItem = { label: string; href: string };
+type NavEntry =
+  | { kind: "link"; label: string; href: string; external?: boolean }
+  | { kind: "menu"; label: string; items: MenuItem[] };
+
+const NAV: NavEntry[] = [
+  {
+    kind: "menu",
+    label: "Products",
+    items: PRODUCT_LINKS,
+  },
+  { kind: "link", label: "Developers", href: DOCS_URL, external: true },
+  { kind: "link", label: "Pricing", href: "/#pricing" },
+  { kind: "link", label: "About", href: "/#about" },
 ];
 
-export default function Navbar() {
-  const navRef = useRef<HTMLElement>(null);
-  const [open, setOpen] = useState(false);
+const SIGN_IN_HREF = "/login";
+const GET_STARTED_HREF = "/register";
 
+// Shared focus ring: visible for keyboard users only.
+const FOCUS =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A0A0A]";
+
+// ── Desktop dropdown ─────────────────────────────────────────────────────────
+
+function Dropdown({ label, items }: { label: string; items: MenuItem[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const panelId = useId();
+
+  // Click outside or Escape closes it; Escape returns focus to the trigger.
   useEffect(() => {
-    // Native scroll listener toggles the nav-scrolled class
-    const onScroll = () => {
-      if (window.scrollY > 50) {
-        navRef.current?.classList.add("nav-scrolled");
-      } else {
-        navRef.current?.classList.remove("nav-scrolled");
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        ref.current?.querySelector("button")?.focus();
       }
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  return (
+    <div
+      ref={ref}
+      className="relative"
+      // Closes when keyboard focus moves outside the dropdown.
+      onBlur={(e) => {
+        if (!ref.current?.contains(e.relatedTarget as Node)) setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+        className={`inline-flex items-center gap-1.5 rounded-md text-[16px] transition-colors duration-200 ${
+          open ? "text-[#0A0A0A]" : "text-[#767676] hover:text-[#0A0A0A]"
+        } ${FOCUS}`}
+      >
+        {label}
+        <ChevronDown open={open} />
+      </button>
+
+      {/* Panel's left edge lines up with the trigger's left edge. */}
+      <div
+        id={panelId}
+        hidden={!open}
+        className="absolute left-0 top-full z-50 pt-4"
+      >
+        {/* shadow-xl matches the dashboard's dropdowns. */}
+        <ul className="w-60 rounded-2xl border border-[#EEEEEE] bg-white p-2 shadow-xl">
+          {items.map((item) => (
+            <li key={item.label}>
+              <Link
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={`block rounded-xl px-4 py-3 text-[16px] text-[#767676] transition-colors duration-150 hover:bg-[#F5F5F5] ${FOCUS}`}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// ── Mobile expandable row ────────────────────────────────────────────────────
+
+function MobileGroup({
+  label,
+  items,
+  onNavigate,
+}: {
+  label: string;
+  items: MenuItem[];
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+  return (
+    <li className="border-b border-[#EEEEEE]">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+        className={`flex w-full items-center justify-between py-4 text-[17px] font-medium text-[#0A0A0A] ${FOCUS}`}
+      >
+        {label}
+        <ChevronDown open={open} />
+      </button>
+      <ul id={panelId} hidden={!open} className="pb-3">
+        {items.map((item) => (
+          <li key={item.label}>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              className={`block rounded-xl px-3 py-2.5 text-[15px] text-[#767676] hover:bg-[#F5F5F5] hover:text-[#0A0A0A] ${FOCUS}`}
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </li>
+  );
+}
+
+// ── Navbar ───────────────────────────────────────────────────────────────────
+
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
 
   // Close the mobile panel once the viewport reaches the desktop breakpoint,
   // so the menu never lingers behind the inline desktop nav.
@@ -58,73 +193,94 @@ export default function Navbar() {
     };
   }, [open]);
 
+  const close = () => setOpen(false);
+
   return (
-    <nav
-      ref={navRef}
-      className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border transition-[background-color,box-shadow] duration-300"
-    >
-      <div className="max-w-[1300px] mx-auto px-4 sm:px-10 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-12">
-          {/* dexxify-tight.png is dexxify.png with its transparent margin
-              cropped off — the original carries ~340px of empty space on the
-              left, which pushed the mark inward no matter what padding the bar
-              had. Cropped, the artwork fills the box, so h-6 here renders the
-              wordmark at the same visual size h-12 did before. */}
-          <Link href="/" aria-label="Dexxify home" className="inline-flex">
-            <Image
-              src="/logo-set/dexxify-tight.png"
-              alt="Dexxify"
-              width={1424}
-              height={347}
-              priority
-              className="h-6 w-auto"
-            />
-          </Link>
-          <nav className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                {...(link.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="text-[15px] font-medium text-slate-light hover:text-foreground transition-colors duration-200"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-        </div>
-        <div className="flex items-center gap-6">
-          <a
-            href="/login"
-            className="hidden md:inline-flex text-[15px] font-medium text-slate-light hover:text-foreground transition-colors duration-200"
+    // Not sticky: the bar sits at the top of the page and scrolls away.
+    <nav aria-label="Main" className="relative z-50 bg-white">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-2 md:grid md:grid-cols-[1fr_auto_1fr] md:px-[48px] md:py-[22px]">
+        {/* Logo — the site's existing wordmark. dexxify-tight.png is the
+            cropped version: 24px tall on phones, 28px from md. */}
+        <Link
+          href="/"
+          aria-label="Dexxify home"
+          className={`inline-flex justify-self-start rounded-md ${FOCUS}`}
+        >
+          <Image
+            src="/logo-set/dexxify-tight.png"
+            alt="Dexxify"
+            width={1424}
+            height={347}
+            priority
+            className="h-6 w-auto md:h-7"
+          />
+        </Link>
+
+        {/* Centre nav (desktop) */}
+        <ul className="hidden items-center gap-9 md:flex">
+          {NAV.map((entry) => (
+            <li key={entry.label}>
+              {entry.kind === "menu" ? (
+                <Dropdown label={entry.label} items={entry.items} />
+              ) : entry.external ? (
+                <a
+                  href={entry.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-md text-[16px] text-[#767676] transition-colors duration-200 hover:text-[#0A0A0A] ${FOCUS}`}
+                >
+                  {entry.label}
+                </a>
+              ) : (
+                <Link
+                  href={entry.href}
+                  className={`rounded-md text-[16px] text-[#767676] transition-colors duration-200 hover:text-[#0A0A0A] ${FOCUS}`}
+                >
+                  {entry.label}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {/* Actions (desktop) + menu button (mobile) */}
+        <div className="flex items-center justify-self-end gap-7">
+          <Link
+            href={SIGN_IN_HREF}
+            className={`hidden rounded-md text-[17px] text-[#767676] transition-colors duration-200 hover:text-[#0A0A0A] md:inline-flex ${FOCUS}`}
           >
             Sign in
-          </a>
-          <a
-            href="/register"
-            className="hidden md:inline-flex h-10 px-5 items-center text-sm font-semibold text-white bg-primary rounded-md hover:bg-primary-hover transition-colors duration-200"
+          </Link>
+          <Link
+            href={GET_STARTED_HREF}
+            className={`hidden items-center rounded-[16px] bg-[#0A0A0A] px-[34px] py-[15px] text-[17px] font-medium leading-none text-white transition-opacity duration-200 hover:opacity-85 md:inline-flex ${FOCUS}`}
           >
-            Get Started
-          </a>
+            Get started
+          </Link>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="md:hidden -mr-2 inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground"
+            className={`-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-md text-[#0A0A0A] md:hidden ${FOCUS}`}
           >
+            {/* Three lines; when open, the outer two cross into an X and the
+                middle one fades out. */}
             <span className="relative block h-4 w-6" aria-hidden="true">
               <span
                 className={`absolute left-0 block h-[2px] w-6 bg-current transition-transform duration-300 ${
-                  open ? "top-1/2 -translate-y-1/2 rotate-45" : "top-[3px]"
+                  open ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-1/2 block h-[2px] w-6 -translate-y-1/2 bg-current transition-opacity duration-200 ${
+                  open ? "opacity-0" : "opacity-100"
                 }`}
               />
               <span
                 className={`absolute left-0 block h-[2px] w-6 bg-current transition-transform duration-300 ${
-                  open ? "top-1/2 -translate-y-1/2 -rotate-45" : "top-[11px]"
+                  open ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0"
                 }`}
               />
             </span>
@@ -132,55 +288,66 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu — dimmed backdrop plus a dropdown card below the bar */}
-      <div
-        onClick={() => setOpen(false)}
-        aria-hidden="true"
-        className={`md:hidden fixed inset-x-0 top-16 bottom-0 bg-foreground/20 transition-opacity duration-200 ${
-          open ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-      />
+      {/* Mobile panel — fills the screen below the bar. Positioned from the
+          bar (not the viewport) because the bar scrolls with the page. */}
       <div
         id="mobile-menu"
-        className={`md:hidden absolute inset-x-0 top-16 origin-top px-4 pb-4 transition-all duration-200 ${
-          open
-            ? "opacity-100 translate-y-0"
-            : "pointer-events-none -translate-y-2 opacity-0"
-        }`}
+        hidden={!open}
+        // Scrolls on its own; keeps smooth scroll from moving the page instead.
+        data-lenis-prevent
+        className="absolute inset-x-0 top-full h-[calc(100dvh-56px)] overflow-y-auto border-t border-[#EEEEEE] bg-white md:hidden"
       >
-        <div className="max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-border bg-background shadow-[0_16px_40px_rgb(26_43_59_/_0.12)]">
-          <div className="flex flex-col px-5 py-2">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                {...(link.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                onClick={() => setOpen(false)}
-                className="py-4 text-[15px] font-medium text-foreground"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-          <div className="flex items-center gap-3 border-t border-border px-5 py-4">
-            <a
-              href="/register"
-              onClick={() => setOpen(false)}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-md bg-primary text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
+        <div className="flex min-h-full flex-col px-5 pb-8 pt-2">
+          <ul>
+            {NAV.map((entry) =>
+              entry.kind === "menu" ? (
+                <MobileGroup
+                  key={entry.label}
+                  label={entry.label}
+                  items={entry.items}
+                  onNavigate={close}
+                />
+              ) : (
+                <li key={entry.label} className="border-b border-[#EEEEEE]">
+                  {entry.external ? (
+                    <a
+                      href={entry.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={close}
+                      className={`block py-4 text-[17px] font-medium text-[#0A0A0A] ${FOCUS}`}
+                    >
+                      {entry.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={entry.href}
+                      onClick={close}
+                      className={`block py-4 text-[17px] font-medium text-[#0A0A0A] ${FOCUS}`}
+                    >
+                      {entry.label}
+                    </Link>
+                  )}
+                </li>
+              ),
+            )}
+          </ul>
+
+          <div className="mt-auto flex flex-col gap-3 pt-8">
+            <Link
+              href={GET_STARTED_HREF}
+              onClick={close}
+              className={`flex items-center justify-center rounded-[16px] bg-[#0A0A0A] py-[15px] text-[17px] font-medium text-white ${FOCUS}`}
             >
-              Get Started
-              <Chevron className="text-white/80" />
-            </a>
-            <a
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-md border border-border text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-card"
+              Get started
+            </Link>
+            <Link
+              href={SIGN_IN_HREF}
+              onClick={close}
+              className={`flex items-center justify-center rounded-[16px] border border-[#EEEEEE] py-[15px] text-[17px] font-medium text-[#0A0A0A] hover:bg-[#F5F5F5] ${FOCUS}`}
             >
               Sign in
-              <Chevron />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -188,7 +355,7 @@ export default function Navbar() {
   );
 }
 
-function Chevron({ className = "text-slate-light" }: { className?: string }) {
+function ChevronDown({ open }: { open: boolean }) {
   return (
     <svg
       width="14"
@@ -196,13 +363,13 @@ function Chevron({ className = "text-slate-light" }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.5"
+      strokeWidth="2.25"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className={className}
+      className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
     >
-      <path d="m9 18 6-6-6-6" />
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }
