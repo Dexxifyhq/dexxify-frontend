@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { DOCS_URL, PRODUCT_LINKS } from "@/lib/constants/links";
+import { DOCS_URL, PRODUCT_LINKS, type ProductLink } from "@/lib/constants/links";
 
 // Pages that don't exist yet link to "#".
-const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
+const COLUMNS: { title: string; links: ProductLink[] }[] = [
   {
     title: "Products",
     links: PRODUCT_LINKS, // same list as the navbar's Products menu
@@ -21,9 +21,10 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Legal",
     links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Use", href: "/terms" },
-      { label: "AML Policy", href: "/aml" },
+      // Point these at /privacy, /terms and /aml once those pages ship.
+      { label: "Privacy Policy", href: "#" },
+      { label: "Terms of Use", href: "#" },
+      { label: "AML Policy", href: "#" },
     ],
   },
   {
@@ -79,12 +80,22 @@ export default function Footer() {
               <ul className="mt-5 flex flex-col gap-4">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="break-all text-[15px] text-[#9A9A9A] transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none sm:break-normal"
-                    >
-                      {link.label}
-                    </a>
+                    {link.soon ? (
+                      // Not available yet: shown, but not a link.
+                      <span className="flex items-center gap-2 text-[15px] text-[#5C5C5C]">
+                        {link.label}
+                        <span className="rounded-full bg-[#1F1F1F] px-2 py-0.5 text-[11px] font-medium text-[#9A9A9A]">
+                          Soon
+                        </span>
+                      </span>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="break-all text-[15px] text-[#9A9A9A] transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none sm:break-normal"
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
