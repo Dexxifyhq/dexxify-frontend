@@ -1,11 +1,10 @@
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/landing/Hero";
 import AssetMarquee from "@/components/landing/AssetMarquee";
-import Announcement from "@/components/landing/Announcement";
 import Infrastructure from "@/components/landing/Infrastructure";
 import UseCases from "@/components/landing/UseCases";
-import TrustSecurity from "@/components/landing/TrustSecurity";
-import FAQ from "@/components/landing/FAQ";
+import Developers from "@/components/landing/Developers";
+import Features from "@/components/landing/Features";
 // Waitlist section hidden for now — uncomment this and <Waitlist /> below to bring it back.
 // import Waitlist from "@/components/landing/Waitlist";
 import Footer from "@/components/layout/Footer";
@@ -81,12 +80,11 @@ export default function Home() {
       />
       <Navbar />
       <Hero />
-      <AssetMarquee />
       <Infrastructure />
+      <AssetMarquee />
       <UseCases />
-      <TrustSecurity />
-      <Announcement />
-      <FAQ />
+      <Developers />
+      <Features />
       {/* <Waitlist /> */}
       <Footer />
     </main>

@@ -1,127 +1,117 @@
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
-import { DOCS_URL } from "@/lib/constants/links";
+import { DOCS_URL, PRODUCT_LINKS } from "@/lib/constants/links";
 
-const FOOTER_LINKS = {
-  Products: [
-    { label: "Payment Gateway", href: "#" },
-    { label: "Offramp API", href: "#" },
-    { label: "Webhooks", href: "#" },
-    { label: "Sandbox", href: "#" },
-  ],
-  Developers: [
-    { label: "Documentation", href: DOCS_URL },
-    { label: "API Reference", href: "#" },
-    { label: "SDKs", href: "#" },
-    { label: "Status", href: "#" },
-  ],
-  Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
-  ],
-  Legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "AML Policy", href: "#" },
-    { label: "Cookie Policy", href: "#" },
-  ],
-};
+// Pages that don't exist yet link to "#".
+const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: "Products",
+    links: PRODUCT_LINKS, // same list as the navbar's Products menu
+  },
+  {
+    title: "Developers",
+    links: [{ label: "Docs", href: DOCS_URL }],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About us", href: "#" },
+      { label: "Blog", href: "#" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Use", href: "/terms" },
+      { label: "AML Policy", href: "/aml" },
+    ],
+  },
+  {
+    title: "Email",
+    links: ["hello", "support", "compliance"].map((box) => ({
+      label: `${box}@dexxify.com`,
+      href: `mailto:${box}@dexxify.com`,
+    })),
+  },
+];
 
 /**
- * Dark footer band. Layout follows the reference — wordmark on top, four link
- * columns, a hairline, then the small print — while the content is unchanged
- * from the previous footer.
+ * Footer — Anchor-style, black. A centred call-to-action band, four link
+ * columns, the logo and tagline, then the copyright.
  *
- * The inner width matches the page's 1200px rail container with the same px-6,
- * so the wordmark and columns line up with the section content above even
- * though the footer draws no rails of its own.
+ * The CTA copy is new: the heading came with the design brief, the paragraph
+ * is the hero's subtext. The button goes where the hero's Get started does.
  */
 export default function Footer() {
   return (
-    <footer className="bg-foreground bg-dots-dark">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-16 sm:py-20">
-        {/* Wordmark, tagline and quick links */}
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            {/* White lockup — the footer band is dark. The navbar sits on
-                white and uses the black version. */}
-            <Image
-              src="/logo-set/dexxify-transparent.png"
-              alt="Dexxify"
-              width={2103}
-              height={748}
-              className="h-8 w-auto"
-            />
-            <p className="mt-2 max-w-xs text-sm leading-relaxed text-background/60">
-              Crypto payments and payouts for Nigerian businesses.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: "Docs", href: DOCS_URL },
-              { label: "API Reference", href: "#" },
-              { label: "Support", href: "#" },
-            ].map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="rounded border border-code-border px-2.5 py-1 text-xs text-background/60 hover:border-background/40 hover:text-background transition-colors duration-200"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Link columns */}
-        <nav
-          aria-label="Footer"
-          className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-4"
+    <footer className="bg-[#0A0A0A] text-white">
+      {/* Call to action. On phones (as on the Anchor mobile reference) the
+          heading is as large as desktop and wraps onto two lines, and the
+          paragraph is narrower, with less padding around the band. */}
+      <div className="mx-auto flex max-w-[640px] flex-col items-center px-6 pb-14 pt-16 text-center lg:pb-20 lg:pt-24">
+        <h2 className="max-w-[260px] text-[32px] font-medium leading-[1.15] tracking-[-0.6px] lg:max-w-none">
+          Start building with Dexxify
+        </h2>
+        <p className="mt-4 max-w-[280px] text-[14px] leading-[1.7] text-[#A3A3A3] lg:max-w-[440px]">
+          Dexxify gives businesses everything they need to accept crypto from
+          customers anywhere, swap it at the live rate and pay out to any bank.
+        </p>
+        <a
+          href="/register"
+          className="group mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-[10px] text-[14px] font-medium text-[#0A0A0A] transition-colors hover:bg-[#E5E5E5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
-          {Object.entries(FOOTER_LINKS).map(([category, links]) => (
-            <div key={category}>
-              <h2 className="text-sm font-semibold text-background">
-                {category}
-              </h2>
-              <ul className="mt-3 space-y-2.5">
-                {links.map((link) => (
+          Get started
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-200 motion-safe:group-hover:translate-x-[3px]"
+          >
+            →
+          </span>
+        </a>
+      </div>
+
+      <div className="mx-auto max-w-[1180px] px-6 lg:px-0">
+        {/* Link columns */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-5">
+          {COLUMNS.map((col) => (
+            <nav key={col.title} aria-label={col.title}>
+              <h3 className="text-[13px] font-medium text-white">{col.title}</h3>
+              <ul className="mt-5 flex flex-col gap-4">
+                {col.links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-sm text-background/60 hover:text-background transition-colors duration-200"
+                      className="break-all text-[15px] text-[#9A9A9A] transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none sm:break-normal"
                     >
                       {link.label}
                     </a>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
-        </nav>
+        </div>
 
-        {/* Small print */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-code-border pt-8 sm:flex-row sm:items-center sm:justify-between">
-          {/* The homepage is prerendered, so this year is fixed at build time
-              and rolls over on the next deploy after New Year. */}
-          <p className="text-xs text-background/60">
-            © {new Date().getFullYear()} Dexxify
+        {/* Brand row: white lockup (the navbar uses the black one) and the
+            company's legal line. */}
+        <div className="mt-16 flex max-w-[360px] flex-col gap-3 pb-14">
+          <Image
+            src="/logo-set/dexxify-transparent.png"
+            alt="Dexxify"
+            width={2103}
+            height={748}
+            className="h-6 w-auto self-start"
+          />
+          <p className="text-[13px] leading-[1.6] text-[#7A7A7A]">
+            Dexxify Ltd provides crypto payment and settlement
+            software for businesses. Dexxify is not a bank.
           </p>
-          <div className="flex items-center gap-4">
-            <a
-              href="#"
-              className="flex items-center gap-1 text-xs text-background/60 hover:text-background transition-colors"
-            >
-              FAQs <ArrowUpRight size={10} />
-            </a>
-            <a
-              href="/register"
-              className="flex items-center gap-1 text-xs text-background/60 hover:text-background transition-colors"
-            >
-              Get Started <ArrowUpRight size={10} />
-            </a>
-          </div>
+        </div>
+
+        {/* Bottom bar. The homepage is prerendered, so the year is fixed at
+            build time and rolls over on the next deploy after New Year. */}
+        <div className="border-t border-[#1F1F1F] py-7 text-[13px] text-[#5C5C5C]">
+          © {new Date().getFullYear()} Dexxify
         </div>
       </div>
     </footer>
