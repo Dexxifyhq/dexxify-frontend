@@ -2,7 +2,16 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { DOCS_URL, PRODUCT_LINKS } from "@/lib/constants/links";
+import { DOCS_URL, PRODUCT_LINKS, type ProductLink } from "@/lib/constants/links";
+
+/** Small "Soon" label for products that aren't available yet. */
+function SoonBadge() {
+  return (
+    <span className="rounded-full bg-[#F2F2F2] px-2 py-0.5 text-[11px] font-medium text-[#767676]">
+      Soon
+    </span>
+  );
+}
 
 /**
  * Marketing navbar — black-and-white, Anchor-style layout.
@@ -19,7 +28,7 @@ import { DOCS_URL, PRODUCT_LINKS } from "@/lib/constants/links";
  * anchors; Pricing likewise until a pricing section exists.
  */
 
-type MenuItem = { label: string; href: string };
+type MenuItem = ProductLink;
 type NavEntry =
   | { kind: "link"; label: string; href: string; external?: boolean }
   | { kind: "menu"; label: string; items: MenuItem[] };
@@ -101,13 +110,21 @@ function Dropdown({ label, items }: { label: string; items: MenuItem[] }) {
         <ul className="w-60 rounded-2xl border border-[#EEEEEE] bg-white p-2 shadow-xl">
           {items.map((item) => (
             <li key={item.label}>
-              <Link
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`block rounded-xl px-4 py-3 text-[16px] text-[#767676] transition-colors duration-150 hover:bg-[#F5F5F5] ${FOCUS}`}
-              >
-                {item.label}
-              </Link>
+              {item.soon ? (
+                // Not available yet: shown, but not a link.
+                <span className="flex items-center justify-between gap-3 px-4 py-3 text-[16px] text-[#9A9A9A]">
+                  {item.label}
+                  <SoonBadge />
+                </span>
+              ) : (
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={`block rounded-xl px-4 py-3 text-[16px] text-[#767676] transition-colors duration-150 hover:bg-[#F5F5F5] ${FOCUS}`}
+                >
+                  {item.label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
@@ -144,13 +161,20 @@ function MobileGroup({
       <ul id={panelId} hidden={!open} className="pb-3">
         {items.map((item) => (
           <li key={item.label}>
-            <Link
-              href={item.href}
-              onClick={onNavigate}
-              className={`block rounded-xl px-3 py-2.5 text-[15px] text-[#767676] hover:bg-[#F5F5F5] hover:text-[#0A0A0A] ${FOCUS}`}
-            >
-              {item.label}
-            </Link>
+            {item.soon ? (
+              <span className="flex items-center justify-between gap-3 px-3 py-2.5 text-[15px] text-[#9A9A9A]">
+                {item.label}
+                <SoonBadge />
+              </span>
+            ) : (
+              <Link
+                href={item.href}
+                onClick={onNavigate}
+                className={`block rounded-xl px-3 py-2.5 text-[15px] text-[#767676] hover:bg-[#F5F5F5] hover:text-[#0A0A0A] ${FOCUS}`}
+              >
+                {item.label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>
