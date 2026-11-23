@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { PRODUCT_TABS, type ProductContent, type TileIcon } from "@/lib/content/products";
@@ -342,7 +343,9 @@ export default function ProductPage({
             href={GET_STARTED_HREF}
             className={`mt-10 inline-flex items-center gap-2 rounded-md text-[15px] font-medium text-[#0A0A0A] hover:underline ${FOCUS}`}
           >
-            Get started <span aria-hidden="true">↗</span>
+            {/* A drawn icon, not the ↗ character, which iPhones show as an
+                emoji. */}
+            Get started <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true" />
           </a>
         </section>
       </div>
