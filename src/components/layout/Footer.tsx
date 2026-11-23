@@ -15,7 +15,7 @@ const COLUMNS: { title: string; links: ProductLink[] }[] = [
   {
     title: "Company",
     links: [
-      { label: "About us", href: "#" },
+      { label: "About us", href: "/about" },
       { label: "Blog", href: "#" },
     ],
   },
