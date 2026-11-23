@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import { DOCS_URL, PRODUCT_LINKS, type ProductLink } from "@/lib/constants/links";
 
 // Pages that don't exist yet link to "#".
@@ -62,12 +63,14 @@ export default function Footer() {
           className="group mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-[10px] text-[14px] font-medium text-[#0A0A0A] transition-colors hover:bg-[#E5E5E5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           Get started
-          <span
+          {/* A drawn icon rather than a text arrow, which some phones
+              render as an emoji. */}
+          <ArrowRight
+            size={15}
+            strokeWidth={2}
             aria-hidden="true"
             className="transition-transform duration-200 motion-safe:group-hover:translate-x-[3px]"
-          >
-            →
-          </span>
+          />
         </a>
       </div>
 
