@@ -41,7 +41,7 @@ const NAV: NavEntry[] = [
   },
   { kind: "link", label: "Developers", href: DOCS_URL, external: true },
   { kind: "link", label: "Pricing", href: "/#pricing" },
-  { kind: "link", label: "About", href: "/#about" },
+  { kind: "link", label: "About", href: "/about" },
 ];
 
 const SIGN_IN_HREF = "/login";
